@@ -1,39 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { registration } from "@/lib/validation";
+import { login } from "@/lib/validation";
 import { z } from "zod";
 
-const RegisterForm = () => {
-  const isLoading = true;
-
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof registration>>({
-    resolver: zodResolver(registration),
+const LoginForm = () => {
+  const form = useForm<z.infer<typeof login>>({
+    resolver: zodResolver(login),
     defaultValues: {
-      firstName: "",
-      lastName: "",
       email: "",
       password: "",
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof registration>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+  function onSubmit(values: z.infer<typeof login>) {
     console.log(values);
   }
 
@@ -74,6 +57,7 @@ const RegisterForm = () => {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -100,88 +84,14 @@ const RegisterForm = () => {
           </Button>
           <p className="text-center text-small-regular mt-5">
             No account?
-            <Link to="/register" className="text-blue-700 text-small-semibold ml-1 ">
+            <Link to="/signup" className="text-blue-700 text-small-semibold ml-1 ">
               Create one
             </Link>
           </p>
         </form>
-
-        {/* <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-1 w-full mt-1">
-          <div className="flex gap-5">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input type="text" className="shad-input h-6 border-r-2" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input type="text" className="shad-input h-6 border-r-2" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="text" className="shad-input h-6 border-r-2" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" className="shad-input h-6 border-r-2" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Re-enter Password</FormLabel>
-                <FormControl>
-                  <Input type="password" className="shad-input h-6 border-r-2" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <div className="flex items-center space-x-2 mb-10">
-            <Checkbox id="terms" />
-            <label htmlFor="terms" className="text-sm font-medium">
-              Accept terms and conditions
-            </label>
-          </div>
-          <Button type="submit" className="shad-button_primary">
-            {isLoading ? "Loading..." : "Sign Up"}
-          </Button>
-        </form> */}
       </div>
     </Form>
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
