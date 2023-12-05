@@ -12,8 +12,8 @@ const App = () => {
       <Routes>
         {/* Login/ Register routes */}
         <Route element={<AuthLayout />}>
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<RegisterForm />} />
+          <Route path="/signin" element={<LoginForm />} />
         </Route>
         {/* After login routes */}
         <Route element={<RootLayout />}>
