@@ -30,15 +30,34 @@ const RegisterForm = () => {
       firstName: "",
       lastName: "",
       userName: "",
-      birthdate: new Date(),
+      birthdate: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof registration>) {
+  // BACKEND SERVER SUBMISSION
+  const onSubmit = async (values: z.infer<typeof registration>) => {
     console.log(values);
-  }
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        console.log("Registration successful!");
+      } else {
+        console.error("Registration failed");
+      }
+    } catch (error) {
+      console.error("Error submitting registration:", error);
+    }
+  };
 
   return (
     <div className="sm:w-420 items-center flex-col">
@@ -65,9 +84,7 @@ const RegisterForm = () => {
         {/* DIALOG BOX FOR CREATING AN ACCOUNT */}
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="shad-button_primary bg-blue-500 hover:bg-blue-700">
-              Create Account
-            </Button>
+            <Button className="shad-button_primary">Create Account</Button>
           </DialogTrigger>
           <Form {...form}>
             <div>
@@ -87,7 +104,7 @@ const RegisterForm = () => {
                           <FormControl>
                             <Input type="text" placeholder="Juan" {...field} />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="shad-form_message" />
                         </FormItem>
                       )}
                     />
@@ -100,7 +117,7 @@ const RegisterForm = () => {
                           <FormControl>
                             <Input type="text" placeholder="Dela Cruz" {...field} />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="shad-form_message" />
                         </FormItem>
                       )}
                     />
@@ -114,7 +131,7 @@ const RegisterForm = () => {
                         <FormControl>
                           <Input type="text" placeholder="juandelacruz1" {...field} />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="shad-form_message" />
                       </FormItem>
                     )}
                   />
@@ -125,9 +142,9 @@ const RegisterForm = () => {
                       <FormItem>
                         <FormLabel>Birthday</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} value="2000-01-01" />
+                          <Input {...field} type="date" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="shad-form_message" />
                       </FormItem>
                     )}
                   />
@@ -140,7 +157,7 @@ const RegisterForm = () => {
                         <FormControl>
                           <Input type="email" placeholder="example@test.com" {...field} />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="shad-form_message" />
                       </FormItem>
                     )}
                   />
@@ -157,7 +174,7 @@ const RegisterForm = () => {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="shad-form_message" />
                       </FormItem>
                     )}
                   />
@@ -170,7 +187,7 @@ const RegisterForm = () => {
                         <FormControl>
                           <Input type="password" placeholder="Re-enter your password" {...field} />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="shad-form_message" />
                       </FormItem>
                     )}
                   />

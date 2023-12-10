@@ -16,9 +16,27 @@ const LoginForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof login>) {
+  // BACKEND SERVER SUBMISSION
+  const onSubmit = async (values: z.infer<typeof login>) => {
     console.log(values);
-  }
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        console.log("Login successful!");
+      } else {
+        console.error("Login failed");
+      }
+    } catch (error) {
+      console.error("Error submitting login:", error);
+    }
+  };
 
   return (
     <Form {...form}>
@@ -53,11 +71,11 @@ const LoginForm = () => {
                   <Input
                     type="email"
                     placeholder="Enter your email here"
-                    className="shad-input h-10 border-r-2 mb-5 border-solid border-2 border-blue-500"
+                    className="shad-input h-10 border-r-2"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="shad-form_message" />
               </FormItem>
             )}
           />
@@ -71,17 +89,19 @@ const LoginForm = () => {
                   <Input
                     type="password"
                     placeholder="Enter your password here"
-                    className="shad-input h-10 border-r-2 border-solid border-2 border-blue-500"
+                    className="shad-input h-10 border-r-2 mt-5"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="shad-form_message" />
               </FormItem>
             )}
           />
-          <Button type="submit" className="shad-button_primary mt-5">
-            Login
-          </Button>
+          <div className="flex flex-1 items-center m-auto mt-5">
+            <Button type="submit" className="shad-button_primary w-20">
+              Login
+            </Button>
+          </div>
           <p className="text-center text-small-regular mt-5">
             No account?
             <Link to="/signup" className="text-blue-700 text-small-semibold ml-1 ">
