@@ -15,6 +15,11 @@ const LeftSidebar = () => {
       label: "Explore",
     },
     {
+      imgURL: "/assets/icons/saved.svg",
+      route: "/saved",
+      label: "Saved",
+    },
+    {
       imgURL: "/assets/icons/map.svg",
       route: "/map",
       label: "Map",
@@ -34,11 +39,7 @@ const LeftSidebar = () => {
       route: "/notifications",
       label: "Notifications",
     },
-    {
-      imgURL: "/assets/icons/more.svg",
-      route: "/more",
-      label: "More",
-    },
+
     {
       route: "/create-post",
       label: "Create Post",
@@ -54,19 +55,15 @@ const LeftSidebar = () => {
         <ul className="flex flex-col gap-2">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.route;
+            const isCreate = link.label === "Create Post";
             return (
               <li key={link.route} className={`leftsidebar-link ${isActive ? "bg-off-white" : ""}`}>
-                <div
-                  className={
-                    link.label === "Create Post"
-                      ? "bg-blue-500 rounded-2xl text-white flex flex-col items-center"
-                      : ""
-                  }
-                >
-                  <NavLink to={link.route} className="flex gap-4 items-center p-4">
-                    {link.label !== "Create Post" && (
-                      <img src={link.imgURL} alt={link.label} className="h-5 w-5" />
-                    )}
+                <div className={isCreate ? "leftsidebar-create" : ""}>
+                  <NavLink
+                    to={link.route}
+                    className={`flex gap-4 items-center p-4 ${isCreate && "text-lg"}`}
+                  >
+                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-5 w-5" />}
                     {link.label}
                   </NavLink>
                 </div>
