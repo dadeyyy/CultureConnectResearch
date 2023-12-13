@@ -6,7 +6,7 @@ const LeftSidebar = () => {
   const sidebarLinks = [
     {
       imgURL: "/assets/icons/home.svg",
-      route: "/",
+      route: "/home",
       label: "Home",
     },
     {

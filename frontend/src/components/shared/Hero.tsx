@@ -10,7 +10,7 @@ const Hero = () => {
         <div className="flex justify-center items-center">
           <p className="md:text-4xl sm:text-4xl text-xl font-bold py-4">Empowering cultures of</p>
           <Typed
-            className="md:text-4xl sm:text-4xl text-xl font-bold md:pl-4 pl-2"
+            className="md:text-4xl sm:text-4xl text-xl text-primary-1 font-bold md:pl-4 pl-2"
             strings={[
               "Abra",
               "Agusan del Norte",

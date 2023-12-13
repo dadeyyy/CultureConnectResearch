@@ -1,6 +1,6 @@
 const Cards = () => {
   return (
-    <div className="w-full py-[10rem] px-4 bg-primary-1 text-center">
+    <div className="w-full py-[10rem] px-4 bg-white text-center">
       <h1 className="mb-8">Meet our team!</h1>
       <div className="max-w-[1240px] mx-auto grid md:grid-cols-4 gap-8">
         <div className="w-full shadow-xl flex flex-col p-4 my-4 rounded-lg hover:scale-105 duration-300">
