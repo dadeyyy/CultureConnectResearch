@@ -32,4 +32,20 @@ postRoute.post('/post', isAuthenticated, upload.array('image'), validate(postSch
   }
 });
 
+
+postRoute.get('/post',isAuthenticated, async(req,res)=>{
+    try{
+        const allPost = await db.post.findMany({
+            include: {
+                photos: true
+            }
+        });
+        res.status(200).json(allPost)
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).json({error : "Cannot get the posts"})
+    }
+})
+
 export default postRoute;
