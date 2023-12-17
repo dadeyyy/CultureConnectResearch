@@ -1,10 +1,12 @@
-import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Bottombar = () => {
+  const { pathname } = useLocation();
+
   const bottombarLinks = [
     {
       imgURL: "/assets/icons/home.svg",
-      route: "/",
+      route: "/home",
       label: "Home",
     },
     {
@@ -39,7 +41,32 @@ const Bottombar = () => {
     },
   ];
 
-  return <div>Bottombar</div>;
+  return (
+    <section className="bottom-bar">
+      {" "}
+      {bottombarLinks.map((link) => {
+        const isActive = pathname === link.route;
+        const isCreate = link.label === "Post";
+        return (
+          <div className={isCreate ? "bg-primary-1 rounded-[10px] p-2" : ""}>
+            <Link
+              to={link.route}
+              key={link.route}
+              className={`${
+                isActive
+                  ? `rounded-[10px] flex-center flex-col gap-1 ${
+                      !isCreate ? "bg-off-white p-2" : ""
+                    }`
+                  : ""
+              } `}
+            >
+              <img src={link.imgURL} alt={link.label} className={"h-5 w-5"} />
+            </Link>
+          </div>
+        );
+      })}
+    </section>
+  );
 };
 
 export default Bottombar;
