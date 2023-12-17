@@ -5,7 +5,9 @@ import session from 'express-session';
 import morgan from 'morgan';
 import authRouter from './router/authRoute.js';
 import postRoute from './router/postRoute.js';
-dotenv.config();
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
 const PORT = parseInt(process.env.PORT, 10);
 const app = express();
 if (!process.env.PORT) {

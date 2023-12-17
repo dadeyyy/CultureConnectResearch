@@ -38,13 +38,21 @@ model Post {
   caption     String
   province    String
   municipality String
-  photos      String[]
+  photos      Photo[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
   likes       Like[]
   comments    Comment[]
+}
+
+model Photo {
+  id          Int       @id @default(autoincrement())
+  url         String
+  filename    String
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Like {

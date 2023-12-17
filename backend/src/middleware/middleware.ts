@@ -10,6 +10,7 @@ export const validate =
     } catch (error) {
       if (error instanceof z.ZodError) {
         const zError = error.issues[0].message;
+        console.log(zError)
         return res.status(500).json({ error: zError });
       }
       return res.status(400).json({ message: 'Invalid Data', error: error });
