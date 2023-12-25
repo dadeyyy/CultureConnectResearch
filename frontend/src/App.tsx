@@ -15,7 +15,6 @@ import PostDetails from "./_root/pages/PostDetails";
 import Profile from "./_root/pages/Profile";
 import UpdateProfile from "./_root/pages/UpdateProfile";
 import Calendar from "./_root/pages/Calendar";
-import Saved from "./_root/pages/Saved";
 import Home from "./_root/pages/Home";
 
 const App = () => {
@@ -34,7 +33,6 @@ const App = () => {
         <Route element={<RootLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
-          <Route path="/saved" element={<Saved />} />
           <Route path="/map" element={<MapForm />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/live-streams" element={<LiveStream />} />
