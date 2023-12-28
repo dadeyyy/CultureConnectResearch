@@ -5,14 +5,15 @@ type PostCardProps = {
   post: {
     creator: {
       id: number;
-      name: string;
+      firstName: string;
+      lastName: string;
       imageUrl?: string;
     };
     $id: string;
     $createdAt: string;
-    location: string;
+    province: string;
+    municipal: string;
     caption: string;
-    tags: string[];
     imageUrl?: string;
   };
 };
@@ -78,12 +79,17 @@ const PostCard = ({ post }: PostCardProps) => {
           </Link>
 
           <div className="flex flex-col">
-            <p className="base-medium lg:body-bold text-light-1">{post.creator.name}</p>
-            <div className="flex-center gap-2 text-light-3">
+            <p className="base-medium lg:body-bold text-dark-1">
+              {post.creator.firstName} {post.creator.lastName}
+            </p>
+            <div className="flex-center gap-2 text-dark-3">
               <p className="subtle-semibold lg:small-regular ">
                 {multiFormatDateString(post.$createdAt)}
               </p>
-              •<p className="subtle-semibold lg:small-regular">{post.location}</p>
+              •
+              <p className="subtle-semibold lg:small-regular">
+                {post.province} at {post.municipal}
+              </p>
             </div>
           </div>
         </div>
@@ -99,13 +105,6 @@ const PostCard = ({ post }: PostCardProps) => {
       <Link to={`/posts/${post.$id}`}>
         <div className="small-medium lg:base-medium py-5">
           <p>{post.caption}</p>
-          <ul className="flex gap-1 mt-2">
-            {post.tags.map((tag: string, index: number) => (
-              <li key={`${tag}${index}`} className="text-light-3 small-regular">
-                #{tag}
-              </li>
-            ))}
-          </ul>
         </div>
 
         <img

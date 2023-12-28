@@ -7,24 +7,44 @@ const Home = () => {
     {
       creator: {
         id: 1,
-        name: "John Doe",
+        firstName: "John",
+        lastName: "Doe",
         imageUrl: "/assets/icons/profile-placeholder.svg",
       },
       $id: "123456",
       $createdAt: "2023-01-01T12:00:00Z",
-      location: "City",
+      province: "Bataan",
+      municipal: "Balanga",
       caption: "Lorem ipsum dolor sit amet.",
-      tags: ["tag1", "tag2"],
-      imageUrl: "/assets/dummy-image.jpg",
+      imageUrl: "/dummy/balanga.jpg",
     },
-  ];
-
-  const dummyCreators = [
     {
-      id: 1,
-      name: "John Doe",
-      imageUrl: "/assets/icons/profile-placeholder.svg",
-      username: "nyenyenye",
+      creator: {
+        id: 1,
+        firstName: "John",
+        lastName: "Doe",
+        imageUrl: "/assets/icons/profile-placeholder.svg",
+      },
+      $id: "123456",
+      $createdAt: "2023-01-01T12:00:00Z",
+      province: "Bataan",
+      municipal: "Balanga",
+      caption: "Lorem ipsum dolor sit amet.",
+      imageUrl: "/dummy/balanga.jpg",
+    },
+    {
+      creator: {
+        id: 1,
+        firstName: "John",
+        lastName: "Doe",
+        imageUrl: "/assets/icons/profile-placeholder.svg",
+      },
+      $id: "123456",
+      $createdAt: "2023-01-01T12:00:00Z",
+      province: "Bataan",
+      municipal: "Balanga",
+      caption: "Lorem ipsum dolor sit amet.",
+      imageUrl: "/dummy/balanga.jpg",
     },
   ];
 
@@ -38,10 +58,10 @@ const Home = () => {
     return (
       <div className="flex flex-1">
         <div className="home-container">
-          <p className="body-medium text-light-1">Something bad happened</p>
+          <p className="body-medium text-dark-1">Something bad happened</p>
         </div>
         <div className="home-creators">
-          <p className="body-medium text-light-1">Something bad happened</p>
+          <p className="body-medium text-dark-1">Something bad happened</p>
         </div>
       </div>
     );
@@ -67,20 +87,9 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="home-creators">
+      {/* <div className="home-creators">
         <h3 className="h3-bold text-light-1">Top Creators</h3>
-        {isUserLoading && !dummyCreators ? (
-          <Loader />
-        ) : (
-          <ul className="grid 2xl:grid-cols-2 gap-6">
-            {dummyCreators.map((dummyCreator) => (
-              <li key={dummyCreator.id}>
-                <UserCard user={dummyCreator} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      </div> */}
     </div>
   );
 };
