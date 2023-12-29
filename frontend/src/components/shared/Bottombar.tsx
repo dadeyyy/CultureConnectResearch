@@ -48,10 +48,9 @@ const Bottombar = () => {
         const isActive = pathname === link.route;
         const isCreate = link.label === "Post";
         return (
-          <div className={isCreate ? "bg-primary-1 rounded-[10px] p-2" : ""}>
+          <div key={link.route} className={isCreate ? "bg-primary-1 rounded-[10px] p-2" : ""}>
             <Link
               to={link.route}
-              key={link.route}
               className={`${
                 isActive
                   ? `rounded-[10px] flex-center flex-col gap-1 ${

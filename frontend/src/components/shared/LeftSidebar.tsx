@@ -1,7 +1,26 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { useUserContext } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 const LeftSidebar = () => {
   const { pathname } = useLocation();
+  const { user, isLoading, checkAuthUser } = useUserContext();
+  console.log(useUserContext());
+  console.log("User:", user);
+  console.log("Is Loading:", isLoading);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Checking authentication user...");
+      if (!user.id) {
+        await checkAuthUser();
+      }
+      console.log("User:", user);
+      console.log("Is Loading:", isLoading);
+    };
+
+    fetchData();
+  }, [checkAuthUser, user.id]);
 
   const sidebarLinks = [
     {
@@ -50,6 +69,7 @@ const LeftSidebar = () => {
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.route;
             const isCreate = link.label === "Create Post";
+
             return (
               <li key={link.route} className={`leftsidebar-link ${isActive ? "bg-off-white" : ""}`}>
                 <div
@@ -57,7 +77,7 @@ const LeftSidebar = () => {
                 >
                   <NavLink
                     to={link.route}
-                    className={`flex gap-4 items-center p-4 ${isCreate && "text-lg"}`}
+                    className={`flex gap-4 items-center p-4 ${isCreate ? "text-lg" : ""}`}
                   >
                     {!isCreate && <img src={link.imgURL} alt={link.label} className="h-5 w-5" />}
                     {link.label}
@@ -69,15 +89,27 @@ const LeftSidebar = () => {
         </ul>
       </div>
       <div className="flex flex-col-reverse">
-        <Link to={"/profile/{user.id}"} className="flex gap-3 items-center">
+        <Link to="/profile" className="flex gap-3 items-center">
           <img
-            src={"/assets/icons/profile-placeholder.svg"}
+            src={
+              isLoading
+                ? "/assets/icons/profile-placeholder.svg"
+                : user.imageUrl || "/assets/icons/profile-placeholder.svg"
+            }
             alt="profile picture"
-            className="h-12 w-12 rounded-full"
+            className="h-12 w-12 rounded-full bg-cover"
           />
           <div className="flex flex-col">
-            <p className="body-bold">Profile</p>
-            <p className="small-regular text-light-3">@username</p>
+            {isLoading || !user.id ? (
+              <p>Loading...</p>
+            ) : (
+              <>
+                <p className="body-bold">
+                  {user.firstName} {user.lastName}
+                </p>
+                <p className="small-regular text-light-3">@{user.username}</p>
+              </>
+            )}
           </div>
         </Link>
       </div>

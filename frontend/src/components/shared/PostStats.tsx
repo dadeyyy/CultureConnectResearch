@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 type PostStatsProps = {
   post: {
     creator: {
-      id: number;
+      id: string;
       firstName: string;
       lastName: string;
       imageUrl?: string;
@@ -17,7 +17,7 @@ type PostStatsProps = {
 
     imageUrl?: string;
   };
-  userId: number;
+  userId: string;
 };
 
 const PostStats = ({}: PostStatsProps) => {
@@ -28,7 +28,7 @@ const PostStats = ({}: PostStatsProps) => {
 
   const handleLikePost = () => {
     setIsLiked((prevIsLiked) => !prevIsLiked);
-    setLike((prevLike) => prevLike + 1);
+    setLike((prevLike) => (isLiked ? prevLike - 1 : prevLike + 1));
   };
 
   const containerStyles = location.pathname.startsWith("/profile") ? "w-full" : "";

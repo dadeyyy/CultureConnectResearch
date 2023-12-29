@@ -25,27 +25,27 @@ import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 
 const provinces = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
+  { label: "Metro Manila", value: "metro_manila" },
+  { label: "Cavite", value: "cavite" },
+  { label: "Laguna", value: "laguna" },
+  { label: "Batangas", value: "batangas" },
+  { label: "Quezon", value: "quezon" },
+  { label: "Rizal", value: "rizal" },
+  { label: "Bulacan", value: "bulacan" },
+  { label: "Pampanga", value: "pampanga" },
+  { label: "Nueva Ecija", value: "nueva_ecija" },
 ] as const;
 
 const municipals = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
+  { label: "Makati City", value: "makati" },
+  { label: "Tagaytay City", value: "tagaytay" },
+  { label: "San Pedro", value: "san_pedro" },
+  { label: "Lipa City", value: "lipa" },
+  { label: "Lucena City", value: "lucena" },
+  { label: "Antipolo City", value: "antipolo" },
+  { label: "Malolos City", value: "malolos" },
+  { label: "Angeles City", value: "angeles" },
+  { label: "Cabanatuan City", value: "cabanatuan" },
 ] as const;
 
 const formSchema = z.object({
@@ -62,7 +62,20 @@ const formSchema = z.object({
 });
 
 type PostFormProps = {
-  post?: any;
+  post?: {
+    creator: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      imageUrl?: string;
+    };
+    $id: string;
+    $createdAt: string;
+    province: string;
+    municipal: string;
+    caption: string;
+    imageUrl?: string;
+  };
   action: "Create" | "Update";
 };
 
