@@ -1,23 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { createContext, useContext, useState } from "react";
-
+import { getUserById } from "@/dummy/dummy";
 import { IUser } from "@/type/index";
-
-//This is a dummy user, get the current user from the backend
-const dummyUser: IUser = {
-  id: "1",
-  firstName: "Boss",
-  lastName: "Amo",
-  username: "boss.amo999",
-  email: "boss@example.com",
-  imageUrl:
-    "https://th.bing.com/th/id/OIP.FKf7M863jluP9y3oejEgpgHaHd?w=512&h=516&rs=1&pid=ImgDetMain",
-  bio: "This is a test bio.",
-};
-
-async function getCurrentUser() {
-  return dummyUser;
-}
 
 export const INITIAL_USER: IUser = {
   id: "",
@@ -58,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuthUser = async () => {
     setIsLoading(true);
     try {
-      const currentAccount = await getCurrentUser();
+      const currentAccount = await getUserById("999");
       if (currentAccount) {
         setUser({
           id: currentAccount.id,

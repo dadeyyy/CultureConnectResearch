@@ -1,4 +1,20 @@
 // dummy.ts
+const getPostsByUserId = (userId: string): DummyPost[] => {
+  const userPosts = dummyPosts.filter((post) => post.creator.id === userId);
+
+  return userPosts;
+};
+
+export type DummyUser = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  imageUrl: string;
+  bio: string;
+  posts: DummyPost[];
+};
 
 export type DummyPost = {
   creator: {
@@ -88,14 +104,76 @@ export const dummyPosts: DummyPost[] = [
   },
 ];
 
+export const dummyUser: DummyUser[] = [
+  {
+    id: "1",
+    firstName: "John",
+    lastName: "Doe",
+    username: "john.doe",
+    email: "john@example.com",
+    imageUrl: "/dummy/john-doe.jpg",
+    bio: "Some bio text for John Doe",
+    posts: getPostsByUserId("1"), // Added posts for John Doe
+  },
+  {
+    id: "2",
+    firstName: "Jane",
+    lastName: "Doe",
+    username: "jane.doe",
+    email: "jane@example.com",
+    imageUrl: "/dummy/jane-doe.jpg",
+    bio: "Some bio text for Jane Doe",
+    posts: getPostsByUserId("2"), // Added posts for Jane Doe
+  },
+  {
+    id: "3",
+    firstName: "Bob",
+    lastName: "Johnson",
+    username: "bob.johnson",
+    email: "bob@example.com",
+    imageUrl: "/dummy/bob-johnson.jpg",
+    bio: "Some bio text for Bob Johnson",
+    posts: getPostsByUserId("3"), // Added posts for Bob Johnson
+  },
+  {
+    id: "4",
+    firstName: "Alice",
+    lastName: "Smith",
+    username: "alice.smith",
+    email: "alice@example.com",
+    imageUrl: "/dummy/alice-smith.jpg",
+    bio: "Some bio text for Alice Smith",
+    posts: getPostsByUserId("4"), // Added posts for Alice Smith
+  },
+  {
+    id: "5",
+    firstName: "Abet",
+    lastName: "Garcia",
+    username: "abet.garcia",
+    email: "abet@example.com",
+    imageUrl: "/dummy/abet-garcia.jpg",
+    bio: "Some bio text for Abet Garcia",
+    posts: getPostsByUserId("5"), // Added posts for Abet Garcia
+  },
+  {
+    id: "999",
+    firstName: "Boss",
+    lastName: "Amo",
+    username: "boss.amo999",
+    email: "boss@example.com",
+    imageUrl:
+      "https://th.bing.com/th/id/OIP.FKf7M863jluP9y3oejEgpgHaHd?w=512&h=516&rs=1&pid=ImgDetMain",
+    bio: "This is a test bio.",
+    posts: getPostsByUserId("999"), // Added empty posts array for Boss Amo
+  },
+];
+
 export const getPostById = (postId?: string): DummyPost => {
   const foundPost = dummyPosts.find((post) => post.$id === postId);
 
   if (foundPost) {
     return foundPost;
   }
-
-  // Return a default DummyPost object if not found
   return {
     creator: {
       id: "",
@@ -109,5 +187,23 @@ export const getPostById = (postId?: string): DummyPost => {
     municipal: "",
     caption: "",
     imageUrl: "",
+  };
+};
+
+export const getUserById = (userId?: string) => {
+  const foundUser = dummyUser.find((users) => users.id === userId);
+
+  if (foundUser) {
+    return foundUser;
+  }
+  return {
+    id: "",
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    imageUrl: "",
+    bio: "",
+    posts: [],
   };
 };
