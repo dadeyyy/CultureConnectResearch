@@ -11,6 +11,9 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
             where: {
                 username: data.username,
             },
+            include: {
+                posts: true,
+            },
         });
         if (user) {
             const passwordMatch = await bcrypt.compare(data.password, user.password);
@@ -21,7 +24,7 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
                     role: user.role,
                 };
                 console.log(req.session);
-                res.json({ message: 'authenticated', status: 200 });
+                res.json({ message: 'authenticated', status: 200, user: user });
             }
             else {
                 res.json({
@@ -47,7 +50,9 @@ authRouter.post('/signup', validate(signUpSchema), async (req, res) => {
             },
         });
         if (user) {
-            return res.status(400).json({ error: 'Username or email is already taken' });
+            return res
+                .status(400)
+                .json({ error: 'Username or email is already taken' });
         }
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const newUser = await db.user.create({

@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { db } from '../utils/db.server.js';
 export const validate = (schema) => (req, res, next) => {
     try {
         schema.parse(req.body);
@@ -19,7 +20,33 @@ export function isAuthenticated(req, res, next) {
         next();
     }
     else {
-        return res.status(401).json({ error: "User not authorized" });
+        return res.status(401).json({ error: 'User not authenticated!' });
     }
 }
+export const isAuthor = async (req, res, next) => {
+    const postId = parseInt(req.params.postId);
+    const username = req.session.user?.username;
+    try {
+        //find post
+        const post = await db.post.findUnique({
+            where: {
+                id: postId,
+            },
+            include: { user: true },
+        });
+        const user = post?.user.username;
+        const authorized = username === user;
+        if (post && authorized) {
+            console.log('Authorized');
+            next();
+        }
+        else {
+            return res.status(500).json({ error: 'Unauthorized!!!' });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 //# sourceMappingURL=middleware.js.map
