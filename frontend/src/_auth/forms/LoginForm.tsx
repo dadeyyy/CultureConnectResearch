@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { login } from "@/lib/validation";
 import { z } from "zod";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof login>>({
     resolver: zodResolver(login),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -20,7 +22,7 @@ const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof login>) => {
     console.log(values);
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("http://localhost:8000/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,6 +32,7 @@ const LoginForm = () => {
 
       if (response.ok) {
         console.log("Login successful!");
+        navigate("/home");
       } else {
         console.error("Login failed");
       }
@@ -64,12 +67,12 @@ const LoginForm = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-1 w-full mt-1">
           <FormField
             control={form.control}
-            name="email"
+            name="username"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
                   <Input
-                    type="email"
+                    type="text"
                     placeholder="Enter your email here"
                     className="shad-input h-10 border-r-2"
                     {...field}

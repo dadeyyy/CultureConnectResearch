@@ -30,6 +30,7 @@ export type IUser = {
   firstName: string;
   lastName: string;
   username: string;
+  birthdate: string;
   email: string;
   imageUrl: string;
   bio: string;

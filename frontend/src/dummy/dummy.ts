@@ -10,6 +10,7 @@ export type DummyUser = {
   firstName: string;
   lastName: string;
   username: string;
+  birthdate?: string;
   email: string;
   imageUrl: string;
   bio: string;
@@ -32,6 +33,20 @@ export type DummyPost = {
 };
 
 export const dummyPosts: DummyPost[] = [
+  {
+    creator: {
+      id: "1",
+      firstName: "John",
+      lastName: "Doe",
+      imageUrl: "/dummy/john-doe.jpg",
+    },
+    $id: "123453216",
+    $createdAt: "2023-01-01T12:00:00Z",
+    province: "Bulacan",
+    municipal: "Malolos",
+    caption: "Exploring the charming streets of Malolos, Bulacan.",
+    imageUrl: "/dummy/bulacan.jpg",
+  },
   {
     creator: {
       id: "1",
@@ -110,6 +125,7 @@ export const dummyUser: DummyUser[] = [
     firstName: "John",
     lastName: "Doe",
     username: "john.doe",
+    birthdate: "01-01-2001",
     email: "john@example.com",
     imageUrl: "/dummy/john-doe.jpg",
     bio: "Some bio text for John Doe",
@@ -120,6 +136,7 @@ export const dummyUser: DummyUser[] = [
     firstName: "Jane",
     lastName: "Doe",
     username: "jane.doe",
+    birthdate: "01-01-2001",
     email: "jane@example.com",
     imageUrl: "/dummy/jane-doe.jpg",
     bio: "Some bio text for Jane Doe",
@@ -130,6 +147,7 @@ export const dummyUser: DummyUser[] = [
     firstName: "Bob",
     lastName: "Johnson",
     username: "bob.johnson",
+    birthdate: "01-01-2001",
     email: "bob@example.com",
     imageUrl: "/dummy/bob-johnson.jpg",
     bio: "Some bio text for Bob Johnson",
@@ -140,6 +158,7 @@ export const dummyUser: DummyUser[] = [
     firstName: "Alice",
     lastName: "Smith",
     username: "alice.smith",
+    birthdate: "01-01-2001",
     email: "alice@example.com",
     imageUrl: "/dummy/alice-smith.jpg",
     bio: "Some bio text for Alice Smith",
@@ -150,6 +169,7 @@ export const dummyUser: DummyUser[] = [
     firstName: "Abet",
     lastName: "Garcia",
     username: "abet.garcia",
+    birthdate: "01-01-2001",
     email: "abet@example.com",
     imageUrl: "/dummy/abet-garcia.jpg",
     bio: "Some bio text for Abet Garcia",
@@ -160,6 +180,7 @@ export const dummyUser: DummyUser[] = [
     firstName: "Boss",
     lastName: "Amo",
     username: "boss.amo999",
+    birthdate: "01-01-2001",
     email: "boss@example.com",
     imageUrl:
       "https://th.bing.com/th/id/OIP.FKf7M863jluP9y3oejEgpgHaHd?w=512&h=516&rs=1&pid=ImgDetMain",

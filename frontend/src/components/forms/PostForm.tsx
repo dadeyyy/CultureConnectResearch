@@ -88,39 +88,61 @@ const PostForm = ({ post, action }: PostFormProps) => {
     },
   });
 
-  // const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost();
-  // const { mutateAsync: updatePost, isLoading: isLoadingUpdate } = useUpdatePost();
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
-  }
-  //   const { register, handleSubmit } = useForm();
-  //   async function onSubmit(data) {
-  //       const formData = new FormData();
-  //       formData.append("example", data.example);
-  //       for (const image of data.image) {
-  //         formData.append("image", image);
-  //       }
-  //       const result = await fetch("http://localhost:8000/post", {
-  //         method: "POST",
-  //         body: formData,
-  //       });
-  //       console.log(result);
-  //   }
+    // ACTION = UPDATE
+    if (post && action === "Update") {
+      try {
+        const response = await fetch("http://localhost:8000/update-post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
 
-  //   return (
-  //     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-  //     <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
-  //       {/* register your input into the hook by invoking the "register" function */}
-  //       <input {...register("example")} />
+        if (response.ok) {
+          console.log("Update successful!");
+          navigate("/home");
+        } else {
+          console.error("Update failed");
+        }
+      } catch (error) {
+        console.error("Error updating post:", error);
+      }
+      return navigate(`/posts/${post.$id}`);
+    }
 
-  //       <input type="file" {...register("image")} multiple />
+    // ACTION = CREATE
+    else if (post && action === "Create") {
+      try {
+        const response = await fetch("http://localhost:8000/create-post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
 
-  //       <input type="submit" />
-  //     </form>
-  //   );
+        if (response.ok) {
+          console.log("Posting successful!");
+          navigate("/home");
+        } else {
+          console.error("Posting failed");
+        }
+      } catch (error) {
+        console.error("Error posting:", error);
+      }
+      return navigate(`/home`);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 w-full max-w-5xl">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="flex flex-col gap-5 w-full max-w-5xl"
+      >
         <FormField
           control={form.control}
           name="caption"
