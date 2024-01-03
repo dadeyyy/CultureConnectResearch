@@ -55,10 +55,10 @@ const formSchema = z.object({
   province: z.string({
     required_error: "Please select a province.",
   }),
-  municipal: z.string({
+  municipality: z.string({
     required_error: "Please select a municipal.",
   }),
-  file: z.custom<File[]>(),
+  image: z.custom<File[]>(),
 });
 
 type PostFormProps = {
@@ -88,39 +88,76 @@ const PostForm = ({ post, action }: PostFormProps) => {
     },
   });
 
-  // const { mutateAsync: createPost, isLoading: isLoadingCreate } = useCreatePost();
-  // const { mutateAsync: updatePost, isLoading: isLoadingUpdate } = useUpdatePost();
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
-  }
-  //   const { register, handleSubmit } = useForm();
-  //   async function onSubmit(data) {
-  //       const formData = new FormData();
-  //       formData.append("example", data.example);
-  //       for (const image of data.image) {
-  //         formData.append("image", image);
-  //       }
-  //       const result = await fetch("http://localhost:8000/post", {
-  //         method: "POST",
-  //         body: formData,
-  //       });
-  //       console.log(result);
-  //   }
+   // ACTION = UPDATE
+    if (action === "Update") {
+      try {
+        const response = await fetch("http://localhost:8000/update-post", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+          credentials: 'include'
+        });
 
-  //   return (
-  //     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-  //     <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
-  //       {/* register your input into the hook by invoking the "register" function */}
-  //       <input {...register("example")} />
+        const data = await response.json();
 
-  //       <input type="file" {...register("image")} multiple />
+        if (response.ok) {
+          console.log("Update successful!");
+          console.log(data)
+          navigate("/home");
+        } else {
+          console.error("Update failed");
+          console.log(data)
+        }
+      } catch (error) {
+        console.error("Error updating post:", error);
+      }
+      return navigate(`/home`);
+    }
 
-  //       <input type="submit" />
-  //     </form>
-  //   );
+    // ACTION = CREATE
+    else if ( action === "Create") {
+      console.log("CREATEEE ")
+      try {
+        const response = await fetch("http://localhost:8000/post", {
+          method: "POST",
+          body: JSON.stringify(values),
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: 'include'
+        });
+
+        const data = await response.json();
+
+
+        if (response.ok) {
+          console.log("Posting successful!");
+          console.log(response)
+          console.log(data);
+          navigate("/home");
+        } else {
+          console.error("Posting failed");
+          console.log("Response", response);
+          console.log("Data", data);
+        }
+      } catch (error) {
+        console.error("Error posting:", error);
+      }
+      return navigate(`/home`);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 w-full max-w-5xl">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="flex flex-col gap-5 w-full max-w-5xl"
+        encType="multipart/form-data"
+      >
         <FormField
           control={form.control}
           name="caption"
@@ -140,7 +177,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
         />
         <FormField
           control={form.control}
-          name="file"
+          name="image"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="shad-form_label">Add Photos</FormLabel>
@@ -205,7 +242,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
           />
           <FormField
             control={form.control}
-            name="municipal"
+            name="municipality"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Municipal</FormLabel>
@@ -234,7 +271,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
                             value={municipal.label}
                             key={municipal.value}
                             onSelect={() => {
-                              form.setValue("municipal", municipal.value);
+                              form.setValue("municipality", municipal.value);
                             }}
                           >
                             <Check

@@ -1,10 +1,18 @@
 import express from 'express';
-import { isAuthenticated, isAuthor, validate } from '../middleware/middleware.js';
+import {
+  isAuthenticated,
+  isAuthor,
+  validate,
+} from '../middleware/middleware.js';
 import { db } from '../utils/db.server.js';
 import { upload } from '../utils/cloudinary.js';
 import { postSchema, postTypeSchema } from '../utils/PostSchema.js';
 
 const postRoute = express.Router();
+
+postRoute.post('/testroute', (req, res) => {
+  console.log(req.session);
+});
 
 //ADD POST
 postRoute.post(
@@ -31,7 +39,7 @@ postRoute.post(
         },
         include: {
           photos: true,
-          user: true
+          user: true,
         },
       });
 
@@ -46,7 +54,7 @@ postRoute.post(
 );
 
 // GET ALL THE POST
-postRoute.get('/post', async (req, res) => {
+postRoute.get('/post', isAuthenticated, async (req, res) => {
   try {
     const allPost = await db.post.findMany({
       include: {
@@ -99,7 +107,7 @@ postRoute.put(
       const data: postTypeSchema = req.body;
       const files: Express.Multer.File[] = req.files as Express.Multer.File[];
 
-      //Check if post with the given ID exists
+      // Check if post with the given ID exists
       const post = await db.post.findUnique({
         where: {
           id: postId,
@@ -107,26 +115,46 @@ postRoute.put(
         include: { photos: true },
       });
 
-      //If not, return not found
+      // If not, return not found
       if (!post) {
         return res.status(404).json({ error: 'Post not found!' });
       }
 
-      //Update the post data
+      // Create an array of new photos to add
+      const newPhotos = files?.map((file) => ({
+        url: file.path,
+        filename: file.filename,
+      }));
+
+      // Update the post data
       const updatedPost = await db.post.update({
         where: { id: postId },
         data: {
           ...data,
           userId: req.session.user?.id,
+          // Add new photos to the existing ones
           photos: {
-            create: files?.map((file) => ({
-              url: file.path,
-              filename: file.filename,
-            })),
+            create: newPhotos,
           },
         },
         include: { photos: true, user: true },
       });
+
+      // If there are images to delete, remove them
+      if (req.body.deleteImages && req.body.deleteImages.length > 0) {
+        const imagesToDelete = req.body.deleteImages;
+
+        await db.post.update({
+          where: { id: postId },
+          data: {
+            photos: {
+              deleteMany: {
+                id: { in: imagesToDelete },
+              },
+            },
+          },
+        });
+      }
 
       res
         .status(200)
@@ -138,31 +166,28 @@ postRoute.put(
   }
 );
 
+postRoute.delete(
+  '/post/:postId',
+  isAuthenticated,
+  isAuthor,
+  async (req, res) => {
+    try {
+      const postId = parseInt(req.params.postId);
 
-postRoute.delete('/post/:postId', isAuthenticated, isAuthor,  async (req,res)=>{
+      const deletedPost = await db.post.delete({
+        where: {
+          id: +postId,
+        },
+        include: { photos: true },
+      });
 
-  try{
-
-    const postId = parseInt(req.params.postId)
-    
-    const deletedPost = await db.post.delete({
-      where:{
-        id: +postId
-      },
-      include: {photos: true}
-    })
-  
-    return res.status(500).json({message: `Successfully deleted post! #${deletedPost.id}`})
+      return res
+        .status(500)
+        .json({ message: `Successfully deleted post! #${deletedPost.id}` });
+    } catch (error) {
+      console.log(error);
+    }
   }
-  catch(error){
-    console.log(error)
-  }
-})
-
-postRoute.get('/allpost', async (req,res)=>{
-  
-  const allpost = await db.post.findMany({})
-  return res.json(allpost)
-})
+);
 
 export default postRoute;

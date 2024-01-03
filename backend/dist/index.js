@@ -14,13 +14,20 @@ if (!process.env.PORT) {
     process.exit(1);
 }
 app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:5173', // Specify the origin of your frontend
+    credentials: true, // Enable credentials (including cookies)
+}));
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, //true in prod
+    cookie: {
+        maxAge: 3600000, // 1 hour
+        secure: false, // Set to true if using HTTPS
+        sameSite: 'lax'
+    }
 }));
-app.use(cors());
 app.use(morgan('tiny'));
 //Routers
 app.use('/', authRouter);

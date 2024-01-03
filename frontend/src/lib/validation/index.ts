@@ -16,6 +16,6 @@ export const registration = z
   });
 
 export const login = z.object({
-  email: z.string().email(),
+  username: z.string(),
   password: z.string().min(8, { message: "Must be a minimum of 8 characters." }),
 });

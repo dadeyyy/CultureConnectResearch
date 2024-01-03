@@ -7,7 +7,7 @@ const authRouter = express.Router();
 authRouter.post('/signin', validate(signInSchema), async (req, res) => {
     try {
         const data = req.body;
-        const user = await db.user.findFirst({
+        const user = await db.user.findUnique({
             where: {
                 username: data.username,
             },
@@ -23,8 +23,19 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
                     username: user.username,
                     role: user.role,
                 };
-                console.log(req.session);
-                res.json({ message: 'authenticated', status: 200, user: user });
+                req.session.save((err) => {
+                    if (err) {
+                        console.log('Error saving the session', err);
+                    }
+                    console.log("COOKIE", req.cookies);
+                    console.log("SESSION", req.session);
+                    res.json({
+                        message: 'authenticated',
+                        status: 200,
+                        user: user,
+                        session: req.session.user,
+                    });
+                });
             }
             else {
                 res.json({

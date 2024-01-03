@@ -6,6 +6,7 @@ export const validate =
   (schema: z.ZodObject<any, any>) =>
   (req: Request, res: Response, next: () => void) => {
     try {
+      console.log(req.body)
       schema.parse(req.body);
       next();
     } catch (error) {
@@ -19,10 +20,12 @@ export const validate =
   };
 
 export function isAuthenticated(req: Request, res: Response, next: () => void) {
+
   if (req.session.user) {
-    console.log(req.session.user);
+    console.log("AUTHENTICATED")
     next();
   } else {
+    console.log("User not authenticated!!!")
     return res.status(401).json({ error: 'User not authenticated!' });
   }
 }
@@ -49,9 +52,13 @@ export const isAuthor = async (
     if (post && authorized) {
       console.log('Authorized');
       next(); 
-    } else {
-      return res.status(500).json({ error: 'Unauthorized!!!' });
+    } else if(!post) {
+      res.status(404).json({error: "Post can't be found!"})
     }
+    else if(!authorized){
+      res.status(401).json({error: "Unauthorized"})
+    }
+    
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: 'Internal Server Error' });

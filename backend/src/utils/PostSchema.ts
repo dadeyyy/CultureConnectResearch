@@ -16,6 +16,11 @@ export const postSchema = z.object({
   province: z.string({ required_error: 'province is required!' }),
   municipality: z.string({ required_error: 'municipality is required!' }),
   userId: z.number().optional(),
+  image: z.array(
+    z.object({
+      path: z.string(),
+    })
+  ),
 });
 
 

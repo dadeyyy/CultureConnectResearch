@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -8,10 +8,11 @@ import { login } from "@/lib/validation";
 import { z } from "zod";
 
 const LoginForm = () => {
+  const navigate = useNavigate()
   const form = useForm<z.infer<typeof login>>({
     resolver: zodResolver(login),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -20,16 +21,20 @@ const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof login>) => {
     console.log(values);
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("http://localhost:8000/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "credentials" : "include"
         },
         body: JSON.stringify(values),
+        credentials: 'include'
       });
 
       if (response.ok) {
-        console.log("Login successful!");
+        const data = await response.json()
+        console.log(data)
+        return navigate('/create-post')
       } else {
         console.error("Login failed");
       }
@@ -64,12 +69,12 @@ const LoginForm = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-1 w-full mt-1">
           <FormField
             control={form.control}
-            name="email"
+            name="username"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
                   <Input
-                    type="email"
+                    type="text"
                     placeholder="Enter your email here"
                     className="shad-input h-10 border-r-2"
                     {...field}

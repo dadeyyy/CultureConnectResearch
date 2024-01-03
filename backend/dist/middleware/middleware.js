@@ -2,6 +2,7 @@ import * as z from 'zod';
 import { db } from '../utils/db.server.js';
 export const validate = (schema) => (req, res, next) => {
     try {
+        console.log(req.body);
         schema.parse(req.body);
         next();
     }
@@ -16,10 +17,11 @@ export const validate = (schema) => (req, res, next) => {
 };
 export function isAuthenticated(req, res, next) {
     if (req.session.user) {
-        console.log(req.session.user);
+        console.log("AUTHENTICATED");
         next();
     }
     else {
+        console.log("User not authenticated!!!");
         return res.status(401).json({ error: 'User not authenticated!' });
     }
 }
@@ -40,8 +42,11 @@ export const isAuthor = async (req, res, next) => {
             console.log('Authorized');
             next();
         }
-        else {
-            return res.status(500).json({ error: 'Unauthorized!!!' });
+        else if (!post) {
+            res.status(404).json({ error: "Post can't be found!" });
+        }
+        else if (!authorized) {
+            res.status(401).json({ error: "Unauthorized" });
         }
     }
     catch (error) {
