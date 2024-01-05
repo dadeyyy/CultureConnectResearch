@@ -68,6 +68,7 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+<<<<<<< HEAD
     const caption = values.caption
 
     if(blacklist.includes(caption)){
@@ -91,10 +92,42 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
       try {
         const response = await fetch("http://localhost:8000/update-post", {
           method: "PUT",
+=======
+    console.log(values);
+    // ACTION = UPDATE
+    if (post && action === "Update") {
+      try {
+        const response = await fetch("http://localhost:8000/update-post", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(values),
+        });
+
+        if (response.ok) {
+          console.log("Update successful!");
+          navigate("/home");
+        } else {
+          console.error("Update failed");
+        }
+      } catch (error) {
+        console.error("Error updating post:", error);
+      }
+      return navigate(`/posts/${post.$id}`);
+    }
+
+    // ACTION = CREATE
+    else if (post && action === "Create") {
+      try {
+        const response = await fetch("http://localhost:8000/create-post", {
+          method: "POST",
+>>>>>>> 0b6a8bd2bd005b549a3f2ea5db3bc1226e86c609
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+<<<<<<< HEAD
           credentials: 'include'
         });
 
@@ -136,6 +169,15 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
           console.error("Posting failed");
           console.log("Response", response);
           console.log("Data", data);
+=======
+        });
+
+        if (response.ok) {
+          console.log("Posting successful!");
+          navigate("/home");
+        } else {
+          console.error("Posting failed");
+>>>>>>> 0b6a8bd2bd005b549a3f2ea5db3bc1226e86c609
         }
       } catch (error) {
         console.error("Error posting:", error);
@@ -149,7 +191,10 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
         className="flex flex-col gap-5 w-full max-w-5xl"
+<<<<<<< HEAD
         encType="multipart/form-data"
+=======
+>>>>>>> 0b6a8bd2bd005b549a3f2ea5db3bc1226e86c609
       >
         <FormField
           control={form.control}

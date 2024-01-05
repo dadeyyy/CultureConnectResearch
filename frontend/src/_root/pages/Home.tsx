@@ -2,9 +2,10 @@ import PostCard from "@/components/shared/PostCard";
 import Loader from "@/components/shared/Loader";
 // import UserCard from "@/components/shared/UserCard";
 import { dummyPosts } from "@/dummy/dummy";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Home = () => {
+  const [postData, setPostData] = useState([]);
   const isPostLoading = false;
   const isErrorPosts = false;
   const isErrorCreators = false;
@@ -14,7 +15,8 @@ const Home = () => {
       const response = await fetch('http://localhost:8000/post',{credentials:'include'})
       const data = await response.json();
       if(response.ok){
-        console.log(data)
+        setPostData(data)
+        console.log(postData);
         return data
       }
       else{

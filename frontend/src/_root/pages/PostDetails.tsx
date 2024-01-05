@@ -36,7 +36,13 @@ const PostDetails = () => {
     }
   }, [id]);
 
-  console.log(post);
+  console.log(post?.creator);
+  console.log(user);
+
+  const handleDeletePost = () => {
+    //wala pa
+    navigate(-1);
+  };
 
   return (
     <div className="post_details-container">
@@ -96,27 +102,20 @@ const PostDetails = () => {
                   <img src={"/assets/icons/edit.svg"} alt="edit" width={24} height={24} />
                 </Link>
 
-                {/* <Button
+                <Button
                   onClick={handleDeletePost}
                   variant="ghost"
-                  className={`ost_details-delete_btn ${user.id !== post?.creator.$id && "hidden"}`}
+                  className={`ost_details-delete_btn ${user.id !== post?.creator.id && "hidden"}`}
                 >
                   <img src={"/assets/icons/delete.svg"} alt="delete" width={24} height={24} />
-                </Button> */}
+                </Button>
               </div>
             </div>
 
             <hr className="border w-full border-dark-4/80" />
 
             <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
-              <p>{post?.caption}</p>
-              {/* <ul className="flex gap-1 mt-2">
-                {post?.tags.map((tag: string, index: string) => (
-                  <li key={`${tag}${index}`} className="text-light-3 small-regular">
-                    #{tag}
-                  </li>
-                ))}
-              </ul> */}
+              <p>{post?.caption}</p>{" "}
             </div>
 
             <div className="w-full">
