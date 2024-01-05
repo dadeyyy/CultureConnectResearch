@@ -34,7 +34,7 @@ const LoginForm = () => {
       if (response.ok) {
         const data = await response.json()
         console.log(data)
-        return navigate('/create-post')
+        return navigate('/home')
       } else {
         console.error("Login failed");
       }

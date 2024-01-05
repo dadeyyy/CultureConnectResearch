@@ -101,6 +101,7 @@ authRouter.post('/logout', (req, res) => {
           .status(500)
           .json({ message: 'Error destroying the session' });
       }
+      console.log(req.session)
       res.status(200).json({ message: 'successfully destroyed session' });
     });
   }

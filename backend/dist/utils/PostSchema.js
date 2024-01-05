@@ -13,9 +13,6 @@ export const postSchema = z.object({
     caption: z.string({ required_error: 'caption is required' }),
     province: z.string({ required_error: 'province is required!' }),
     municipality: z.string({ required_error: 'municipality is required!' }),
-    userId: z.number().optional(),
-    image: z.array(z.object({
-        path: z.string(),
-    })),
+    userId: z.number().optional()
 });
 //# sourceMappingURL=PostSchema.js.map

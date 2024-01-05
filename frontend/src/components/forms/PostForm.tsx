@@ -23,30 +23,9 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
+import {blacklist, municipals, provinces} from './PostInfo'
 
-const provinces = [
-  { label: "Metro Manila", value: "metro_manila" },
-  { label: "Cavite", value: "cavite" },
-  { label: "Laguna", value: "laguna" },
-  { label: "Batangas", value: "batangas" },
-  { label: "Quezon", value: "quezon" },
-  { label: "Rizal", value: "rizal" },
-  { label: "Bulacan", value: "bulacan" },
-  { label: "Pampanga", value: "pampanga" },
-  { label: "Nueva Ecija", value: "nueva_ecija" },
-] as const;
 
-const municipals = [
-  { label: "Makati City", value: "makati" },
-  { label: "Tagaytay City", value: "tagaytay" },
-  { label: "San Pedro", value: "san_pedro" },
-  { label: "Lipa City", value: "lipa" },
-  { label: "Lucena City", value: "lucena" },
-  { label: "Antipolo City", value: "antipolo" },
-  { label: "Malolos City", value: "malolos" },
-  { label: "Angeles City", value: "angeles" },
-  { label: "Cabanatuan City", value: "cabanatuan" },
-] as const;
 
 const formSchema = z.object({
   caption: z.string().min(0, {
@@ -79,7 +58,7 @@ type PostFormProps = {
   action: "Create" | "Update";
 };
 
-const PostForm = ({ post, action }: PostFormProps) => {
+const PostForm = ({ post, action,  }: PostFormProps) => {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,7 +68,24 @@ const PostForm = ({ post, action }: PostFormProps) => {
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    const caption = values.caption
+
+    if(blacklist.includes(caption)){
+        form.setError('caption', {type:'custom', message: `${caption} is not a valid caption`})
+        return
+    }
+
+    const formData = new FormData();
+
+    formData.append('caption', values.caption)
+    formData.append('province', values.province)
+    formData.append('municipality', values.municipality)
+    values.image.forEach((file) => {
+      formData.append(`image`, file);
+    });
+
+    console.log(formData)
+
    // ACTION = UPDATE
     if (action === "Update") {
       try {
@@ -124,10 +120,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       try {
         const response = await fetch("http://localhost:8000/post", {
           method: "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json"
-          },
+          body: formData,
           credentials: 'include'
         });
 

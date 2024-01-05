@@ -1,13 +1,28 @@
 import PostCard from "@/components/shared/PostCard";
 import Loader from "@/components/shared/Loader";
-import UserCard from "@/components/shared/UserCard";
+// import UserCard from "@/components/shared/UserCard";
 import { dummyPosts } from "@/dummy/dummy";
+import { useEffect } from "react";
 
 const Home = () => {
   const isPostLoading = false;
   const isErrorPosts = false;
-
   const isErrorCreators = false;
+  
+  useEffect(()=>{
+    async function fetchAllpost(){
+      const response = await fetch('http://localhost:8000/post',{credentials:'include'})
+      const data = await response.json();
+      if(response.ok){
+        console.log(data)
+        return data
+      }
+      else{
+        return "FAILED TO FETCH"
+      }
+    }
+    fetchAllpost()
+  },[])
 
   if (isErrorPosts || isErrorCreators) {
     return (
@@ -21,6 +36,8 @@ const Home = () => {
       </div>
     );
   }
+
+  
 
   return (
     <div className="flex flex-1">

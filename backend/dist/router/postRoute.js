@@ -12,6 +12,8 @@ postRoute.post('/post', isAuthenticated, upload.array('image'), validate(postSch
     try {
         const data = req.body;
         const files = req.files;
+        console.log(data);
+        console.log(files);
         const images = files?.map((file) => ({
             url: file.path,
             filename: file.filename,
@@ -44,6 +46,7 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
         const allPost = await db.post.findMany({
             include: {
                 photos: true,
+                user: true
             },
         });
         res.status(200).json(allPost);

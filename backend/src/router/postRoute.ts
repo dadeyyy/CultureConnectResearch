@@ -24,6 +24,8 @@ postRoute.post(
     try {
       const data: postTypeSchema = req.body;
       const files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      console.log(data);
+      console.log(files);
       const images = files?.map((file) => ({
         url: file.path,
         filename: file.filename,
@@ -59,6 +61,7 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
     const allPost = await db.post.findMany({
       include: {
         photos: true,
+        user: true
       },
     });
     res.status(200).json(allPost);
