@@ -5,12 +5,26 @@ import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/context/AuthContext";
 import Loader from "@/components/shared/Loader";
 import GridPostList from "@/components/shared/GridPostList";
-import { DummyUser, getUserById } from "@/dummy/dummy";
-import { useEffect, useState } from "react";
 
 interface StabBlockProps {
   value: string | number;
   label: string;
+}
+
+interface ProfileProps {
+  userProfile: {
+    avatarUrl: string | null;
+    bio: string | null;
+    createdAt: string;
+    email: string;
+    firstName: string;
+    id: number;
+    lastName: string;
+    password: string;
+    role: string;
+    updatedAt: string;
+    username: string;
+  };
 }
 
 const StatBlock = ({ value, label }: StabBlockProps) => (
@@ -20,36 +34,14 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
   </div>
 );
 
-const Profile = () => {
+const Profile = ({ userProfile }: ProfileProps) => {
   const { id } = useParams();
   const { user } = useUserContext();
   const { pathname } = useLocation();
-  const [isLoading, setIsLoading] = useState(true);
 
-  const [currentUser, setUserData] = useState<DummyUser | undefined>(undefined);
-  console.log(id);
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const fetchedUserData = await getUserById(id);
-        setUserData(fetchedUserData);
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  console.log(userProfile);
 
-    if (id) {
-      fetchPost();
-    } else {
-      setIsLoading(false);
-    }
-  }, [id]);
-
-  console.log(currentUser);
-
-  if (!currentUser)
+  if (!userProfile)
     return (
       <div className="flex-center w-full h-full">
         <Loader />
@@ -61,44 +53,44 @@ const Profile = () => {
       <div className="profile-inner_container">
         <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7">
           <img
-            src={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
+            src={userProfile.avatarUrl || "/assets/icons/profile-placeholder.svg"}
             alt="profile"
             className="w-28 h-28 lg:h-36 lg:w-36 object-cover  rounded-full"
           />
           <div className="flex flex-col flex-1 justify-between md:mt-2">
             <div className="flex flex-col w-full">
               <h1 className="text-center xl:text-left h3-bold md:h1-semibold w-full">
-                {currentUser.firstName} {currentUser.lastName}
+                {userProfile.firstName} {userProfile.lastName}
               </h1>
               <p className="small-regular md:body-medium test-dark-3 text-center xl:text-left">
-                @{currentUser.username}
+                @{userProfile.username}
               </p>
             </div>
 
             <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
-              {/* <StatBlock value={currentUser.posts.length} label="Posts" /> */}
+              {/* <StatBlock value={userProfile.posts.length} label="Posts" /> */}
               <StatBlock value={20} label="Followers" />
               <StatBlock value={20} label="Following" />
             </div>
 
             <p className="small-medium md:base-medium text-center xl:text-left mt-7 max-w-screen-sm">
-              {currentUser.bio}
+              {userProfile.bio}
             </p>
           </div>
 
           <div className="flex justify-center gap-4">
-            <div className={`${user.id !== currentUser.id && "hidden"}`}>
+            <div className={`${user.id !== userProfile.id && "hidden"}`}>
               <Link
-                to={`/update-profile/${currentUser.id}`}
+                to={`/update-profile/${userProfile.id}`}
                 className={`h-12 bg-off-white px-5 test-dark-1 flex-center gap-2 rounded-lg ${
-                  user.id !== currentUser.id && "hidden"
+                  user.id !== userProfile.id && "hidden"
                 }`}
               >
                 <img src={"/assets/icons/edit.svg"} alt="edit" width={20} height={20} />
                 <p className="flex whitespace-nowrap small-medium">Edit Profile</p>
               </Link>
             </div>
-            <div className={`${user.id === id && "hidden"}`}>
+            <div className={`${user.id === userProfile.id && "hidden"}`}>
               <Button type="button" className="shad-button_primary px-8">
                 Follow
               </Button>
@@ -107,7 +99,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {currentUser.id === user.id && (
+      {userProfile.id === user.id && (
         <div className="flex max-w-5xl w-full">
           <Link
             to={`/profile/${id}`}
@@ -129,8 +121,7 @@ const Profile = () => {
       )}
 
       <Routes>
-        <Route index element={<GridPostList posts={currentUser.posts} showUser={false} />} />
-        {/* {currentUser.$id === user.id && <Route path="/liked-posts" element={<LikedPosts />} />} */}
+        {/* <Route index element={<GridPostList posts={userProfile.posts} showUser={false} />} /> */}
       </Routes>
       <Outlet />
     </div>

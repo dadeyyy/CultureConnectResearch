@@ -1,5 +1,5 @@
 export type IUpdateUser = {
-  userId: string;
+  userId: number;
   firstName: string;
   lastName: string;
   bio: string;
@@ -9,7 +9,7 @@ export type IUpdateUser = {
 };
 
 export type INewPost = {
-  userId: string;
+  userId: number;
   caption: string;
   file: File[];
   province: string;
@@ -17,7 +17,7 @@ export type INewPost = {
 };
 
 export type IUpdatePost = {
-  postId: string;
+  postId: number;
   caption: string;
   imageId: string;
   imageUrl: URL;
@@ -26,18 +26,17 @@ export type IUpdatePost = {
   municipal: string;
 };
 export type IUser = {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
   username: string;
-  birthdate: string;
   email: string;
   imageUrl: string;
   bio: string;
 };
 
 export type INewUser = {
-  firstName: string;
+  firstName: number;
   lastName: string;
   email: string;
   username: string;

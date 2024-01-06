@@ -1,27 +1,32 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
-import GridPostList from "@/components/shared/GridPostList";
 import PostStats from "@/components/shared/PostStats";
-
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
-import { DummyPost, getPostById } from "@/dummy/dummy";
+import { usePostContext, IPost } from "@/context/PostContext";
 import { useEffect, useState } from "react";
+import Carousel from "@/components/shared/Carousel";
 
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useUserContext();
   const [isLoading, setIsLoading] = useState(true);
-
-  const [post, setPost] = useState<DummyPost | undefined>(undefined);
+  const { postData, isPostLoading, fetchPosts } = usePostContext();
+  const [post, setPost] = useState<IPost | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const fetchedPost = await getPostById(id);
-        setPost(fetchedPost);
+        const postId = id ? parseInt(id, 10) : undefined;
+
+        // Simulate fetching post from the server
+        const foundPost = postData.find((post) => post.id === postId);
+
+        if (foundPost) {
+          setPost(foundPost);
+        }
       } catch (error) {
         console.error("Error fetching post:", error);
       } finally {
@@ -34,16 +39,7 @@ const PostDetails = () => {
     } else {
       setIsLoading(false);
     }
-  }, [id]);
-
-  console.log(post?.creator);
-  console.log(user);
-
-  const handleDeletePost = () => {
-    //wala pa
-    navigate(-1);
-  };
-
+  }, [id, postData]);
   return (
     <div className="post_details-container">
       <div className="hidden md:flex max-w-5xl w-full">
@@ -66,29 +62,29 @@ const PostDetails = () => {
       {isLoading || !post ? (
         <Loader />
       ) : (
-        <div className="post_details-card">
-          <img src={post?.imageUrl} alt="creator" className="post_details-img" />
+        <div className="post_details-card p-5">
+          <Carousel photos={post?.photos || []} />
 
           <div className="post_details-info">
             <div className="flex-between w-full">
-              <Link to={`/profile/${post?.creator.id}`} className="flex items-center gap-3">
+              <Link to={`/profile/${post?.user.id}`} className="flex items-center gap-3">
                 <img
-                  src={post?.creator.imageUrl || "/assets/icons/profile-placeholder.svg"}
-                  alt="creator"
+                  src={post?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
+                  alt="user"
                   className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
                 />
 
                 <div className="flex gap-1 flex-col">
                   <p className="base-medium lg:body-bold text-dark-1">
-                    {post?.creator.firstName} {post?.creator.lastName}
+                    {post?.user.firstName} {post?.user.lastName}
                   </p>
                   <div className="flex-center gap-2 text-light-3">
                     <p className="subtle-semibold lg:small-regular ">
-                      {multiFormatDateString(post?.$createdAt)}
+                      {multiFormatDateString(post?.createdAt)}
                     </p>
                     •
                     <p className="subtle-semibold lg:small-regular">
-                      {post?.province} {post?.municipal}
+                      {post?.province} {post?.municipality}
                     </p>
                   </div>
                 </div>
@@ -96,16 +92,16 @@ const PostDetails = () => {
 
               <div className="flex-center gap-4">
                 <Link
-                  to={`/update-post/${post?.$id}`}
-                  className={`${user.id !== post?.creator.id && "hidden"}`}
+                  to={`/update-post/${post?.id}`}
+                  className={`${user.id !== post?.user.id && "hidden"}`}
                 >
                   <img src={"/assets/icons/edit.svg"} alt="edit" width={24} height={24} />
                 </Link>
 
                 <Button
-                  onClick={handleDeletePost}
+                  //onClick={handleDeletePost}
                   variant="ghost"
-                  className={`ost_details-delete_btn ${user.id !== post?.creator.id && "hidden"}`}
+                  className={`ost_details-delete_btn ${user.id !== post?.user.id && "hidden"}`}
                 >
                   <img src={"/assets/icons/delete.svg"} alt="delete" width={24} height={24} />
                 </Button>

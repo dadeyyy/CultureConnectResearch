@@ -17,23 +17,38 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import Carousel from "./Carousel";
 
-type PostCardProps = {
+interface PostCardProps {
   post: {
-    creator: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      imageUrl?: string;
-    };
-    $id: string;
-    $createdAt: string;
-    province: string;
-    municipal: string;
+    id: number;
     caption: string;
-    imageUrl?: string;
+    createdAt: string;
+    municipality: string;
+    photos: {
+      id: number;
+      url: string;
+      filename: string;
+      postId: number;
+    }[];
+    province: string;
+    updatedAt: string;
+    user: {
+      avatarUrl: string | null;
+      bio: string | null;
+      createdAt: string;
+      email: string;
+      firstName: string;
+      id: number;
+      lastName: string;
+      password: string;
+      role: string;
+      updatedAt: string;
+      username: string;
+    };
   };
-};
+  userId: number;
+}
 
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
@@ -67,31 +82,31 @@ const PostCard = ({ post }: PostCardProps) => {
 
   const options = [{ label: "Report", value: "report" }];
 
-  if (!post.creator) return null;
+  if (!post.user) return null;
 
   return (
     <div className="post-card">
       <div className="flex-between">
         <div className="flex items-center gap-3">
-          <Link to={`/profile/${post.creator.id}`}>
+          <Link to={`/profile/${post.user.id}`}>
             <img
-              src={post?.creator.imageUrl || "/assets/icons/profile-placeholder.svg"}
-              alt="creator"
+              src={post?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
+              alt="user"
               className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
             />
           </Link>
 
           <div className="flex flex-col">
             <p className="base-medium lg:body-bold text-dark-1">
-              {post.creator.firstName} {post.creator.lastName}
+              {post.user.firstName} {post.user.lastName}
             </p>
             <div className="flex-center gap-2 text-dark-3">
               <p className="subtle-semibold lg:small-regular ">
-                {multiFormatDateString(post.$createdAt)}
+                {multiFormatDateString(post.createdAt)}
               </p>
               •
               <p className="subtle-semibold lg:small-regular">
-                {post.province} at {post.municipal}
+                {post.province} at {post.municipality}
               </p>
             </div>
           </div>
@@ -148,24 +163,20 @@ const PostCard = ({ post }: PostCardProps) => {
             </Command>
           </PopoverContent>
         </Popover>
-        <Link
-          to={`/update-post/${post.$id}`}
-          className={`${user.id !== post.creator.id && "hidden"}`}
+        {/* <Link
+          to={`/update-post/${post.id}`}
+          className={`${user.id !== post.user.id && "hidden"}`}
         >
           <img src={"/assets/icons/edit.svg"} alt="edit" width={20} height={20} />
-        </Link>
+        </Link> */}
       </div>
 
-      <Link to={`/posts/${post.$id}`}>
+      <Link to={`/posts/${post.id}`}>
         <div className="small-medium lg:base-medium py-5">
           <p>{post.caption}</p>
         </div>
 
-        <img
-          src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
-          alt="post image"
-          className="post-card_img"
-        />
+        <Carousel photos={post?.photos || []} />
       </Link>
 
       <PostStats post={post} userId={user.id} />

@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { login } from "@/lib/validation";
 import { z } from "zod";
+import { useUserContext } from "@/context/AuthContext";
 
 const LoginForm = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { setUser, setIsAuthenticated } = useUserContext();
   const form = useForm<z.infer<typeof login>>({
     resolver: zodResolver(login),
     defaultValues: {
@@ -17,24 +19,34 @@ const LoginForm = () => {
     },
   });
 
-  // BACKEND SERVER SUBMISSION
   const onSubmit = async (values: z.infer<typeof login>) => {
-    console.log(values);
     try {
       const response = await fetch("http://localhost:8000/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "credentials" : "include"
         },
         body: JSON.stringify(values),
-        credentials: 'include'
+        credentials: "include",
       });
 
       if (response.ok) {
-        const data = await response.json()
-        console.log(data)
-        return navigate('/home')
+        const { user } = await response.json();
+
+        // Update the AuthContext with the user information from the login response
+        setUser({
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          email: user.email,
+          imageUrl: user.imageUrl,
+          bio: user.bio,
+        });
+
+        setIsAuthenticated(true);
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        return navigate("/home");
       } else {
         console.error("Login failed");
       }
