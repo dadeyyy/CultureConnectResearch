@@ -30,7 +30,6 @@ const RegisterForm = () => {
       firstName: "",
       lastName: "",
       userName: "",
-      birthdate: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -41,7 +40,7 @@ const RegisterForm = () => {
   const onSubmit = async (values: z.infer<typeof registration>) => {
     console.log(values);
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("http://localhost:8000/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -130,19 +129,6 @@ const RegisterForm = () => {
                         <FormLabel>Username</FormLabel>
                         <FormControl>
                           <Input type="text" placeholder="juandelacruz1" {...field} />
-                        </FormControl>
-                        <FormMessage className="shad-form_message" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="birthdate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Birthday</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="date" />
                         </FormControl>
                         <FormMessage className="shad-form_message" />
                       </FormItem>

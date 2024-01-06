@@ -23,9 +23,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
-import {blacklist, municipals, provinces} from './PostInfo'
-
-
+import { blacklist, municipals, provinces } from "./PostInfo";
 
 const formSchema = z.object({
   caption: z.string().min(0, {
@@ -42,23 +40,36 @@ const formSchema = z.object({
 
 type PostFormProps = {
   post?: {
-    creator: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      imageUrl?: string;
-    };
-    $id: string;
-    $createdAt: string;
-    province: string;
-    municipal: string;
+    id: number;
     caption: string;
-    imageUrl?: string;
+    createdAt: string;
+    municipality: string;
+    photos: {
+      id: number;
+      url?: string;
+      filename: string;
+      postId: number;
+    }[];
+    province: string;
+    updatedAt: string;
+    user: {
+      avatarUrl: string | null;
+      bio: string | null;
+      createdAt: string;
+      email: string;
+      firstName: string;
+      id: number;
+      lastName: string;
+      password: string;
+      role: string;
+      updatedAt: string;
+      username: string;
+    };
   };
   action: "Create" | "Update";
 };
 
-const PostForm = ({ post, action,  }: PostFormProps) => {
+const PostForm = ({ post, action }: PostFormProps) => {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,26 +78,27 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
     },
   });
 
+  console.log(action);
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    const caption = values.caption
+    const caption = values.caption;
 
-    if(blacklist.includes(caption)){
-        form.setError('caption', {type:'custom', message: `${caption} is not a valid caption`})
-        return
+    if (blacklist.includes(caption)) {
+      form.setError("caption", { type: "custom", message: `${caption} is not a valid caption` });
+      return;
     }
 
     const formData = new FormData();
 
-    formData.append('caption', values.caption)
-    formData.append('province', values.province)
-    formData.append('municipality', values.municipality)
+    formData.append("caption", values.caption);
+    formData.append("province", values.province);
+    formData.append("municipality", values.municipality);
     values.image.forEach((file) => {
       formData.append(`image`, file);
     });
 
-    console.log(formData)
+    console.log(formData);
 
-   // ACTION = UPDATE
+    // ACTION = UPDATE
     if (action === "Update") {
       try {
         const response = await fetch("http://localhost:8000/update-post", {
@@ -95,18 +107,18 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(values),
-          credentials: 'include'
+          credentials: "include",
         });
 
         const data = await response.json();
 
         if (response.ok) {
           console.log("Update successful!");
-          console.log(data)
+          console.log(data);
           navigate("/home");
         } else {
           console.error("Update failed");
-          console.log(data)
+          console.log(data);
         }
       } catch (error) {
         console.error("Error updating post:", error);
@@ -115,21 +127,20 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
     }
 
     // ACTION = CREATE
-    else if ( action === "Create") {
-      console.log("CREATEEE ")
+    else if (action === "Create") {
+      console.log("CREATEEE ");
       try {
         const response = await fetch("http://localhost:8000/post", {
           method: "POST",
           body: formData,
-          credentials: 'include'
+          credentials: "include",
         });
 
         const data = await response.json();
 
-
         if (response.ok) {
           console.log("Posting successful!");
-          console.log(response)
+          console.log(response);
           console.log(data);
           navigate("/home");
         } else {
@@ -175,7 +186,10 @@ const PostForm = ({ post, action,  }: PostFormProps) => {
             <FormItem>
               <FormLabel className="shad-form_label">Add Photos</FormLabel>
               <FormControl>
-                <FileUploader fieldChange={field.onChange} mediaUrl={post?.imageUrl} />
+                <FileUploader
+                  fieldChange={field.onChange}
+                  mediaUrl={post?.photos?.[0]?.url ?? ""}
+                />
               </FormControl>
               <FormMessage className="shad-form_message" />
             </FormItem>

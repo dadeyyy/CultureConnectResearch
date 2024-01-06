@@ -1,24 +1,36 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-type PostStatsProps = {
+interface PostStatsProps {
   post: {
-    creator: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      imageUrl?: string;
-    };
-    $id: string;
-    $createdAt: string;
-    province: string;
-    municipal: string;
+    id: number;
     caption: string;
-
-    imageUrl?: string;
+    createdAt: string;
+    municipality: string;
+    photos: {
+      id: number;
+      url: string;
+      filename: string;
+      postId: number;
+    }[];
+    province: string;
+    updatedAt: string;
+    user: {
+      avatarUrl: string | null;
+      bio: string | null;
+      createdAt: string;
+      email: string;
+      firstName: string;
+      id: number;
+      lastName: string;
+      password: string;
+      role: string;
+      updatedAt: string;
+      username: string;
+    };
   };
-  userId: string;
-};
+  userId: number;
+}
 
 const PostStats = ({}: PostStatsProps) => {
   const location = useLocation();

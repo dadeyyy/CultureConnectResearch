@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require("tailwindcss/defaultTheme");
 
+const labelsClasses = ["indigo", "gray", "green", "blue", "red", "purple"];
+
 module.exports = {
   darkMode: ["class"],
   content: [

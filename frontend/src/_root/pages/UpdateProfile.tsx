@@ -25,7 +25,6 @@ const ProfileValidation = z.object({
   firstName: z.string().min(2),
   lastName: z.string().min(2),
   userName: z.string().min(2),
-  birthdate: z.string(),
   email: z.string().email(),
   bio: z.string(),
 });
@@ -42,7 +41,6 @@ const UpdateProfile = () => {
       firstName: user.firstName,
       lastName: user.lastName,
       userName: user.username,
-      birthdate: user.birthdate,
       email: user.email,
       bio: user.bio || "",
     },
@@ -170,19 +168,6 @@ const UpdateProfile = () => {
                   <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input type="text" placeholder="juandelacruz1" {...field} />
-                  </FormControl>
-                  <FormMessage className="shad-form_message" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="birthdate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Birthday</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="date" />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
                 </FormItem>

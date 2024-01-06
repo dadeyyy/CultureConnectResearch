@@ -28,8 +28,8 @@ const App = () => {
           <Route path="/signup" element={<RegisterForm />} />
           <Route path="/signin" element={<LoginForm />} />
         </Route>
-        {/* After login routes */}
 
+        {/* After login routes */}
         <Route element={<RootLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
