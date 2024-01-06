@@ -2,7 +2,6 @@ import * as z from 'zod';
 import { db } from '../utils/db.server.js';
 export const validate = (schema) => (req, res, next) => {
     try {
-        console.log(req.body);
         schema.parse(req.body);
         next();
     }

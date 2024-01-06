@@ -37,12 +37,10 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
           if (err) {
             console.log('Error saving the session', err);
           }
-          console.log("COOKIE", req.cookies)
           console.log("SESSION", req.session);
           res.json({
             message: 'authenticated',
             status: 200,
-            user: user,
             session: req.session.user,
           });
         });
@@ -93,7 +91,7 @@ authRouter.post('/signup', validate(signUpSchema), async (req, res) => {
 });
 
 authRouter.post('/logout', (req, res) => {
-  if (req.session) {
+  if (req.session.user) {
     return req.session.destroy((err) => {
       if (err) {
         console.log('Error destroying the session');
@@ -101,11 +99,11 @@ authRouter.post('/logout', (req, res) => {
           .status(500)
           .json({ message: 'Error destroying the session' });
       }
-      console.log(req.session)
-      res.status(200).json({ message: 'successfully destroyed session' });
+      return res.status(200).json({ message: 'successfully destroyed session' });
     });
   }
 
+  console.log(req.session)
   res.status(404).json({ error: 'No active session to destroy' });
 });
 
