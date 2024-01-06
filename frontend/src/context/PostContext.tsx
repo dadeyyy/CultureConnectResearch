@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 
 export type IPost = {
   id: number;
@@ -47,7 +47,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
   const [isPostLoading, setIsPostLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback( async () => {
     try {
       const response = await fetch("http://localhost:8000/post", { credentials: "include" });
       const data = await response.json();
@@ -63,7 +63,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
       setError("Something went wrong while fetching posts. Please try again later.");
       setIsPostLoading(false);
     }
-  };
+  }, [])
 
   const value: IPostContext = {
     postData,

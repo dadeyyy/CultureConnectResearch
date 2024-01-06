@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,12 +24,13 @@ import { registration } from "@/lib/validation";
 import { z } from "zod";
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof registration>>({
     resolver: zodResolver(registration),
     defaultValues: {
       firstName: "",
       lastName: "",
-      userName: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -38,18 +39,25 @@ const RegisterForm = () => {
 
   // BACKEND SERVER SUBMISSION
   const onSubmit = async (values: z.infer<typeof registration>) => {
-    console.log(values);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {confirmPassword, ...signUpValues} = values
+
     try {
       const response = await fetch("http://localhost:8000/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(signUpValues),
       });
 
+    
+
       if (response.ok) {
+        const data = await response.json()
+        console.log(data.message)
         console.log("Registration successful!");
+        return navigate('/signin')
       } else {
         console.error("Registration failed");
       }
@@ -123,7 +131,7 @@ const RegisterForm = () => {
                   </div>
                   <FormField
                     control={form.control}
-                    name="userName"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Username</FormLabel>

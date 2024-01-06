@@ -14,7 +14,6 @@ export const signUpSchema = z.object({
     .min(5, { message: 'Password must be atleast 5 characters' }),
   firstName: z.string({ required_error: 'First Name is required' }),
   lastName: z.string({ required_error: 'Last Name is required' }),
-  
   email: z.string({ required_error: 'Email is required' }).email(),
   bio: z.string().optional(),
   avatarUrl: z.string().optional(),

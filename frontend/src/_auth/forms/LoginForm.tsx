@@ -34,6 +34,8 @@ const LoginForm = () => {
       if (response.ok) {
         const { user } = await response.json();
 
+        console.log(user)
+
         // Update the AuthContext with the user information from the login response
         setUser({
           id: user.id,
@@ -41,8 +43,8 @@ const LoginForm = () => {
           lastName: user.lastName,
           username: user.username,
           email: user.email,
-          imageUrl: user.imageUrl,
-          bio: user.bio,
+          imageUrl: "https://hips.hearstapps.com/hmg-prod/images/gettyimages-1229892983-square.jpg",
+          bio: "Bio means life",
         });
 
         setIsAuthenticated(true);

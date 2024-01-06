@@ -41,7 +41,8 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
           res.json({
             message: 'authenticated',
             status: 200,
-            session: req.session.user,
+            user: {id: user.id, firstName: user.firstName, lastName: user.lastName,
+            username: user.username, email: user.email}
           });
         });
       } else {
@@ -73,7 +74,6 @@ authRouter.post('/signup', validate(signUpSchema), async (req, res) => {
         .status(400)
         .json({ error: 'Username or email is already taken' });
     }
-
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const newUser = await db.user.create({
       data: {
@@ -82,10 +82,13 @@ authRouter.post('/signup', validate(signUpSchema), async (req, res) => {
       },
     });
 
+    console.log(newUser);
+
     res.status(200).json({
       message: `${newUser.firstName} ${newUser.lastName} was successfully created`,
     });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: 'Cannot Sign-up' });
   }
 });
