@@ -1,15 +1,17 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const LeftSidebar = () => {
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user, isLoading, checkAuthUser } = useUserContext();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
-
+  
+  
   useEffect(() => {
     const fetchData = async () => {
       if (!user.id) {
@@ -62,13 +64,19 @@ const LeftSidebar = () => {
     },
   ];
 
-  const handleOptionSelect = (selectedValue: string) => {
+  const handleOptionSelect = async (selectedValue: string) => {
     setOpen(false);
     setValue(selectedValue);
 
     if (selectedValue === "logout") {
-      console.log("Logging out...");
-      window.location.href = "/";
+      const response = await fetch('http://localhost:8000/logout',{
+        method: "POST",
+        credentials: 'include'
+      })
+      const data = await response.json();
+      console.log(data)
+      
+      return navigate('/')
     } else if (selectedValue === "profile") {
       window.location.href = `/profile/${user.id}`;
     }

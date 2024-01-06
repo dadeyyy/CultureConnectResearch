@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { login } from "@/lib/validation";
 import { z } from "zod";
+// import { useState } from "react";
 
 const LoginForm = () => {
   const navigate = useNavigate()
@@ -37,6 +38,7 @@ const LoginForm = () => {
         return navigate('/home')
       } else {
         console.error("Login failed");
+        return navigate('/signin')
       }
     } catch (error) {
       console.error("Error submitting login:", error);

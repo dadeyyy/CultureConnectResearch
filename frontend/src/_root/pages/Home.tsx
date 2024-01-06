@@ -16,7 +16,9 @@ const Home = () => {
       const data = await response.json();
       if(response.ok){
         setPostData(data)
-        console.log(postData);
+
+        console.log("DATA", data)
+        console.log("POSTDATA", postData )
         return data
       }
       else{
@@ -25,6 +27,7 @@ const Home = () => {
     }
     fetchAllpost()
   },[])
+
 
   if (isErrorPosts || isErrorCreators) {
     return (
