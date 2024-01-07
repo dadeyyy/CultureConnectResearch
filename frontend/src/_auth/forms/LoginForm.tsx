@@ -34,7 +34,7 @@ const LoginForm = () => {
       if (response.ok) {
         const { user } = await response.json();
 
-        console.log(user)
+        console.log(user);
 
         // Update the AuthContext with the user information from the login response
         setUser({
@@ -52,7 +52,7 @@ const LoginForm = () => {
         return navigate("/home");
       } else {
         console.error("Login failed");
-        return navigate('/signin')
+        return navigate("/signin");
       }
     } catch (error) {
       console.error("Error submitting login:", error);

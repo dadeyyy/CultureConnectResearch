@@ -19,7 +19,7 @@ const Navbar = () => {
         <li className="p-4">About</li>
         <li className="p-4">Contact</li>
         <li>
-          <Link to="/signup" className="leftsidebar-create rounded-md font-medium py-3 px-6 ">
+          <Link to="/signin" className="leftsidebar-create rounded-md font-medium py-3 px-6 ">
             Sign in
           </Link>
         </li>
@@ -35,15 +35,15 @@ const Navbar = () => {
             : "ease-in-out duration-500 fixed left-[-100%]"
         }
       >
-        <h1 className="w-full text-3xl font-bold text-[#00df9a] m-4">REACT.</h1>
+        <img src="/assets/images/logo-2.svg" width={200} height={50} className="py-5" />
         <li className="p-4 border-b border-gray-600">Home</li>
-        <li className="p-4 border-b border-gray-600">Company</li>
-        <li className="p-4 border-b border-gray-600">Resources</li>
+        <li className="p-4 border-b border-gray-600">Features</li>
+        <li className="p-4 border-b border-gray-600">Who we are</li>
         <li className="p-4 border-b border-gray-600">About</li>
         <li className="p-4 border-b border-gray-600">Contact</li>
         <li>
           <Link
-            to="/signup"
+            to="/signin"
             className="leftsidebar-create w-[100px] rounded-md font-medium my-6 mx-auto py-3"
           >
             Sign in
