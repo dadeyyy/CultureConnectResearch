@@ -62,7 +62,7 @@ const PostDetails = () => {
       {isLoading || !post ? (
         <Loader />
       ) : (
-        <div className="post_details-card p-5">
+        <div className="post_details-card p-5 grid grid-cols-2">
           <Carousel photos={post?.photos || []} />
 
           <div className="post_details-info">
