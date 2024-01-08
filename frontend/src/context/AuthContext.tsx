@@ -1,15 +1,21 @@
-import { useNavigate } from "react-router-dom";
-import { createContext, useContext, useEffect, useState } from "react";
-import { IUser } from "@/type/index";
+import { useNavigate } from 'react-router-dom';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { IUser } from '@/type/index';
 
 export const INITIAL_USER = {
   id: 0,
-  firstName: "",
-  lastName: "",
-  username: "",
-  email: "",
-  imageUrl: "",
-  bio: "",
+  firstName: '',
+  lastName: '',
+  username: '',
+  email: '',
+  imageUrl: '',
+  bio: '',
 };
 
 const INITIAL_STATE = {
@@ -33,23 +39,23 @@ type IContextType = {
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const USER_STORAGE_KEY = "currentUser";
+  const USER_STORAGE_KEY = 'currentUser';
   const navigate = useNavigate();
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Change to true initially
 
-  const checkAuthUser = async () => {
+  const checkAuthUser = useCallback(async () => {
     try {
       const cookieFallback = localStorage.getItem(USER_STORAGE_KEY);
 
       if (
         !cookieFallback ||
-        cookieFallback === "[]" ||
+        cookieFallback === '[]' ||
         cookieFallback === null ||
         cookieFallback === undefined
       ) {
-        navigate("/signin");
+        navigate('/signin');
         return false;
       }
 
@@ -71,12 +77,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return false;
     } catch (error) {
-      console.error("Error checking authentication:", error);
+      console.error('Error checking authentication:', error);
       throw error; // Re-throw the error after logging
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate, setUser, setIsAuthenticated, setIsLoading]);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -84,7 +90,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     };
 
-    initializeAuth();
+    if (isLoading) {
+      initializeAuth();
+    }
   }, []);
 
   const value = {
@@ -96,7 +104,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuthUser,
   };
 
-  return <AuthContext.Provider value={value}>{!isLoading && children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {!isLoading && children}
+    </AuthContext.Provider>
+  );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useUserContext = () => useContext(AuthContext);

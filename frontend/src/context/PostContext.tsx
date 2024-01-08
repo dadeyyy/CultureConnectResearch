@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 
 export type IPost = {
   id: number;
@@ -75,6 +75,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
   return <PostContext.Provider value={value}>{children}</PostContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const usePostContext = () => {
   const context = useContext(PostContext);
   if (!context) {

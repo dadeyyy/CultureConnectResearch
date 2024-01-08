@@ -22,18 +22,16 @@ const PostDetails = () => {
 
     initializeAuth();
   }, [checkAuthUser]);
+  console.log(user);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        // Ensure that posts are fetched before attempting to find the post
         if (!postData.length) {
           await fetchPosts();
         }
 
         const postId = id ? parseInt(id, 10) : undefined;
-
-        // Find the post in the postData array based on postId
         const foundPost = postData.find((post) => post.id === postId);
 
         if (foundPost) {
@@ -44,12 +42,25 @@ const PostDetails = () => {
       }
     };
 
-    if (id && postData.length > 0) {
-      fetchPost();
-    } else {
-      console.error("Error else:");
-    }
+    fetchPost();
   }, [id, postData, fetchPosts]);
+
+  async function handleDeletePost(){
+    const response = await fetch(`http://localhost:8000/post/${id}`, {
+      method: "DELETE",
+      credentials:'include'
+    })
+
+    const data = await response.json();
+
+    if(response.ok){
+      console.log("SUCCESS", data)
+      return navigate('/home')
+    }
+    else{
+      console.log("FAILED", data)
+    }
+  }
 
   return (
     <div className="post_details-container">
@@ -110,7 +121,7 @@ const PostDetails = () => {
                 </Link>
 
                 <Button
-                  //onClick={handleDeletePost}
+                  onClick={handleDeletePost}
                   variant="ghost"
                   className={`ost_details-delete_btn ${user.id !== post?.user.id && "hidden"}`}
                 >

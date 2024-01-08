@@ -46,7 +46,7 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
         const allPost = await db.post.findMany({
             include: {
                 photos: true,
-                user: true
+                user: true,
             },
         });
         res.status(200).json(allPost);
@@ -141,18 +141,28 @@ postRoute.put('/post/:postId', isAuthenticated, upload.array('image'), validate(
 postRoute.delete('/post/:postId', isAuthenticated, isAuthor, async (req, res) => {
     try {
         const postId = parseInt(req.params.postId);
-        const deletedPost = await db.post.delete({
+        //Find post to delete
+        const post = await db.post.findUnique({
             where: {
-                id: +postId,
+                id: postId,
             },
-            include: { photos: true },
         });
-        return res
-            .status(500)
-            .json({ message: `Successfully deleted post! #${deletedPost.id}` });
+        if (post) {
+            const deletedPost = await db.post.delete({
+                where: {
+                    id: +postId,
+                },
+                include: { photos: true },
+            });
+            return res
+                .status(200)
+                .json({ message: `Successfully deleted post! #${deletedPost.id}` });
+        }
+        return res.status(404).json({ error: "Can't find post!" });
     }
     catch (error) {
         console.log(error);
+        return res.status(500).json({ error, message: 'Internal Server Error!' });
     }
 });
 export default postRoute;
