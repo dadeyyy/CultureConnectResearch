@@ -215,9 +215,9 @@ const PostForm = ({ action }: PostFormProps) => {
                         className={cn("justify-between", !field.value && "text-muted-foreground")}
                       >
                         {post?.province
-                          ? // If provinceLabel is available, find the corresponding province and use its label
+                          ?
                             provinces.find((province) => province.value === post?.province)?.label
-                          : // Otherwise, use the default or selected province value
+                          :
                           field.value
                           ? provinces.find((province) => province.value === field.value)?.label
                           : "Select Province"}

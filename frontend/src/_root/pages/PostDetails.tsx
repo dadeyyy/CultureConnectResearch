@@ -7,6 +7,20 @@ import { useUserContext } from "@/context/AuthContext";
 import { usePostContext, IPost } from "@/context/PostContext";
 import { useEffect, useState } from "react";
 import Carousel from "@/components/shared/Carousel";
+import Comments from "@/components/shared/Comments";
+import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const PostDetails = () => {
   const navigate = useNavigate();
@@ -14,6 +28,11 @@ const PostDetails = () => {
   const { user, isLoading, checkAuthUser } = useUserContext();
   const { postData, fetchPosts } = usePostContext();
   const [post, setPost] = useState<IPost | null>(null);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+  const [openAlertDialog, setOpenAlertDialog] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("");
+  const [openNestedAlertDialog, setOpenNestedAlertDialog] = useState(false);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -45,22 +64,45 @@ const PostDetails = () => {
     fetchPost();
   }, [id, postData, fetchPosts]);
 
-  async function handleDeletePost(){
+  async function handleDeletePost() {
     const response = await fetch(`http://localhost:8000/post/${id}`, {
       method: "DELETE",
-      credentials:'include'
-    })
+      credentials: "include",
+    });
 
     const data = await response.json();
 
-    if(response.ok){
-      console.log("SUCCESS", data)
-      return navigate('/home')
-    }
-    else{
-      console.log("FAILED", data)
+    if (response.ok) {
+      console.log("SUCCESS", data);
+      return navigate("/home");
+    } else {
+      console.log("FAILED", data);
     }
   }
+
+  const handleOptionSelect = (selectedValue: string) => {
+    setSelectedOption(selectedValue);
+    setOpenAlertDialog(true);
+    setValue(selectedValue);
+  };
+
+  const handleCancel = () => {
+    setOpenAlertDialog(false);
+  };
+
+  const handleContinue = () => {
+    setOpenAlertDialog(false);
+    setOpenNestedAlertDialog(true);
+  };
+
+  const handleNestedContinue = () => {
+    setOpenNestedAlertDialog(false);
+    if (value === "report") {
+      window.location.href = "/home";
+    }
+  };
+
+  const options = [{ label: "Report", value: "report" }];
 
   return (
     <div className="post_details-container">
@@ -84,9 +126,8 @@ const PostDetails = () => {
       {isLoading || !post ? (
         <Loader />
       ) : (
-        <div className="grid grid-cols-2 post_details-card p-5 ">
+        <div className="post_details-card p-5 ">
           <Carousel photos={post?.photos || []} />
-
           <div className="post_details-info">
             <div className="flex-between w-full">
               <Link to={`/profile/${post?.user.id}`} className="flex items-center gap-3">
@@ -127,18 +168,75 @@ const PostDetails = () => {
                 >
                   <img src={"/assets/icons/delete.svg"} alt="delete" width={24} height={24} />
                 </Button>
+
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <img
+                      src={"/assets/icons/three-dots.svg"}
+                      alt="edit"
+                      width={20}
+                      height={20}
+                      className={`${user.id === post?.user.id && "hidden"}`}
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] bg-light-2 p-0" side="top" align="end">
+                    <Command>
+                      <CommandGroup>
+                        {options.map((option) => (
+                          <CommandItem
+                            key={option.value}
+                            value={option.value}
+                            onSelect={handleOptionSelect}
+                            className="hover:bg-primary-1 cursor-pointer transition-colors"
+                          >
+                            {option.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                      <AlertDialog open={openAlertDialog}>
+                        <AlertDialogContent className="bg-light-2">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Report post.</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure reporting this post?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
+                            <AlertDialogTrigger asChild>
+                              <Button onClick={handleContinue}>Submit</Button>
+                            </AlertDialogTrigger>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+
+                        <AlertDialog open={openNestedAlertDialog}>
+                          <AlertDialogContent className="bg-light-2">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Report Submitted.</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Thank you for reporting this post.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogAction onClick={handleNestedContinue}>
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </AlertDialog>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
-
             <hr className="border w-full border-dark-4/80" />
 
             <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
               <p>{post?.caption}</p>{" "}
             </div>
-
-            <div className="w-full">
-              <PostStats post={post} userId={user.id} />
-            </div>
+            <PostStats post={post} userId={user.id} />
+            <Comments postId={post.id} />
           </div>
         </div>
       )}
