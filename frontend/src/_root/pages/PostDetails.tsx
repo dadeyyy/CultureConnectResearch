@@ -11,17 +11,29 @@ import Carousel from "@/components/shared/Carousel";
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { user } = useUserContext();
-  const [isLoading, setIsLoading] = useState(true);
-  const { postData, isPostLoading, fetchPosts } = usePostContext();
+  const { user, isLoading, checkAuthUser } = useUserContext();
+  const { postData, fetchPosts } = usePostContext();
   const [post, setPost] = useState<IPost | null>(null);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      await checkAuthUser();
+    };
+
+    initializeAuth();
+  }, [checkAuthUser]);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
+        // Ensure that posts are fetched before attempting to find the post
+        if (!postData.length) {
+          await fetchPosts();
+        }
+
         const postId = id ? parseInt(id, 10) : undefined;
 
-        // Simulate fetching post from the server
+        // Find the post in the postData array based on postId
         const foundPost = postData.find((post) => post.id === postId);
 
         if (foundPost) {
@@ -29,17 +41,16 @@ const PostDetails = () => {
         }
       } catch (error) {
         console.error("Error fetching post:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    if (id) {
+    if (id && postData.length > 0) {
       fetchPost();
     } else {
-      setIsLoading(false);
+      console.error("Error else:");
     }
-  }, [id, postData]);
+  }, [id, postData, fetchPosts]);
+
   return (
     <div className="post_details-container">
       <div className="hidden md:flex max-w-5xl w-full">
@@ -62,7 +73,7 @@ const PostDetails = () => {
       {isLoading || !post ? (
         <Loader />
       ) : (
-        <div className="post_details-card p-5 grid grid-cols-2">
+        <div className="grid grid-cols-2 post_details-card p-5 ">
           <Carousel photos={post?.photos || []} />
 
           <div className="post_details-info">

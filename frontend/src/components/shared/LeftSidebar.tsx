@@ -10,15 +10,13 @@ const LeftSidebar = () => {
   const { user, isLoading, checkAuthUser } = useUserContext();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
-  
-  
+
   useEffect(() => {
     const fetchData = async () => {
       if (!user.id) {
         await checkAuthUser();
       }
     };
-
     fetchData();
   }, [checkAuthUser, user.id]);
 
@@ -69,14 +67,14 @@ const LeftSidebar = () => {
     setValue(selectedValue);
 
     if (selectedValue === "logout") {
-      const response = await fetch('http://localhost:8000/logout',{
+      const response = await fetch("http://localhost:8000/logout", {
         method: "POST",
-        credentials: 'include'
-      })
+        credentials: "include",
+      });
       const data = await response.json();
-      console.log(data)
-      
-      return navigate('/')
+      console.log(data);
+
+      return navigate("/");
     } else if (selectedValue === "profile") {
       window.location.href = `/profile/${user.id}`;
     }

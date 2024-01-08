@@ -33,6 +33,7 @@ type IContextType = {
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const USER_STORAGE_KEY = "currentUser";
   const navigate = useNavigate();
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,15 +41,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuthUser = async () => {
     try {
-      // ------------ CHANGE THIS CURRENTUSER TO COOKIE WHEN IT IS WORKING HAHAHA -------
-      const cookieFallback = localStorage.getItem("currentUser");
-      if (cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) {
+      const cookieFallback = localStorage.getItem(USER_STORAGE_KEY);
+
+      if (
+        !cookieFallback ||
+        cookieFallback === "[]" ||
+        cookieFallback === null ||
+        cookieFallback === undefined
+      ) {
         navigate("/signin");
         return false;
       }
 
-      // Extract user information from local storage
-      const storedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+      const storedUser = JSON.parse(cookieFallback);
 
       if (storedUser) {
         setUser({
@@ -61,16 +66,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           bio: storedUser.bio,
         });
         setIsAuthenticated(true);
-        console.log(user);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error(error);
-      return false;
+      console.error("Error checking authentication:", error);
+      throw error; // Re-throw the error after logging
     } finally {
-      setIsLoading(false); // Move setIsLoading(false) to finally block
+      setIsLoading(false);
     }
   };
 
