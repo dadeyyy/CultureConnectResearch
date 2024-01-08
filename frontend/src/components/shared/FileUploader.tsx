@@ -22,7 +22,7 @@ type FileUploaderProps = {
 const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [fileUrls, setFileUrls] = useState<string[]>(
-    Array.isArray(photos) ? photos.map((photo) => photo.url) : photos ? [photos.url] : []
+    photos ? (Array.isArray(photos) ? photos.map((photo) => photo.url) : [photos.url]) : []
   );
 
   console.log(photos);
