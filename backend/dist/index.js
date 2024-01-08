@@ -7,6 +7,7 @@ import authRouter from './router/authRoute.js';
 import postRoute from './router/postRoute.js';
 import userRoute from './router/userRoute.js';
 import commentRoute from './router/commentRoute.js';
+import likeRoute from './router/likeRoute.js';
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
 }
@@ -36,6 +37,7 @@ app.use('/', authRouter);
 app.use('/', postRoute);
 app.use('/', userRoute);
 app.use('/', commentRoute);
+app.use('/', likeRoute);
 app.listen(PORT, () => {
     console.log(`LISTENING ON PORT ${PORT}`);
 });

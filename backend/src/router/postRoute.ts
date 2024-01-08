@@ -10,10 +10,6 @@ import { postSchema, postTypeSchema } from '../utils/Schemas.js';
 
 const postRoute = express.Router();
 
-postRoute.post('/testroute', (req, res) => {
-  console.log(req.session);
-});
-
 //ADD POST
 postRoute.post(
   '/post',

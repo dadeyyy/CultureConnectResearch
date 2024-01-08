@@ -3,7 +3,6 @@ import { db } from '../utils/db.server.js';
 import {
   isAuthenticated,
   validate,
-  isAuthor,
   isCommentAuthor,
 } from '../middleware/middleware.js';
 import { commentSchema, commentTypeSchema } from '../utils/Schemas.js';

@@ -4,9 +4,6 @@ import { db } from '../utils/db.server.js';
 import { upload } from '../utils/cloudinary.js';
 import { postSchema } from '../utils/Schemas.js';
 const postRoute = express.Router();
-postRoute.post('/testroute', (req, res) => {
-    console.log(req.session);
-});
 //ADD POST
 postRoute.post('/post', isAuthenticated, upload.array('image'), validate(postSchema), async (req, res) => {
     try {
