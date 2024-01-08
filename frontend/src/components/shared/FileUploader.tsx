@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 
@@ -21,12 +21,30 @@ type FileUploaderProps = {
 
 const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const [fileUrls, setFileUrls] = useState<string[]>(
-    photos ? (Array.isArray(photos) ? photos.map((photo) => photo.url) : [photos.url]) : []
-  );
+  useEffect(() => {
+    if (photos) {
+      if (Array.isArray(photos) && photos.length > 0) {
+        setFileUrls(photos.map((photo) => photo.url));
+      } else if (!Array.isArray(photos)) {
+        setFileUrls([photos.url]);
+      }
+    }
+  }, [photos]);
+
+  const [fileUrls, setFileUrls] = useState<string[]>(() => {
+    if (photos) {
+      if (Array.isArray(photos) && photos.length > 0) {
+        return photos.map((photo) => photo.url);
+      } else if (!Array.isArray(photos)) {
+        return [photos.url];
+      }
+    }
+    return [];
+  });
 
   console.log(photos);
   console.log(fileUrls);
+
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
       const updatedFiles = [...files, ...acceptedFiles];

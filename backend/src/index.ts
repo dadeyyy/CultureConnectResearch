@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import authRouter from './router/authRoute.js';
 import postRoute from './router/postRoute.js';
 import userRoute from './router/userRoute.js';
+import commentRoute from './router/commentRoute.js';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -56,6 +57,7 @@ app.use(morgan('tiny'));
 app.use('/', authRouter);
 app.use('/', postRoute);
 app.use('/', userRoute)
+app.use('/', commentRoute)
 
 app.listen(PORT, () => {
   console.log(`LISTENING ON PORT ${PORT}`);

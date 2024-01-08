@@ -73,6 +73,7 @@ const LeftSidebar = () => {
       });
       const data = await response.json();
       console.log(data);
+      localStorage.removeItem("currentUser");
 
       return navigate("/");
     } else if (selectedValue === "profile") {

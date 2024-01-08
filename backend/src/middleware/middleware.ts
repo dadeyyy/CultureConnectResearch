@@ -19,12 +19,11 @@ export const validate =
   };
 
 export function isAuthenticated(req: Request, res: Response, next: () => void) {
-
   if (req.session.user) {
-    console.log("AUTHENTICATED")
+    console.log('AUTHENTICATED');
     next();
   } else {
-    console.log("User not authenticated!!!")
+    console.log('User not authenticated!!!');
     return res.status(401).json({ error: 'User not authenticated!' });
   }
 }
@@ -47,20 +46,54 @@ export const isAuthor = async (
     });
 
     const user = post?.user.username;
-    const authorized =  username === user;
+    const authorized = username === user;
     if (post && authorized) {
       console.log('Authorized');
-      next(); 
-    } else if(!post) {
-      res.status(404).json({error: "Post can't be found!"})
+      next();
+    } else if (!post) {
+      res.status(404).json({ error: "Post can't be found!" });
+    } else if (!authorized) {
+      res.status(401).json({ error: 'Unauthorized' });
     }
-    else if(!authorized){
-      res.status(401).json({error: "Unauthorized"})
-    }
-    
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+export const isCommentAuthor = async (
+  req: Request,
+  res: Response,
+  next: () => void
+) => {
+  try {
+    const commentId = req.params.commentId;
+    const author = req.session.user?.id;
+
+    //Find comment
+    const comment = await db.comment.findUnique({
+      where: {
+        id: +commentId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    const commentAuthor = comment?.user.id;
+
+    if (comment && author === commentAuthor) {
+      console.log(author);
+      console.log(commentAuthor);
+      next();
+    } else {
+      return res.status(400).json({ error: 'Not an author' });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error, message: 'INTERNAL SERVER ERROR! ' });
+  }
+};
+
+
 

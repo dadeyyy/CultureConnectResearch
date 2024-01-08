@@ -26,11 +26,14 @@ const Home = () => {
             </div>
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full">
-              {postData.map((post) => (
-                <li key={post.id} className="flex justify-center w-full">
-                  <PostCard post={post} userId={user.id} />
-                </li>
-              ))}
+              {postData
+                .slice()
+                .reverse()
+                .map((post) => (
+                  <li key={post.id} className="flex justify-center w-full">
+                    <PostCard post={post} userId={user.id} />
+                  </li>
+                ))}
             </ul>
           )}
         </div>

@@ -2,7 +2,7 @@ import express from 'express';
 import { isAuthenticated, isAuthor, validate, } from '../middleware/middleware.js';
 import { db } from '../utils/db.server.js';
 import { upload } from '../utils/cloudinary.js';
-import { postSchema } from '../utils/PostSchema.js';
+import { postSchema } from '../utils/Schemas.js';
 const postRoute = express.Router();
 postRoute.post('/testroute', (req, res) => {
     console.log(req.session);
@@ -47,8 +47,10 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
             include: {
                 photos: true,
                 user: true,
+                comments: true,
             },
         });
+        console.log(allPost);
         res.status(200).json(allPost);
     }
     catch (error) {

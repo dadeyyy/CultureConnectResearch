@@ -1,12 +1,6 @@
-import { useNavigate } from 'react-router-dom';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-import { IUser } from '@/type/index';
+import { useNavigate } from "react-router-dom";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { IUser } from "@/type/index";
 
 export const INITIAL_USER = {
   id: 0,

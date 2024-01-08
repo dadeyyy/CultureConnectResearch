@@ -46,7 +46,7 @@ const PostStats = ({}: PostStatsProps) => {
   const containerStyles = location.pathname.startsWith("/profile") ? "w-full" : "";
 
   return (
-    <div className={`flex justify-between items-center z-20 ${containerStyles}`}>
+    <div className={`flex justify-between items-center my-5 z-20 ${containerStyles}`}>
       <div className="flex gap-2 mr-5">
         <img
           src={isLiked ? "/assets/icons/liked.svg" : "/assets/icons/like.svg"}

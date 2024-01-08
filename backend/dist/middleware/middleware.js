@@ -16,11 +16,11 @@ export const validate = (schema) => (req, res, next) => {
 };
 export function isAuthenticated(req, res, next) {
     if (req.session.user) {
-        console.log("AUTHENTICATED");
+        console.log('AUTHENTICATED');
         next();
     }
     else {
-        console.log("User not authenticated!!!");
+        console.log('User not authenticated!!!');
         return res.status(401).json({ error: 'User not authenticated!' });
     }
 }
@@ -45,12 +45,40 @@ export const isAuthor = async (req, res, next) => {
             res.status(404).json({ error: "Post can't be found!" });
         }
         else if (!authorized) {
-            res.status(401).json({ error: "Unauthorized" });
+            res.status(401).json({ error: 'Unauthorized' });
         }
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+export const isCommentAuthor = async (req, res, next) => {
+    try {
+        const commentId = req.params.commentId;
+        const author = req.session.user?.id;
+        //Find comment
+        const comment = await db.comment.findUnique({
+            where: {
+                id: +commentId,
+            },
+            include: {
+                user: true,
+            },
+        });
+        const commentAuthor = comment?.user.id;
+        if (comment && author === commentAuthor) {
+            console.log(author);
+            console.log(commentAuthor);
+            next();
+        }
+        else {
+            return res.status(400).json({ error: 'Not an author' });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ error, message: 'INTERNAL SERVER ERROR! ' });
     }
 };
 //# sourceMappingURL=middleware.js.map

@@ -18,7 +18,14 @@ export const postSchema = z.object({
   userId: z.number().optional()
 });
 
-
 export type postTypeSchema = z.infer<typeof postSchema>;
+
+
+
+export const commentSchema = z.object({
+  content: z.string({required_error: 'content is required'})
+})
+
+export type commentTypeSchema = z.infer<typeof commentSchema>
 
 

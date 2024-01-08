@@ -15,5 +15,7 @@ export const postSchema = z.object({
     municipality: z.string({ required_error: 'municipality is required!' }),
     userId: z.number().optional()
 });
-export const ;
-//# sourceMappingURL=PostSchema.js.map
+export const commentSchema = z.object({
+    content: z.string({ required_error: 'content is required' })
+});
+//# sourceMappingURL=Schemas.js.map

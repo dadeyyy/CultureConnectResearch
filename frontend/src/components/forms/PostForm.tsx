@@ -148,23 +148,16 @@ const PostForm = ({ action }: PostFormProps) => {
           body: formData,
           credentials: "include",
         });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          console.log("Posting successful!");
-          console.log(response);
-          console.log(data);
-          navigate("/home");
-        } else {
-          console.error("Posting failed");
-          console.log("Response", response);
-          console.log("Data", data);
+        if (!response.ok) {
+          console.error("Error during POST request:", response);
+          return;
         }
+        const data = await response.json();
+        console.log("Posting successful!", data);
+        navigate("/home");
       } catch (error) {
-        console.error("Error posting:", error);
+        console.error("Error during POST request:", error);
       }
-      return navigate(`/home`);
     }
   };
 
@@ -221,9 +214,13 @@ const PostForm = ({ action }: PostFormProps) => {
                         role="combobox"
                         className={cn("justify-between", !field.value && "text-muted-foreground")}
                       >
-                        {field.value
+                        {post?.province
+                          ? // If provinceLabel is available, find the corresponding province and use its label
+                            provinces.find((province) => province.value === post?.province)?.label
+                          : // Otherwise, use the default or selected province value
+                          field.value
                           ? provinces.find((province) => province.value === field.value)?.label
-                          : post?.province || "Select Province"}
+                          : "Select Province"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -244,7 +241,9 @@ const PostForm = ({ action }: PostFormProps) => {
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                province.value === field.value ? "opacity-100" : "opacity-0"
+                                province.value === field.value || province.value === post?.province
+                                  ? "opacity-100"
+                                  : "opacity-0"
                               )}
                             />
                             {province.label}
@@ -272,9 +271,13 @@ const PostForm = ({ action }: PostFormProps) => {
                         role="combobox"
                         className={cn("justify-between", !field.value && "text-muted-foreground")}
                       >
-                        {field.value
+                        {post?.municipality
+                          ? municipals.find((municipal) => municipal.value === post?.municipality)
+                              ?.label
+                          : // Otherwise, use the default or selected province value
+                          field.value
                           ? municipals.find((municipal) => municipal.value === field.value)?.label
-                          : post?.municipality || "Select Municipal"}
+                          : "Select Municipality"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -295,7 +298,10 @@ const PostForm = ({ action }: PostFormProps) => {
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                municipal.value === field.value ? "opacity-100" : "opacity-0"
+                                municipal.value === field.value ||
+                                  municipal.value === post?.municipality
+                                  ? "opacity-100"
+                                  : "opacity-0"
                               )}
                             />
                             {municipal.label}

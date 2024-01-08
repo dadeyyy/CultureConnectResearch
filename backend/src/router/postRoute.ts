@@ -6,7 +6,7 @@ import {
 } from '../middleware/middleware.js';
 import { db } from '../utils/db.server.js';
 import { upload } from '../utils/cloudinary.js';
-import { postSchema, postTypeSchema } from '../utils/PostSchema.js';
+import { postSchema, postTypeSchema } from '../utils/Schemas.js';
 
 const postRoute = express.Router();
 
@@ -62,8 +62,10 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
       include: {
         photos: true,
         user: true,
+        comments: true,
       },
     });
+    console.log(allPost)
     res.status(200).json(allPost);
   } catch (error) {
     console.log(error);
