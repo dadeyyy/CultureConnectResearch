@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { IUser } from "@/type/index";
 
 export const INITIAL_USER = {
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Change to true initially
 
-  const checkAuthUser = async () => {
+  const checkAuthUser = useCallback(async () => {
     try {
       const cookieFallback = localStorage.getItem(USER_STORAGE_KEY);
 
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate, setUser, setIsAuthenticated, setIsLoading]);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -84,7 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     };
 
-    initializeAuth();
+    if (isLoading) {
+      initializeAuth();
+    }
   }, []);
 
   const value = {

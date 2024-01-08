@@ -18,6 +18,8 @@ import {
 import { useState } from "react";
 import { Button } from "../ui/button";
 import Carousel from "./Carousel";
+import { filterInappropriateWords } from "@/lib/CaptionFilter";
+import Comments from "./Comments";
 
 interface PostCardProps {
   post: {
@@ -173,13 +175,13 @@ const PostCard = ({ post }: PostCardProps) => {
 
       <Link to={`/posts/${post.id}`}>
         <div className="small-medium lg:base-medium py-5">
-          <p>{post.caption}</p>
+          <p>{filterInappropriateWords(post.caption)}</p>
         </div>
-
-        <Carousel photos={post?.photos || []} />
       </Link>
+      <Carousel photos={post?.photos || []} />
 
       <PostStats post={post} userId={user.id} />
+      <Comments />
     </div>
   );
 };

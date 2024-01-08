@@ -49,6 +49,7 @@ const LoginForm = () => {
 
         setIsAuthenticated(true);
         localStorage.setItem("currentUser", JSON.stringify(user));
+
         return navigate("/home");
       } else {
         console.error("Login failed");

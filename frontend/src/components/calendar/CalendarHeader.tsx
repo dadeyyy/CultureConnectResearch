@@ -21,20 +21,16 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = () => {
 
   return (
     <header className="px-4 py-2 flex items-center">
-      <img src={"@/dummy/dummy.jpg"} alt="calendar" className="mr-2 w-12 h-12" />
+      <img src={"/assets/icons/calendar-calendar.svg"} alt="calendar" className="mr-2 w-12 h-12" />
       <h1 className="mr-10 text-xl text-gray-500 fond-bold">Calendar</h1>
       <button onClick={handleReset} className="border rounded py-2 px-4 mr-5">
         Today
       </button>
       <button onClick={handlePrevMonth}>
-        <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2">
-          chevron_left
-        </span>
+        <img src="assets/icons/calendar-back.svg" width={20} height={20} />
       </button>
       <button onClick={handleNextMonth}>
-        <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2">
-          chevron_right
-        </span>
+        <img src="assets/icons/calendar-next.svg" width={20} height={20} />
       </button>
       <h2 className="ml-4 text-xl text-gray-500 font-bold">
         {dayjs(new Date(dayjs().year(), monthIndex)).format("MMMM YYYY")}
