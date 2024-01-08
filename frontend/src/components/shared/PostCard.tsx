@@ -81,7 +81,7 @@ const PostCard = ({ post }: PostCardProps) => {
       window.location.href = "/home";
     }
   };
-
+  console.log(post.id);
   const options = [{ label: "Report", value: "report" }];
 
   if (!post.user) return null;
@@ -181,7 +181,7 @@ const PostCard = ({ post }: PostCardProps) => {
       <Carousel photos={post?.photos || []} />
 
       <PostStats post={post} userId={user.id} />
-      <Comments />
+      <Comments postId={post.id} />
     </div>
   );
 };
