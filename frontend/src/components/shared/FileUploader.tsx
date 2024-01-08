@@ -4,13 +4,29 @@ import { Button } from "@/components/ui/button";
 
 type FileUploaderProps = {
   fieldChange: (files: File[]) => void;
-  mediaUrl?: string;
+  photos?:
+    | {
+        id: number;
+        url: string;
+        filename: string;
+        postId: number;
+      }[]
+    | {
+        id: number;
+        url: string;
+        filename: string;
+        postId: number;
+      };
 };
 
-const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
+const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const [fileUrls, setFileUrls] = useState<string[]>(mediaUrl ? [mediaUrl] : []);
+  const [fileUrls, setFileUrls] = useState<string[]>(
+    Array.isArray(photos) ? photos.map((photo) => photo.url) : photos ? [photos.url] : []
+  );
 
+  console.log(photos);
+  console.log(fileUrls);
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
       const updatedFiles = [...files, ...acceptedFiles];

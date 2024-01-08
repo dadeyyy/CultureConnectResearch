@@ -70,7 +70,7 @@ const LoginForm = () => {
           <p className="font-bold text-red-700">in the Philippines</p>
         </div>
         <h2 className="font-bold pt-5 sm:py-5">Sign in to CultureConnect</h2>
-        <div className="flex flex-center flex-col">
+        {/* <div className="flex flex-center flex-col">
           <Button
             variant="outline"
             className="group hover:bg-blue-500 hover:text-white active:border-blue-500 active:bg-white active:text-black"
@@ -81,7 +81,7 @@ const LoginForm = () => {
           <div className="text-center sm:text-center sm:w-100 m-3">
             <p className="font-bold">or</p>
           </div>
-        </div>
+        </div> */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-1 w-full mt-1">
           <FormField
             control={form.control}
