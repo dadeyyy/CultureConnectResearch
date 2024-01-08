@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { blacklist, municipals, provinces } from "./PostInfo";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   caption: z.string().min(0, {
@@ -39,37 +40,49 @@ const formSchema = z.object({
 });
 
 type PostFormProps = {
-  post?: {
-    id: number;
-    caption: string;
-    createdAt: string;
-    municipality: string;
-    photos: {
-      id: number;
-      url?: string;
-      filename: string;
-      postId: number;
-    }[];
-    province: string;
-    updatedAt: string;
-    user: {
-      avatarUrl: string | null;
-      bio: string | null;
-      createdAt: string;
-      email: string;
-      firstName: string;
-      id: number;
-      lastName: string;
-      password: string;
-      role: string;
-      updatedAt: string;
-      username: string;
-    };
-  };
   action: "Create" | "Update";
 };
 
-const PostForm = ({ post, action }: PostFormProps) => {
+type PostProps = {
+  caption: string;
+  createdAt: string;
+  id: number;
+  municipality: string;
+  photos: {
+    id: number;
+    url: string;
+    filename: string;
+    postId: number;
+  }[];
+  province: string;
+  updatedAt: string;
+  userId: number;
+};
+
+const PostForm = ({ action }: PostFormProps) => {
+  const { id } = useParams();
+  const [post, setPost] = useState<PostProps | null>(null);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/post/${id}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setPost(data);
+          console.log(data);
+        } else {
+          console.error("Error fetching post:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching post:", error);
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -173,6 +186,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
                   className="shad-textarea custom-scrollbar"
                   placeholder="Caption here"
                   {...field}
+                  value={post?.caption}
                 />
               </FormControl>
               <FormMessage className="shad-form_message" />
@@ -186,10 +200,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
             <FormItem>
               <FormLabel className="shad-form_label">Add Photos</FormLabel>
               <FormControl>
-                <FileUploader
-                  fieldChange={field.onChange}
-                  mediaUrl={post?.photos?.[0]?.url ?? ""}
-                />
+                <FileUploader fieldChange={field.onChange} photos={post?.photos} />
               </FormControl>
               <FormMessage className="shad-form_message" />
             </FormItem>
@@ -212,7 +223,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
                       >
                         {field.value
                           ? provinces.find((province) => province.value === field.value)?.label
-                          : "Select Province"}
+                          : post?.province || "Select Province"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -263,7 +274,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
                       >
                         {field.value
                           ? municipals.find((municipal) => municipal.value === field.value)?.label
-                          : "Select Municipal"}
+                          : post?.municipality || "Select Municipal"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>

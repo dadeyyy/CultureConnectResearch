@@ -40,7 +40,7 @@ const RegisterForm = () => {
   // BACKEND SERVER SUBMISSION
   const onSubmit = async (values: z.infer<typeof registration>) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {confirmPassword, ...signUpValues} = values
+    const { confirmPassword, ...signUpValues } = values;
 
     try {
       const response = await fetch("http://localhost:8000/signup", {
@@ -51,13 +51,11 @@ const RegisterForm = () => {
         body: JSON.stringify(signUpValues),
       });
 
-    
-
       if (response.ok) {
-        const data = await response.json()
-        console.log(data.message)
+        const data = await response.json();
+        console.log(data.message);
         console.log("Registration successful!");
-        return navigate('/signin')
+        return navigate("/signin");
       } else {
         console.error("Registration failed");
       }
@@ -77,7 +75,7 @@ const RegisterForm = () => {
       </div>
       <h2 className="font-bold pt-5 sm:py-5">Sign up to CultureConnect</h2>
       <div className="flex flex-center flex-col">
-        <Button
+        {/* <Button
           variant="outline"
           className="group hover:bg-blue-500 hover:text-white active:border-blue-500 active:bg-white active:text-black"
         >
@@ -86,7 +84,7 @@ const RegisterForm = () => {
         </Button>
         <div className="text-center sm:text-center sm:w-100 m-3">
           <p className="font-bold">or</p>
-        </div>
+        </div> */}
 
         {/* DIALOG BOX FOR CREATING AN ACCOUNT */}
         <Dialog>

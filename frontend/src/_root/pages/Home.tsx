@@ -1,9 +1,9 @@
 // Home.tsx
-import { useEffect } from 'react';
-import PostCard from '@/components/shared/PostCard';
-import Loader from '@/components/shared/Loader';
-import { useUserContext } from '@/context/AuthContext';
-import { usePostContext } from '@/context/PostContext';
+import { useEffect } from "react";
+import PostCard from "@/components/shared/PostCard";
+import Loader from "@/components/shared/Loader";
+import { useUserContext } from "@/context/AuthContext";
+import { usePostContext } from "@/context/PostContext";
 
 const Home = () => {
   const { user } = useUserContext();
@@ -11,7 +11,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, []); 
+  }, []);
 
   return (
     <div className="flex flex-1">
