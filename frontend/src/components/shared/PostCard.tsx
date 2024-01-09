@@ -81,7 +81,6 @@ const PostCard = ({ post }: PostCardProps) => {
       window.location.href = "/home";
     }
   };
-  console.log(post.id);
   const options = [{ label: "Report", value: "report" }];
 
   if (!post.user) return null;

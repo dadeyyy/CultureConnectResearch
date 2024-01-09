@@ -81,4 +81,13 @@ export const isCommentAuthor = async (req, res, next) => {
         return res.status(500).json({ error, message: 'INTERNAL SERVER ERROR! ' });
     }
 };
+export const isAdmin = (req, res, next) => {
+    if (req.session.user?.role === "ADMIN") {
+        console.log(req.session.user);
+        next();
+    }
+    else {
+        return res.status(401).json({ error: "NOT AN ADMIN!!" });
+    }
+};
 //# sourceMappingURL=middleware.js.map

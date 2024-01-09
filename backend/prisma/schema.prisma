@@ -75,3 +75,20 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 }
+
+model Calendar {
+  id        Int      @id @default(autoincrement())
+  title     String
+  details   String
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  province  Province  @relation(fields: [provinceId], references: [name])
+  provinceId String
+}
+
+model Province {
+  name      String   @id
+  calendars Calendar[]
+}

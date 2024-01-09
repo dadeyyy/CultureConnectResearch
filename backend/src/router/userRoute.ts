@@ -27,7 +27,8 @@ userRoute.get('/user/:userId', isAuthenticated, async (req, res) => {
     });
 
     if (user) {
-      return res.status(200).json({ user: user });
+      return res.status(200).json({ user: {id: user.id, firstName: user.firstName, lastName: user.lastName,
+        username: user.username, email: user.email} });
     }
     return res.status(404).json({error: "Can't find user"});
   } catch (error) {

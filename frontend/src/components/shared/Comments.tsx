@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { multiFormatDateString } from "@/lib/utils";
-import { useUserContext } from "@/context/AuthContext";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useState, useEffect } from 'react';
+import { multiFormatDateString } from '@/lib/utils';
+import { useUserContext } from '@/context/AuthContext';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Command, CommandGroup, CommandItem } from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface CommentProps {
   postId: number;
@@ -35,26 +39,30 @@ interface UserProfile {
 
 const Comments = ({ postId }: CommentProps) => {
   const { user, isLoading } = useUserContext();
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
   const [showComments, setShowComments] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const [commentUser, setCommentUser] = useState<UserProfile | null>(null);
 
   const options = [
-    { label: "Edit", value: "edit" },
-    { label: "Delete", value: "delete" },
+    { label: 'Edit', value: 'edit' },
+    { label: 'Delete', value: 'delete' },
   ];
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/${postId}/comments`);
+        const response = await fetch(
+          `http://localhost:8000/post/${postId}/comments`,
+          { credentials: 'include' }
+        );
         const data = await response.json();
-        setComments(data);
+        console.log(data);
+        setComments(data.comments);
       } catch (error) {
-        console.error("Error fetching comments:", error);
+        console.error('Error fetching comments:', error);
       }
     };
 
@@ -64,16 +72,19 @@ const Comments = ({ postId }: CommentProps) => {
   useEffect(() => {
     const fetchCommentUser = async (userId: number) => {
       try {
-        const response = await fetch(`http://localhost:8000/user/${userId}`);
+        const response = await fetch(`http://localhost:8000/user/${userId}`, {
+          credentials: 'include',
+        });
         const data = await response.json();
 
         if (response.ok) {
+          console.log(data);
           setCommentUser(data.user);
         } else {
-          console.error("Failed to fetch current user");
+          console.error('Failed to fetch current user');
         }
       } catch (error) {
-        console.error("Error fetching current user:", error);
+        console.error('Error fetching current user:', error);
       }
     };
     if (comments.length > 0) {
@@ -85,35 +96,42 @@ const Comments = ({ postId }: CommentProps) => {
     setOpen(false);
     setValue(selectedValue);
 
-    if (selectedValue === "edit") {
+    if (selectedValue === 'edit') {
       // EDIT
-    } else if (selectedValue === "delete") {
+    } else if (selectedValue === 'delete') {
       // DELETE
     }
   };
 
   const handleCommentSubmit = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/${postId}/comment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: newComment,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/post/${postId}/comment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: newComment,
+          }),
+          credentials: 'include',
+        }
+      );
 
       if (!response.ok) {
-        console.error("Error submitting comment. Server responded with:", response);
+        console.error(
+          'Error submitting comment. Server responded with:',
+          response
+        );
         return;
       }
 
       const data = await response.json();
-      setComments([...comments, data]); // Assuming your server returns the created comment
-      setNewComment("");
+      setComments([...comments, data.comment]); // Assuming your server returns the created comment
+      setNewComment('');
     } catch (error) {
-      console.error("Error submitting comment:", error);
+      console.error('Error submitting comment:', error);
     }
   };
 
@@ -127,8 +145,8 @@ const Comments = ({ postId }: CommentProps) => {
         <img
           src={
             isLoading
-              ? "/assets/icons/profile-placeholder.svg"
-              : user.imageUrl || "/assets/icons/profile-placeholder.svg"
+              ? '/assets/icons/profile-placeholder.svg'
+              : user.imageUrl || '/assets/icons/profile-placeholder.svg'
           }
           alt="profile picture"
           className="h-12 w-12 rounded-full bg-cover"
@@ -143,7 +161,12 @@ const Comments = ({ postId }: CommentProps) => {
               onChange={(e) => setNewComment(e.target.value)}
             />
             <Button type="button" onClick={handleCommentSubmit}>
-              <img src="/assets/icons/send.svg" width={20} height={20} alt="send" />
+              <img
+                src="/assets/icons/send.svg"
+                width={20}
+                height={20}
+                alt="send"
+              />
             </Button>
           </>
         </div>
@@ -156,7 +179,7 @@ const Comments = ({ postId }: CommentProps) => {
           onClick={toggleComments}
           className="mt-2 text-sm font-semibold text-gray-500 hover:text-gray-800 focus:outline-none"
         >
-          {showComments ? "Hide Comments" : "Show Comments"}
+          {showComments ? 'Hide Comments' : 'Show Comments'}
         </Button>
       )}
 
@@ -166,13 +189,16 @@ const Comments = ({ postId }: CommentProps) => {
           {comments.map((comment) => (
             <div key={comment.id} className="flex gap-3 items-center">
               <img
-                src={commentUser?.avatarUrl || "/assets/icons/profile-placeholder.svg"}
+                src={
+                  commentUser?.avatarUrl ||
+                  '/assets/icons/profile-placeholder.svg'
+                }
                 alt="profile picture"
                 className="h-8 w-8 rounded-full bg-cover"
               />
               <p className="text-dark-1">
                 <span className="font-bold">
-                  {commentUser?.firstName} {commentUser?.lastName}:{" "}
+                  {commentUser?.firstName} {commentUser?.lastName}:{' '}
                   <span className="text-gray-500 text-regular text-sm">
                     {multiFormatDateString(comment.createdAt.toString())}
                   </span>
@@ -184,12 +210,16 @@ const Comments = ({ postId }: CommentProps) => {
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <img
-                      src={"/assets/icons/three-dots.svg"}
+                      src={'/assets/icons/three-dots.svg'}
                       alt="profile picture"
                       className="h-5 w-5 rounded-full hover:opacity-70 transition-opacity ml-auto"
                     />
                   </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0 bg-light-2" side="bottom" align="start">
+                  <PopoverContent
+                    className="w-[200px] p-0 bg-light-2"
+                    side="bottom"
+                    align="start"
+                  >
                     <Command>
                       <CommandGroup>
                         {options.map((option) => (

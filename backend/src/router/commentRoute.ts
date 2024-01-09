@@ -9,6 +9,26 @@ import { commentSchema, commentTypeSchema } from '../utils/Schemas.js';
 
 const commentRoute = express.Router();
 
+commentRoute.get('/post/:postId/comments', isAuthenticated, async (req,res)=>{
+  try{
+    const postId = req.params.postId;
+
+    //find post with and its comment;
+    const comments = await db.comment.findMany({
+      where: {
+        postId: +postId
+      }
+    })
+
+    if(comments){
+      return res.status(200).json({comments })
+    }
+  }
+  catch(error){
+    console.log(error)
+  }
+})
+
 commentRoute.post(
   '/post/:postId/comment',
   isAuthenticated,
@@ -40,7 +60,8 @@ commentRoute.post(
 
       console.log(comment);
 
-      return res.status(201).json({ message: `Commented ${comment}` });
+
+      return res.status(201).json({ message: `Commented ${comment}`, comment });
     } else {
       console.log('No post found');
       return res.status(404).json({ error: "Can't find post" });

@@ -18,4 +18,11 @@ export const postSchema = z.object({
 export const commentSchema = z.object({
     content: z.string({ required_error: 'content is required' })
 });
+export const calendarSchema = z.object({
+    title: z.string({ required_error: 'title is required' }),
+    details: z.string({ required_error: 'details is required' }),
+    startDate: z.date({ required_error: 'startDate is required' }),
+    endDate: z.date({ required_error: 'endDate is required' }),
+    provinceId: z.string({ required_error: 'provinceId is required' })
+});
 //# sourceMappingURL=Schemas.js.map

@@ -95,5 +95,15 @@ export const isCommentAuthor = async (
   }
 };
 
+export const isAdmin = (req: Request, res: Response, next: () => void) => {
 
+  if(req.session.user?.role === "ADMIN"){
+    console.log(req.session.user)
+    
+    next()
+  }
+  else{
+    return res.status(401).json({error: "NOT AN ADMIN!!"})
+  }
 
+};

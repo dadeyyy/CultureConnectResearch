@@ -61,7 +61,6 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
         comments: true,
       },
     });
-    console.log(allPost)
     res.status(200).json(allPost);
   } catch (error) {
     console.log(error);
