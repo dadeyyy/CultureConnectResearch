@@ -32,7 +32,7 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
                         message: 'authenticated',
                         status: 200,
                         user: { id: user.id, firstName: user.firstName, lastName: user.lastName,
-                            username: user.username, email: user.email }
+                            username: user.username, email: user.email, role: user.role }
                     });
                 });
             }

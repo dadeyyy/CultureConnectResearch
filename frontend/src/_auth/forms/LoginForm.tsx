@@ -1,12 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { login } from "@/lib/validation";
 import { z } from "zod";
-import toast from 'react-hot-toast'
+import toast from "react-hot-toast";
 import { useUserContext } from "@/context/AuthContext";
 
 const LoginForm = () => {
@@ -33,9 +39,9 @@ const LoginForm = () => {
 
       if (response.ok) {
         const { user } = await response.json();
-        toast.success("Successfully logged in")
+        toast.success("Successfully logged in");
         console.log(user);
-        console.log("TESTTT")
+        console.log("TESTTT");
 
         // Update the AuthContext with the user information from the login response
         setUser({
@@ -44,17 +50,19 @@ const LoginForm = () => {
           lastName: user.lastName,
           username: user.username,
           email: user.email,
-          imageUrl: "https://hips.hearstapps.com/hmg-prod/images/gettyimages-1229892983-square.jpg",
+          imageUrl:
+            "https://hips.hearstapps.com/hmg-prod/images/gettyimages-1229892983-square.jpg",
           bio: "Bio means life",
+          role: user.role,
         });
 
         setIsAuthenticated(true);
         localStorage.setItem("currentUser", JSON.stringify(user));
-        
+
         return navigate("/home");
       } else {
         console.error("Login failed");
-        toast.error("Failed to sign in")
+        toast.error("Failed to sign in");
         return navigate("/signin");
       }
     } catch (error) {
@@ -66,10 +74,16 @@ const LoginForm = () => {
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
         <div className="flex justify-center items-center">
-          <img src="/assets/images/logo-2.svg" alt="logo" className="h-20 w-100" />
+          <img
+            src="/assets/images/logo-2.svg"
+            alt="logo"
+            className="h-20 w-100"
+          />
         </div>
         <div className="text-center sm:text-center sm:w-100 text-xl ">
-          <p className="font-bold h-5 text-blue-800">Connecting different cultures</p>
+          <p className="font-bold h-5 text-blue-800">
+            Connecting different cultures
+          </p>
           <p className="font-bold text-red-700">in the Philippines</p>
         </div>
         <h2 className="font-bold pt-5 sm:py-5">Sign in to CultureConnect</h2>
@@ -85,7 +99,10 @@ const LoginForm = () => {
             <p className="font-bold">or</p>
           </div>
         </div> */}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-1 w-full mt-1">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-1 w-full mt-1"
+        >
           <FormField
             control={form.control}
             name="username"
@@ -128,7 +145,10 @@ const LoginForm = () => {
           </div>
           <p className="text-center text-small-regular mt-5">
             No account?
-            <Link to="/signup" className="text-blue-700 text-small-semibold ml-1 ">
+            <Link
+              to="/signup"
+              className="text-blue-700 text-small-semibold ml-1 "
+            >
               Create one
             </Link>
           </p>

@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useNavigate } from "react-router-dom";
+import { filterInappropriateWords } from "@/lib/CaptionFilter";
 
 interface CommentProps {
   postId: number;
@@ -173,7 +174,7 @@ const Comments = ({ postId, action }: CommentProps) => {
                   {multiFormatDateString(comment.createdAt.toString())}
                 </span>
               </span>
-              <div>{comment.content}</div>
+              <div>{filterInappropriateWords(comment.content)}</div>
             </p>
             <p className="text-dark-3 subtle-regular"></p>
             {comment.userId === user.id && (
