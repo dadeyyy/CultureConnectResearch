@@ -6,6 +6,7 @@ import {
 } from '../middleware/middleware.js';
 import { calendarSchema, calendarTypeSchema } from '../utils/Schemas.js';
 import { db } from '../utils/db.server.js';
+import { provinces } from './province.js';
 const calendarRoute = express.Router();
 
 calendarRoute.get('/province/:provinceId', async (req, res) => {
@@ -41,7 +42,9 @@ calendarRoute.post(
     try{
 
         const data: calendarTypeSchema = req.body;
-    
+        console.log(data)
+
+        
         const newCalendar = await db.calendar.create({
             data: data
         })
@@ -114,5 +117,19 @@ calendarRoute.put(
       }
     }
   );
+
+  calendarRoute.post('/createprovince', async (req,res)=>{
+
+    for(let i = 0 ; i< provinces.length; i ++){
+      const data = await db.province.create({
+        data: {
+          name: `${provinces[i]}`
+        }
+        })
+
+        console.log(`Created: ${data}`)
+    }
+    
+  })
 
 export default calendarRoute;

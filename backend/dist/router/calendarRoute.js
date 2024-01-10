@@ -2,6 +2,7 @@ import express from 'express';
 import { isAdmin, isAuthenticated, validate, } from '../middleware/middleware.js';
 import { calendarSchema } from '../utils/Schemas.js';
 import { db } from '../utils/db.server.js';
+import { provinces } from './province.js';
 const calendarRoute = express.Router();
 calendarRoute.get('/province/:provinceId', async (req, res) => {
     try {
@@ -25,6 +26,7 @@ calendarRoute.get('/province/:provinceId', async (req, res) => {
 calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calendarSchema), async (req, res) => {
     try {
         const data = req.body;
+        console.log(data);
         const newCalendar = await db.calendar.create({
             data: data
         });
@@ -73,6 +75,16 @@ calendarRoute.delete('/delete-calendar/:calendarId', isAuthenticated, isAdmin, a
     catch (error) {
         console.error(error);
         return res.status(500).json({ error, message: 'INTERNAL SERVER ERROR!!' });
+    }
+});
+calendarRoute.post('/createprovince', async (req, res) => {
+    for (let i = 0; i < provinces.length; i++) {
+        const data = await db.province.create({
+            data: {
+                name: `${provinces[i]}`
+            }
+        });
+        console.log(`Created: ${data}`);
     }
 });
 export default calendarRoute;
