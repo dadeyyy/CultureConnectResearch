@@ -33,7 +33,7 @@ export type commentTypeSchema = z.infer<typeof commentSchema>
 export const calendarSchema = z.object({
   title: z.string({required_error: 'title is required'}),
   details: z.string({required_error: 'details is required'}),
-  date: z.date({required_error: 'date is required'}),
+  date: z.string({required_error: 'date is required'}),
   provinceId: z.string({required_error: 'provinceId is required'})
 })
 

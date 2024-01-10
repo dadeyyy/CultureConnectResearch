@@ -6,9 +6,9 @@ export const createEventId = () => String(eventGuid++);
 export const INITIAL_EVENTS: EventInput[] = [
   {
     id: createEventId(),
-    title: "All-day event",
+    title: "new year",
     details: "hey hey hey",
-    date: "2024-01-13",
+    date: "2024-01-1",
   },
   {
     id: createEventId(),

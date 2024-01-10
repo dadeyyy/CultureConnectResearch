@@ -27,8 +27,15 @@ calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calend
     try {
         const data = req.body;
         console.log(data);
+        const { date } = data;
+        console.log(date);
+        const parsedDate = new Date(date);
+        console.log(data);
         const newCalendar = await db.calendar.create({
-            data: data
+            data: {
+                ...data,
+                date: parsedDate
+            }
         });
         return res.status(200).json(newCalendar);
     }

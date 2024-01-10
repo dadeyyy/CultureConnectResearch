@@ -7,9 +7,9 @@ import FullCalendar, {
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import allLocales from "@fullcalendar/core/locales-all";
-import { INITIAL_EVENTS, createEventId } from "../../lib/event-utils";
 import { useUserContext } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
+import { EventInput } from "@fullcalendar/react";
 import {
   Command,
   CommandEmpty,
@@ -62,6 +62,14 @@ const FormSchema = z.object({
   }),
 });
 
+interface ICalendar {
+  id: number;
+  title: string;
+  details: string;
+  date: string;
+  provinceId: string;
+}
+
 const Calendar = () => {
   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
   const handleEvents = useCallback(
@@ -74,6 +82,7 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [value, setValue] = useState("");
+  const [calendar, setCalendar] = useState<ICalendar | null>(null);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -111,14 +120,71 @@ const Calendar = () => {
     }
   }, []);
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    const formData = {
-      ...data,
-      date: selectedDate,
-    };
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const selectedDateToDate = new Date(selectedDate).toISOString();
 
-    console.log(formData);
+    const formData = {
+      title: data.title,
+      details: data.details,
+      provinceId: data.province,
+      date: selectedDateToDate,
+    };
+    try {
+      const response = await fetch("http://localhost:8000/create-calendar", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+      } else {
+        console.log("SKDJFHKSDHJF");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
+  console.log(selectedProvince);
+  useEffect(() => {
+    const fetchCalendar = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/province/${selectedProvince}`,
+          {
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          // Handle non-success status codes
+          console.error("Error fetching calendar. Status:", response.status);
+          return;
+        }
+
+        const data = await response.json();
+        console.log(data);
+        setCalendar(data);
+      } catch (error) {
+        console.error("Error fetching calendar:", error);
+        throw error;
+      }
+    };
+    fetchCalendar();
+  }, [selectedProvince]);
+
+  const INITIAL_EVENTS: EventInput[] = [
+    {
+      id: calendar?.id,
+      title: calendar?.title,
+      details: calendar?.details,
+      date: calendar?.date,
+    },
+  ];
 
   return (
     <div className="post_details-container">
