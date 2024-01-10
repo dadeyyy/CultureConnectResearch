@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { login } from "@/lib/validation";
 import { z } from "zod";
-
+import toast from 'react-hot-toast'
 import { useUserContext } from "@/context/AuthContext";
 
 const LoginForm = () => {
@@ -33,7 +33,7 @@ const LoginForm = () => {
 
       if (response.ok) {
         const { user } = await response.json();
-
+        toast.success("Successfully logged in")
         console.log(user);
 
         // Update the AuthContext with the user information from the login response
@@ -49,10 +49,11 @@ const LoginForm = () => {
 
         setIsAuthenticated(true);
         localStorage.setItem("currentUser", JSON.stringify(user));
-
+        
         return navigate("/home");
       } else {
         console.error("Login failed");
+        toast.error("Failed to sign in")
         return navigate("/signin");
       }
     } catch (error) {

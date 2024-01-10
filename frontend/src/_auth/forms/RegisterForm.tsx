@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { registration } from "@/lib/validation";
 import { z } from "zod";
+import toast from 'react-hot-toast'
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -55,12 +56,14 @@ const RegisterForm = () => {
         const data = await response.json();
         console.log(data.message);
         console.log("Registration successful!");
+        toast.success("Successfully created user!")
         return navigate("/signin");
       } else {
         console.error("Registration failed");
       }
     } catch (error) {
-      console.error("Error submitting registration:", error);
+      toast.error("Failed to sign-up")
+      return navigate("/signup")
     }
   };
 

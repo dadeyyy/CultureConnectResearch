@@ -55,6 +55,7 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
       res.status(404).json({ error: 'Invalid Username or Password' });
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({ status: 500, error: 'Internal Server Error' });
   }
 });
