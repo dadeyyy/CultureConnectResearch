@@ -127,7 +127,6 @@ const PostDetails = () => {
         <Loader />
       ) : (
         <div className="post_details-card p-5 ">
-          <Carousel photos={post?.photos || []} />
           <div className="post_details-info">
             <div className="flex-between w-full">
               <Link to={`/profile/${post?.user.id}`} className="flex items-center gap-3">
@@ -153,7 +152,7 @@ const PostDetails = () => {
                 </div>
               </Link>
 
-              <div className="flex-center gap-4">
+              <div className="flex-center gap-1">
                 <Link
                   to={`/update-post/${post?.id}`}
                   className={`${user.id !== post?.user.id && "hidden"}`}
@@ -235,8 +234,14 @@ const PostDetails = () => {
             <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
               <p>{post?.caption}</p>{" "}
             </div>
-            <PostStats post={post} userId={user.id} />
-            <Comments postId={post.id} />
+            <div className="w-full">
+              <Carousel photos={post?.photos || []} />
+              <PostStats post={post} userId={user.id} />
+            </div>
+          </div>
+
+          <div className="post_details-info">
+            <Comments postId={post.id} action="detail" />
           </div>
         </div>
       )}

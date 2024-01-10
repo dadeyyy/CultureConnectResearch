@@ -87,9 +87,13 @@ const PostForm = ({ action }: PostFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      caption: "",
+      caption: post ? post?.caption : "",
+      municipality: post ? post?.municipality : "",
+      province: post ? post?.province : "",
     },
   });
+
+  console.log(post?.caption);
 
   console.log(action);
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -179,7 +183,7 @@ const PostForm = ({ action }: PostFormProps) => {
                   className="shad-textarea custom-scrollbar"
                   placeholder="Caption here"
                   {...field}
-                  value={post?.caption}
+                  defaultValue={post?.caption}
                 />
               </FormControl>
               <FormMessage className="shad-form_message" />
@@ -214,13 +218,12 @@ const PostForm = ({ action }: PostFormProps) => {
                         role="combobox"
                         className={cn("justify-between", !field.value && "text-muted-foreground")}
                       >
-                        {post?.province
-                          ?
-                            provinces.find((province) => province.value === post?.province)?.label
-                          :
-                          field.value
+                        {field.value
                           ? provinces.find((province) => province.value === field.value)?.label
+                          : post?.province
+                          ? provinces.find((province) => province.value === post.province)?.label
                           : "Select Province"}
+
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -238,14 +241,6 @@ const PostForm = ({ action }: PostFormProps) => {
                               form.setValue("province", province.value);
                             }}
                           >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                province.value === field.value || province.value === post?.province
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
                             {province.label}
                           </CommandItem>
                         ))}
@@ -271,12 +266,11 @@ const PostForm = ({ action }: PostFormProps) => {
                         role="combobox"
                         className={cn("justify-between", !field.value && "text-muted-foreground")}
                       >
-                        {post?.municipality
-                          ? municipals.find((municipal) => municipal.value === post?.municipality)
+                        {field.value
+                          ? municipals.find((municipals) => municipals.value === field.value)?.label
+                          : post?.province
+                          ? municipals.find((municipals) => municipals.value === post.municipality)
                               ?.label
-                          : // Otherwise, use the default or selected province value
-                          field.value
-                          ? municipals.find((municipal) => municipal.value === field.value)?.label
                           : "Select Municipality"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -295,15 +289,6 @@ const PostForm = ({ action }: PostFormProps) => {
                               form.setValue("municipality", municipal.value);
                             }}
                           >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                municipal.value === field.value ||
-                                  municipal.value === post?.municipality
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
                             {municipal.label}
                           </CommandItem>
                         ))}

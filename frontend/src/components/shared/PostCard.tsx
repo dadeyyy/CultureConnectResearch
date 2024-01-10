@@ -180,7 +180,7 @@ const PostCard = ({ post }: PostCardProps) => {
       <Carousel photos={post?.photos || []} />
 
       <PostStats post={post} userId={user.id} />
-      <Comments postId={post.id} />
+      <Comments postId={post.id} action="home" />
     </div>
   );
 };
