@@ -80,8 +80,6 @@ model Calendar {
   id        Int      @id @default(autoincrement())
   title     String
   details   String
-  startDate DateTime
-  endDate   DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   province  Province  @relation(fields: [provinceId], references: [name])
