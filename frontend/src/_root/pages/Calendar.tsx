@@ -5,6 +5,7 @@ import Month from "@/components/calendar/Month";
 import GlobalContext from "@/context/calendar/GlobalContext";
 import dayjs from "dayjs";
 import { getMonth } from "@/lib/utils";
+import EventModal from "@/components/calendar/EventModal";
 
 const Calendar = () => {
   const [currenMonth, setCurrentMonth] = useState(getMonth());
@@ -15,13 +16,16 @@ const Calendar = () => {
   }, [monthIndex]);
 
   return (
-    <div className="h-screen w-full flex flex-col">
-      <CalendarHeader />
-      <div className="flex flex-1">
-        <Sidebar />
-        <Month month={currenMonth} />
+    <>
+      {showEventModal && <EventModal />}
+      <div className="h-screen w-full flex flex-col">
+        <CalendarHeader />
+        <div className="flex flex-1">
+          <Sidebar />
+          <Month month={currenMonth} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

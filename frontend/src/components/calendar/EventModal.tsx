@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import dayjs from "dayjs";
 
-
 interface GlobalContextType {
   daySelected: Date | null;
   setShowEventModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,7 +13,7 @@ const labelsClasses = ["indigo", "gray", "green", "blue", "red", "purple"];
 const GlobalContext = React.createContext<GlobalContextType>({
   daySelected: null,
   setShowEventModal: () => {},
-  dispatchCalEvent: (payload: { type: string; payload?: any }) => void;
+  dispatchCalEvent: () => {},
   selectedEvent: null,
 });
 
