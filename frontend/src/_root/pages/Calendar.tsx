@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { format } from "date-fns";
 import FullCalendar, {
   DateSelectArg,
   EventApi,
@@ -62,12 +63,17 @@ const FormSchema = z.object({
   }),
 });
 
-interface ICalendar {
+interface IEvent {
   id: number;
   title: string;
   details: string;
   date: string;
   provinceId: string;
+}
+
+interface ICalendar {
+  name: string;
+  calendars: IEvent[];
 }
 
 const Calendar = () => {
@@ -82,7 +88,7 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [value, setValue] = useState("");
-  const [calendar, setCalendar] = useState<ICalendar | null>(null);
+  const [calendar, setCalendar] = useState<ICalendar>();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -162,13 +168,17 @@ const Calendar = () => {
 
         if (!response.ok) {
           // Handle non-success status codes
+
           console.error("Error fetching calendar. Status:", response.status);
           return;
         }
 
         const data = await response.json();
-        console.log(data);
-        setCalendar(data);
+        if (data) {
+          setCalendar(data);
+        } else {
+          console.log("NO DATAAAA");
+        }
       } catch (error) {
         console.error("Error fetching calendar:", error);
         throw error;
@@ -177,12 +187,30 @@ const Calendar = () => {
     fetchCalendar();
   }, [selectedProvince]);
 
+  // const INITIAL_EVENTS: EventInput[] =
+  //   calendar?.calendars.map((event: IEvent) => ({
+  //     id: event.id,
+  //     title: event.title,
+  //     details: event.details,
+  //     date: format(new Date(event.date), "yyyy-MM-dd"),
+  //   })) || [];
+
+  // console.log(INITIAL_EVENTS);
+
+  let eventGuid = 0;
+  const todayStr = new Date().toISOString().replace(/T.*$/, "");
+  const createEventId = () => String(eventGuid++);
   const INITIAL_EVENTS: EventInput[] = [
     {
-      id: calendar?.id,
-      title: calendar?.title,
-      details: calendar?.details,
-      date: calendar?.date,
+      id: createEventId(),
+      title: "new year",
+      details: "hey hey hey",
+      date: "2024-01-01",
+    },
+    {
+      id: createEventId(),
+      title: "Timed event",
+      date: todayStr + "T12:00:00",
     },
   ];
 
