@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
-import FullCalendar, {
-  DateSelectArg,
-  EventApi,
-  EventClickArg,
-} from "@fullcalendar/react";
+import FullCalendar, { DateSelectArg, EventApi, EventClickArg } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import allLocales from "@fullcalendar/core/locales-all";
@@ -18,11 +14,7 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Form,
   FormControl,
@@ -78,10 +70,7 @@ interface ICalendar {
 
 const Calendar = () => {
   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
-  const handleEvents = useCallback(
-    (events: EventApi[]) => setCurrentEvents(events),
-    []
-  );
+  const handleEvents = useCallback((events: EventApi[]) => setCurrentEvents(events), []);
   const { user, checkAuthUser } = useUserContext();
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -117,11 +106,7 @@ const Calendar = () => {
   }, []);
 
   const handleEventClick = useCallback((clickInfo: EventClickArg) => {
-    if (
-      window.confirm(
-        `Do you want to delete the event "${clickInfo.event.title}"?`
-      )
-    ) {
+    if (window.confirm(`Do you want to delete the event "${clickInfo.event.title}"?`)) {
       clickInfo.event.remove();
     }
   }, []);
@@ -158,13 +143,14 @@ const Calendar = () => {
   console.log(selectedProvince);
   useEffect(() => {
     const fetchCalendar = async () => {
+      if (!selectedProvince) {
+        console.log("Please select a province");
+        return;
+      }
       try {
-        const response = await fetch(
-          `http://localhost:8000/province/${selectedProvince}`,
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`http://localhost:8000/province/${selectedProvince}`, {
+          credentials: "include",
+        });
 
         if (!response.ok) {
           // Handle non-success status codes
@@ -176,6 +162,14 @@ const Calendar = () => {
         const data = await response.json();
         if (data) {
           setCalendar(data);
+          setCurrentEvents(
+            data.calendars.map((event: IEvent) => ({
+              id: event.id,
+              title: event.title,
+              details: event.details,
+              date: new Date(event.date).toISOString().replace(/T.*$/, ""),
+            }))
+          );
         } else {
           console.log("NO DATAAAA");
         }
@@ -187,32 +181,33 @@ const Calendar = () => {
     fetchCalendar();
   }, [selectedProvince]);
 
-  // const INITIAL_EVENTS: EventInput[] =
-  //   calendar?.calendars.map((event: IEvent) => ({
-  //     id: event.id,
-  //     title: event.title,
-  //     details: event.details,
-  //     date: format(new Date(event.date), "yyyy-MM-dd"),
-  //   })) || [];
+  const INITIAL_EVENTS: EventInput[] =
+    calendar?.calendars.map((event: IEvent) => ({
+      id: event.id,
+      title: event.title,
+      details: event.details,
+      date: format(new Date(event.date), "yyyy-MM-dd"),
+    })) || [];
 
-  // console.log(INITIAL_EVENTS);
-
-  let eventGuid = 0;
-  const todayStr = new Date().toISOString().replace(/T.*$/, "");
-  const createEventId = () => String(eventGuid++);
-  const INITIAL_EVENTS: EventInput[] = [
-    {
-      id: createEventId(),
-      title: "new year",
-      details: "hey hey hey",
-      date: "2024-01-01",
-    },
-    {
-      id: createEventId(),
-      title: "Timed event",
-      date: todayStr + "T12:00:00",
-    },
-  ];
+  // let eventGuid = 0;
+  // const todayStr = new Date().toISOString().replace(/T.*$/, "");
+  // const createEventId = () => String(eventGuid++);
+  // const INITIAL_EVENTS: EventInput[] = [
+  //   {
+  //     id: createEventId(),
+  //     title: "new year",
+  //     details: "hey hey hey",
+  //     date: "2024-01-01",
+  //   },
+  //   {
+  //     id: createEventId(),
+  //     title: "Timed event",
+  //     date: todayStr + "T12:00:00",
+  //   },
+  // ];
+  console.log(currentEvents);
+  console.log(INITIAL_EVENTS);
+  console.log("Calendar Data:", calendar?.calendars);
 
   return (
     <div className="post_details-container">
@@ -222,10 +217,7 @@ const Calendar = () => {
             <Button
               variant="outline"
               role="combobox"
-              className={cn(
-                "w-[200px] justify-between",
-                !value && "text-muted-foreground"
-              )}
+              className={cn("w-[200px] justify-between", !value && "text-muted-foreground")}
             >
               {value
                 ? provinces.find((province) => province.value === value)?.label
@@ -264,15 +256,10 @@ const Calendar = () => {
         <Dialog open={openModal} onOpenChange={setOpenModal}>
           <DialogContent className="sm:max-w-[425px]">
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <DialogHeader>
                   <DialogTitle>Add Event</DialogTitle>
-                  <DialogDescription>
-                    Enter event details below:
-                  </DialogDescription>
+                  <DialogDescription>Enter event details below:</DialogDescription>
                 </DialogHeader>
                 <FormField
                   control={form.control}
@@ -335,12 +322,7 @@ const Calendar = () => {
                     <FormItem>
                       <FormLabel>Date</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          type="text"
-                          readOnly
-                          value={selectedDate?.toString()}
-                        />
+                        <Input {...field} type="text" readOnly value={selectedDate?.toString()} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -360,10 +342,9 @@ const Calendar = () => {
           initialView="dayGridMonth"
           selectable={user.role === "USER" ? false : true}
           editable={user.role === "USER" ? false : true}
-          initialEvents={INITIAL_EVENTS}
           locales={allLocales}
           locale="en"
-          eventsSet={handleEvents}
+          events={INITIAL_EVENTS}
           select={handleDateSelect}
           eventClick={handleEventClick}
         />
