@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { IUser } from "@/type/index";
 
 export const INITIAL_USER = {
@@ -10,6 +10,7 @@ export const INITIAL_USER = {
   email: '',
   imageUrl: '',
   bio: '',
+  role: '',
 };
 
 const INITIAL_STATE = {
@@ -64,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: storedUser.email,
           imageUrl: storedUser.imageUrl,
           bio: storedUser.bio,
+          role: storedUser.role,
         });
         setIsAuthenticated(true);
         return true;

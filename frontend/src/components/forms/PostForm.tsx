@@ -64,23 +64,23 @@ const PostForm = ({ action }: PostFormProps) => {
   const [post, setPost] = useState<PostProps | null>(null);
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/post/${id}`);
-        const data = await response.json();
+    // const fetchPost = async () => {
+    //   try {
+    //     const response = await fetch(`http://localhost:8000/post/${id}`);
+    //     const data = await response.json();
 
-        if (response.ok) {
-          setPost(data);
-          console.log(data);
-        } else {
-          console.error("Error fetching post:", data);
-        }
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      }
-    };
+    //     if (response.ok) {
+    //       setPost(data);
+    //       console.log(data);
+    //     } else {
+    //       console.error("Error fetching post:", data);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching post:", error);
+    //   }
+    // };
 
-    fetchPost();
+    // fetchPost();
   }, [id]);
 
   const navigate = useNavigate();

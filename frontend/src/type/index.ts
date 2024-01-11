@@ -33,6 +33,7 @@ export type IUser = {
   email: string;
   imageUrl: string;
   bio: string;
+  role: string;
 };
 
 export type INewUser = {

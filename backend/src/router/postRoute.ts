@@ -45,6 +45,7 @@ postRoute.post(
         .status(201)
         .json({ message: 'Successfully created new post', data: newPost });
     } catch (error) {
+      console.log("TEST");
       console.log(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
