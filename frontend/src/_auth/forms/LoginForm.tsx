@@ -35,7 +35,7 @@ const LoginForm = () => {
         const { user } = await response.json();
         toast.success("Successfully logged in")
         console.log(user);
-        console.log("TESTTT")
+        console.log("TESTTT");
 
         // Update the AuthContext with the user information from the login response
         setUser({
