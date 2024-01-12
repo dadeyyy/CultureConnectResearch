@@ -164,5 +164,71 @@ postRoute.delete('/post/:postId', isAuthenticated, isAuthor, async (req, res) =>
         return res.status(500).json({ error, message: 'Internal Server Error!' });
     }
 });
+postRoute.post('/post/:postId/report', async (req, res) => {
+    const postId = req.params.postId;
+    const currentUser = req.session.user?.id;
+    try {
+        // Find post
+        const post = await db.post.findUnique({
+            where: {
+                id: +postId,
+            },
+            include: {
+                user: true,
+            },
+        });
+        // Determine if the post is the current user's post, if not, proceed to report
+        if (!post || post.user.id === currentUser) {
+            return res.status(403).json({ error: "You cannot report your own post or the post does not exist" });
+        }
+        // Check if the user has already reported this post
+        const existingReport = await db.report.findFirst({
+            where: {
+                postId: +postId,
+                userId: currentUser,
+            },
+        });
+        if (existingReport) {
+            return res.status(400).json({ error: "You have already reported this post" });
+        }
+        // Create a report record
+        await db.report.create({
+            data: {
+                postId: +postId,
+                userId: currentUser,
+            },
+        });
+        // Update the reportCount field in the Post model
+        const updatedPost = await db.post.update({
+            where: {
+                id: +postId,
+            },
+            data: {
+                reportCount: {
+                    increment: 1,
+                },
+            },
+            include: {
+                reports: true
+            }
+        });
+        if (updatedPost.reports.length > 2) {
+            const deletedReportedPost = await db.post.delete({
+                where: {
+                    id: +postId
+                },
+                include: {
+                    reports: true
+                }
+            });
+            return res.json({ deletedReportedPost, message: "Post was deleted" });
+        }
+        return res.status(200).json({ message: "Post reported successfully", updatedPost });
+    }
+    catch (error) {
+        console.log("Error");
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
 export default postRoute;
 //# sourceMappingURL=postRoute.js.map

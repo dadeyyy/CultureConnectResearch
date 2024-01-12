@@ -159,6 +159,11 @@ const Calendar = () => {
   useEffect(() => {
     const fetchCalendar = async () => {
       try {
+
+        if (!selectedProvince) {
+          console.log("Please select a province");
+          return;
+        }
         const response = await fetch(
           `http://localhost:8000/province/${selectedProvince}`,
           {
@@ -187,32 +192,32 @@ const Calendar = () => {
     fetchCalendar();
   }, [selectedProvince]);
 
-  // const INITIAL_EVENTS: EventInput[] =
-  //   calendar?.calendars.map((event: IEvent) => ({
-  //     id: event.id,
-  //     title: event.title,
-  //     details: event.details,
-  //     date: format(new Date(event.date), "yyyy-MM-dd"),
-  //   })) || [];
+  const INITIAL_EVENTS: EventInput[] =
+    calendar?.calendars.map((event: IEvent) => ({
+      id: event.id,
+      title: event.title,
+      details: event.details,
+      date: format(new Date(event.date), "yyyy-MM-dd"),
+    })) || [];
 
-  // console.log(INITIAL_EVENTS);
+  console.log(INITIAL_EVENTS);
 
-  let eventGuid = 0;
-  const todayStr = new Date().toISOString().replace(/T.*$/, "");
-  const createEventId = () => String(eventGuid++);
-  const INITIAL_EVENTS: EventInput[] = [
-    {
-      id: createEventId(),
-      title: "new year",
-      details: "hey hey hey",
-      date: "2024-01-01",
-    },
-    {
-      id: createEventId(),
-      title: "Timed event",
-      date: todayStr + "T12:00:00",
-    },
-  ];
+  // let eventGuid = 0;
+  // const todayStr = new Date().toISOString().replace(/T.*$/, "");
+  // const createEventId = () => String(eventGuid++);
+  // const INITIAL_EVENTS: EventInput[] = [
+  //   {
+  //     id: createEventId(),
+  //     title: "new year",
+  //     details: "hey hey hey",
+  //     date: "2024-01-01",
+  //   },
+  //   {
+  //     id: createEventId(),
+  //     title: "Timed event",
+  //     date: todayStr + "T12:00:00",
+  //   },
+  // ];
 
   return (
     <div className="post_details-container">

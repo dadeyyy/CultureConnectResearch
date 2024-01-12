@@ -31,6 +31,7 @@ model User {
   posts       Post[]
   likes       Like[]
   comments    Comment[]
+  reports     Report[] 
 }
 
 model Post {
@@ -38,7 +39,7 @@ model Post {
   caption     String
   province    String
   municipality String
-  reportCount Int?
+  reportCount Int? @default(0)
   photos      Photo[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -46,8 +47,18 @@ model Post {
   user        User      @relation(fields: [userId], references: [id])
   likes       Like[]
   comments    Comment[]
+  reports     Report[]
 }
 
+model Report {
+  id      Int      @id @default(autoincrement())
+  postId  Int
+  userId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id])
+}
 model Photo {
   id          Int       @id @default(autoincrement())
   url         String
