@@ -81,10 +81,10 @@ const Comments = ({ postId, action }: CommentProps) => {
           console.log(data);
           setCommentUser(data.user);
         } else {
-          console.error("Failed to fetch current user");
+          console.error("Failed to fetch comment user");
         }
       } catch (error) {
-        console.error("Error fetching current user:", error);
+        console.error("Error fetching comment user:", error);
       }
     };
     if (comments.length > 0) {
