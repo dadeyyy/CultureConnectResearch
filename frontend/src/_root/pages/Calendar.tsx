@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 
 const FormSchema = z.object({
   province: z.string({
@@ -87,6 +88,7 @@ const Calendar = () => {
       date: "",
     },
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,6 +114,7 @@ const Calendar = () => {
   }, []);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setOpen(false);
     const selectedDateToDate = new Date(selectedDate).toISOString();
 
     const formData = {
@@ -133,6 +136,7 @@ const Calendar = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
+        navigate("/calendar");
       } else {
         console.log("SKDJFHKSDHJF");
       }

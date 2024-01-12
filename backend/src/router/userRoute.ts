@@ -1,11 +1,11 @@
-import express from 'express';
-import { db } from '../utils/db.server.js';
-import { isAuthenticated } from '../middleware/middleware.js';
+import express from "express";
+import { db } from "../utils/db.server.js";
+import { isAuthenticated } from "../middleware/middleware.js";
 
 const userRoute = express.Router();
 
 //GET ALL USERS
-userRoute.get('/allusers', isAuthenticated, async (req, res) => {
+userRoute.get("/allusers", isAuthenticated, async (req, res) => {
   const allusers = await db.user.findMany({});
 
   console.log(allusers);
@@ -13,7 +13,7 @@ userRoute.get('/allusers', isAuthenticated, async (req, res) => {
 });
 
 //GET USER BY ID
-userRoute.get('/user/:userId', isAuthenticated, async (req, res) => {
+userRoute.get("/user/:userId", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
 
@@ -27,13 +27,20 @@ userRoute.get('/user/:userId', isAuthenticated, async (req, res) => {
     });
 
     if (user) {
-      return res.status(200).json({ user: {id: user.id, firstName: user.firstName, lastName: user.lastName,
-        username: user.username, email: user.email} });
+      return res.status(200).json({
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          email: user.email,
+        },
+      });
     }
-    return res.status(404).json({error: "Can't find user"});
+    return res.status(404).json({ error: "Can't find user" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
