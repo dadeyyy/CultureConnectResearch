@@ -39,10 +39,10 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
   const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
-    // Check if the post is liked by the user
-    const checkIfLiked = async () => {
+    // Check if the post is liked by the user and get like count
+    const checkLikeStatus = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/post/${post.id}/like`, {
+        const response = await fetch(`http://localhost:8000/post/${post.id}/like-status`, {
           method: "GET",
           credentials: "include",
         });
@@ -60,7 +60,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       }
     };
 
-    checkIfLiked();
+    checkLikeStatus();
   }, [post.id, userId]);
 
   const handleLikePost = async () => {
@@ -73,7 +73,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       if (!response.ok) {
         console.error("Error liking post. Server responded with:", response);
         return;
-      }
+      } else console.log("Liked Successfully");
 
       const data = await response.json();
       setLikeCount(data.count);

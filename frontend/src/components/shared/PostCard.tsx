@@ -1,13 +1,9 @@
-import { Link } from 'react-router-dom';
-import PostStats from './PostStats';
-import { multiFormatDateString } from '@/lib/utils';
-import { useUserContext } from '@/context/AuthContext';
-import { Command, CommandGroup, CommandItem } from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Link } from "react-router-dom";
+import PostStats from "./PostStats";
+import { multiFormatDateString } from "@/lib/utils";
+import { useUserContext } from "@/context/AuthContext";
+import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,13 +14,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import Carousel from './Carousel';
-import { filterInappropriateWords } from '@/lib/CaptionFilter';
-import Comments from './Comments';
-import toast from 'react-hot-toast';
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import Carousel from "./Carousel";
+import { filterInappropriateWords } from "@/lib/CaptionFilter";
+import Comments from "./Comments";
+import toast from "react-hot-toast";
+import { municipalities, provincesTest } from "@/lib/provinces";
 
 interface PostCardProps {
   post: {
@@ -60,9 +57,9 @@ interface PostCardProps {
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption, setSelectedOption] = useState("");
   const [openNestedAlertDialog, setOpenNestedAlertDialog] = useState(false);
 
   const handleOptionSelect = (selectedValue: string) => {
@@ -77,13 +74,10 @@ const PostCard = ({ post }: PostCardProps) => {
 
   const handleContinue = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/post/${post.id}/report`,
-        {
-          credentials: 'include',
-          method: 'POST',
-        }
-      );
+      const response = await fetch(`http://localhost:8000/post/${post.id}/report`, {
+        credentials: "include",
+        method: "POST",
+      });
 
       const data = await response.json();
 
@@ -102,11 +96,11 @@ const PostCard = ({ post }: PostCardProps) => {
 
   const handleNestedContinue = () => {
     setOpenNestedAlertDialog(false);
-    if (value === 'report') {
-      window.location.href = '/home';
+    if (value === "report") {
+      window.location.href = "/home";
     }
   };
-  const options = [{ label: 'Report', value: 'report' }];
+  const options = [{ label: "Report", value: "report" }];
 
   if (!post.user) return null;
 
@@ -116,9 +110,7 @@ const PostCard = ({ post }: PostCardProps) => {
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.user.id}`}>
             <img
-              src={
-                post?.user.avatarUrl || '/assets/icons/profile-placeholder.svg'
-              }
+              src={post?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
               alt="user"
               className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
             />
@@ -134,7 +126,13 @@ const PostCard = ({ post }: PostCardProps) => {
               </p>
               •
               <p className="subtle-semibold lg:small-regular">
-                {post.province} at {post.municipality}
+                {post?.municipality &&
+                  municipalities[post.province]?.find(
+                    (municipal) => municipal.value === post.municipality
+                  )?.label}{" "}
+                {" at "}
+                {post?.province &&
+                  provincesTest.find((province) => province.value === post.province)?.label}
               </p>
             </div>
           </div>
@@ -142,18 +140,9 @@ const PostCard = ({ post }: PostCardProps) => {
 
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <img
-              src={'/assets/icons/three-dots.svg'}
-              alt="edit"
-              width={20}
-              height={20}
-            />
+            <img src={"/assets/icons/three-dots.svg"} alt="edit" width={20} height={20} />
           </PopoverTrigger>
-          <PopoverContent
-            className="w-[200px] bg-light-2 p-0"
-            side="top"
-            align="end"
-          >
+          <PopoverContent className="w-[200px] bg-light-2 p-0" side="top" align="end">
             <Command>
               <CommandGroup>
                 {options.map((option) => (
@@ -176,9 +165,7 @@ const PostCard = ({ post }: PostCardProps) => {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel onClick={handleCancel}>
-                      Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
                     <AlertDialogTrigger asChild>
                       <Button onClick={handleContinue}>Submit</Button>
                     </AlertDialogTrigger>
@@ -194,9 +181,7 @@ const PostCard = ({ post }: PostCardProps) => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogAction onClick={handleNestedContinue}>
-                        Continue
-                      </AlertDialogAction>
+                      <AlertDialogAction onClick={handleNestedContinue}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

@@ -57,7 +57,6 @@ const CommentCard: React.FC<CommentCardProps> = ({
         const data = await response.json();
 
         if (response.ok) {
-          console.log(data);
           setCommentUser(data.user);
         } else {
           console.error("Failed to fetch comment user");

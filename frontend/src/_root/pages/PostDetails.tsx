@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { municipalities, provincesTest } from "@/lib/provinces";
 
 const PostDetails = () => {
   const navigate = useNavigate();
@@ -41,7 +42,6 @@ const PostDetails = () => {
 
     initializeAuth();
   }, [checkAuthUser]);
-  console.log(user);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -146,7 +146,13 @@ const PostDetails = () => {
                     </p>
                     •
                     <p className="subtle-semibold lg:small-regular">
-                      {post?.province} {post?.municipality}
+                      {post?.municipality &&
+                        municipalities[post.province]?.find(
+                          (municipal) => municipal.value === post.municipality
+                        )?.label}{" "}
+                      {" at "}
+                      {post?.province &&
+                        provincesTest.find((province) => province.value === post.province)?.label}
                     </p>
                   </div>
                 </div>

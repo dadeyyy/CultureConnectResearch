@@ -49,10 +49,7 @@ const Comments = ({ postId, action }: CommentProps) => {
   const [commentUser, setCommentUser] = useState<UserProfile | null>(null);
   const navigate = useNavigate();
 
-  const options = [
-    { label: "Edit", value: "edit" },
-    { label: "Delete", value: "delete" },
-  ];
+  const options = [{ label: "Delete", value: "delete" }];
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -61,7 +58,6 @@ const Comments = ({ postId, action }: CommentProps) => {
           credentials: "include",
         });
         const data = await response.json();
-        console.log(data);
         setComments(data.comments);
         setOpenStates(Array(data.comments.length).fill(false)); // Initialize open states for each comment
       } catch (error) {
@@ -116,9 +112,6 @@ const Comments = ({ postId, action }: CommentProps) => {
     navigate(`/posts/${postId}`);
   };
 
-  console.log(user);
-  console.log(comments);
-
   const numberOfCommentsToShow = action === "detail" ? comments.length : 1;
   const displayedComments = comments.slice(0, numberOfCommentsToShow);
 
@@ -139,7 +132,7 @@ const Comments = ({ postId, action }: CommentProps) => {
         </Button>
       )}
 
-      <div className={`mt-2 overflow-y-auto  ${action === "detail" ? "pt-5 h-96" : ""}`}>
+      <div className={`mt-2 overflow-y-auto  ${action === "detail" ? "pt-5 lg:h-96" : ""}`}>
         {displayedComments.map((comment, index) => (
           <CommentCard
             key={comment.id}
