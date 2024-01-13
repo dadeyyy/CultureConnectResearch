@@ -1,8 +1,28 @@
-// ComponentCard.tsx
-import React from "react";
+// CommentCard.tsx
+
+import React, { useState, useEffect } from "react";
+import { multiFormatDateString } from "@/lib/utils";
+import { filterInappropriateWords } from "@/lib/CaptionFilter";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { multiFormatDateString } from "@/lib/utils";
+import { useUserContext } from "@/context/AuthContext";
+
+interface CommentCardProps {
+  comment: Comment;
+  index: number;
+  openStates: boolean[];
+  setOpenStates: React.Dispatch<React.SetStateAction<boolean[]>>;
+  handleOptionSelect: (selectedValue: string, index: number) => void;
+}
+
+interface Comment {
+  content: string;
+  createdAt: string;
+  id: number;
+  postId: number;
+  updatedAt: string;
+  userId: number;
+}
 
 interface UserProfile {
   avatarUrl: string | null;
@@ -18,32 +38,40 @@ interface UserProfile {
   username: string;
 }
 
-interface Comment {
-  content: string;
-  createdAt: string;
-  id: number;
-  postId: number;
-  updatedAt: string;
-  userId: number;
-}
-
-interface ComponentCardProps {
-  comment: Comment;
-  commentUser: UserProfile | null;
-  openState: boolean;
-  handleOptionSelect: (selectedValue: string) => void;
-  user: UserProfile;
-}
-
-const ComponentCard: React.FC<ComponentCardProps> = ({
+const CommentCard: React.FC<CommentCardProps> = ({
   comment,
-  commentUser,
-  openState,
+  index,
+  openStates,
+  setOpenStates,
   handleOptionSelect,
-  user,
 }) => {
+  const { user } = useUserContext();
+  const [commentUser, setCommentUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const fetchCommentUser = async (userId: number) => {
+      try {
+        const response = await fetch(`http://localhost:8000/user/${userId}`, {
+          credentials: "include",
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          setCommentUser(data.user);
+        } else {
+          console.error("Failed to fetch comment user");
+        }
+      } catch (error) {
+        console.error("Error fetching comment user:", error);
+      }
+    };
+    fetchCommentUser(comment.userId);
+  }, [comment.userId]);
+
+  const options = [{ label: "Delete", value: "delete" }];
+
   return (
-    <div className="flex gap-3 mb-3 items-center">
+    <div key={comment.id} className="flex gap-3 mb-3 items-center">
       <img
         src={commentUser?.avatarUrl || "/assets/icons/profile-placeholder.svg"}
         alt="profile picture"
@@ -56,11 +84,17 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
             {multiFormatDateString(comment.createdAt.toString())}
           </span>
         </span>
-        <div>{comment.content}</div>
       </p>
-      <p className="text-dark-3 subtle-regular"></p>
+      <div>{filterInappropriateWords(comment.content)}</div>
       {comment.userId === user.id && (
-        <Popover open={openState} onOpenChange={() => handleOptionSelect(comment.id)}>
+        <Popover
+          open={openStates[index]}
+          onOpenChange={(isOpen) =>
+            setOpenStates((prevStates) =>
+              prevStates.map((prev, i) => (i === index ? isOpen : prev))
+            )
+          }
+        >
           <PopoverTrigger asChild>
             <img
               src={"/assets/icons/three-dots.svg"}
@@ -71,20 +105,16 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
           <PopoverContent className="w-[200px] p-0 bg-light-2" side="bottom" align="start">
             <Command>
               <CommandGroup>
-                <CommandItem
-                  value="edit"
-                  onSelect={() => handleOptionSelect("edit")}
-                  className="hover:bg-primary-1 cursor-pointer transition-colors"
-                >
-                  Edit
-                </CommandItem>
-                <CommandItem
-                  value="delete"
-                  onSelect={() => handleOptionSelect("delete")}
-                  className="hover:bg-primary-1 cursor-pointer transition-colors"
-                >
-                  Delete
-                </CommandItem>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={() => handleOptionSelect(option.value, index)}
+                    className="hover:bg-primary-1 cursor-pointer transition-colors"
+                  >
+                    {option.label}
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </Command>
           </PopoverContent>
@@ -94,4 +124,4 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
   );
 };
 
-export default ComponentCard;
+export default CommentCard;

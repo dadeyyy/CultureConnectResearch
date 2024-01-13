@@ -109,6 +109,7 @@ commentRoute.delete(
   async (req, res) => {
     try {
       const { commentId } = req.params;
+      
 
       const deletedComment = await db.comment.delete({
         where: {

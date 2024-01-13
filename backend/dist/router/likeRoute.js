@@ -1,8 +1,8 @@
-import express from 'express';
-import { isAuthenticated } from '../middleware/middleware.js';
-import { db } from '../utils/db.server.js';
+import express from "express";
+import { isAuthenticated } from "../middleware/middleware.js";
+import { db } from "../utils/db.server.js";
 const likeRoute = express.Router();
-likeRoute.post('/post/:postId/like', isAuthenticated, async (req, res) => {
+likeRoute.post("/post/:postId/like", isAuthenticated, async (req, res) => {
     try {
         const userId = req.session.user?.id;
         const { postId } = req.params;
@@ -12,7 +12,6 @@ likeRoute.post('/post/:postId/like', isAuthenticated, async (req, res) => {
                 userId: userId,
             },
         });
-        console.log("Existing like", existingLike);
         if (existingLike) {
             await db.like.delete({
                 where: {
@@ -24,7 +23,7 @@ likeRoute.post('/post/:postId/like', isAuthenticated, async (req, res) => {
                     postId: +postId,
                 },
             });
-            res.status(200).json({ message: 'Unliked successfully', count });
+            res.status(200).json({ message: "Unliked successfully", count });
         }
         else {
             await db.like.create({
@@ -38,12 +37,35 @@ likeRoute.post('/post/:postId/like', isAuthenticated, async (req, res) => {
                     postId: +postId,
                 },
             });
-            res.status(201).json({ message: 'Liked successfully', count });
+            res.status(201).json({ message: "Liked successfully", count });
         }
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({ error, message: 'INTERNAL SERVER ERROR!' });
+        res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
+    }
+});
+likeRoute.get("/post/:postId/like-status", isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        const { postId } = req.params;
+        const existingLike = await db.like.findFirst({
+            where: {
+                postId: +postId,
+                userId: userId,
+            },
+        });
+        const isLiked = !!existingLike;
+        const count = await db.like.count({
+            where: {
+                postId: +postId,
+            },
+        });
+        res.status(200).json({ isLiked, count });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
     }
 });
 export default likeRoute;

@@ -19,16 +19,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Textarea } from '../ui/textarea';
-import FileUploader from '../shared/FileUploader';
-import { blacklist, municipals, provinces } from './PostInfo';
-import { useEffect, useState } from 'react';
+} from "@/components/ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "../ui/textarea";
+import FileUploader from "../shared/FileUploader";
+import { provincesTest, municipalities } from "@/lib/provinces";
+import { blacklist } from "./PostInfo";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   caption: z.string().min(0, {
@@ -66,28 +63,30 @@ type PostProps = {
 const PostForm = ({ action }: PostFormProps) => {
   const { id } = useParams();
   const [post, setPost] = useState<PostProps | null>(null);
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [selectedMunicipal, setSelectedMunicipal] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        // Check Action
-        if (action !== 'Create') {
+        // Check if the action is not "create" before making the fetch request
+        if (action !== "Create") {
           const response = await fetch(`http://localhost:8000/post/${id}`);
           const data = await response.json();
           if (response.ok) {
             setPost(data);
             console.log(data);
           } else {
-            console.error('Error fetching post:', data);
+            console.error("Error fetching post:", data);
           }
         }
       } catch (error) {
-        console.error('Error fetching post:', error);
+        console.error("Error fetching post:", error);
       }
     };
 
     fetchPost();
-  }, [id, action]);
+  }, [id, action]); // Include action in the dependency array
 
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -189,7 +188,7 @@ const PostForm = ({ action }: PostFormProps) => {
       }
     }
   };
-
+  console.log(selectedMunicipal);
   return (
     <Form {...form}>
       <form
@@ -250,14 +249,11 @@ const PostForm = ({ action }: PostFormProps) => {
                         )}
                       >
                         {field.value
-                          ? provinces.find(
-                              (province) => province.value === field.value
-                            )?.label
+                          ? provincesTest.find((province) => province.value === field.value)?.label
                           : post?.province
-                          ? provinces.find(
-                              (province) => province.value === post.province
-                            )?.label
-                          : 'Select Province'}
+                          ? provincesTest.find((province) => province.value === post.province)
+                              ?.label
+                          : "Select Province"}
 
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -267,13 +263,14 @@ const PostForm = ({ action }: PostFormProps) => {
                     <Command>
                       <CommandInput placeholder="Search province..." />
                       <CommandEmpty>No province found.</CommandEmpty>
-                      <CommandGroup>
-                        {provinces.map((province) => (
+                      <CommandGroup className="max-h-[200px] overflow-y-auto">
+                        {provincesTest.map((province) => (
                           <CommandItem
                             value={province.label}
                             key={province.value}
                             onSelect={() => {
-                              form.setValue('province', province.value);
+                              form.setValue("province", province.value);
+                              setSelectedProvince(province.value);
                             }}
                           >
                             {province.label}
@@ -299,21 +296,20 @@ const PostForm = ({ action }: PostFormProps) => {
                       <Button
                         variant="outline"
                         role="combobox"
-                        className={cn(
-                          'justify-between',
-                          !field.value && 'text-muted-foreground'
-                        )}
+                        className={cn("justify-between", !field.value && "text-muted-foreground")}
+                        // Disable the button if selectedProvince is empty or municipalities list is empty
+                        disabled={!selectedProvince || !municipalities[selectedProvince]?.length}
                       >
-                        {field.value
-                          ? municipals.find(
-                              (municipals) => municipals.value === field.value
+                        {selectedProvince !== null
+                          ? (municipalities[selectedProvince] || []).find(
+                              (municipal) => municipal.label === field.value
                             )?.label
                           : post?.province
-                          ? municipals.find(
-                              (municipals) =>
-                                municipals.value === post.municipality
+                          ? (municipalities[post.province] || []).find(
+                              (municipal) => municipal.value === post.municipality
                             )?.label
-                          : 'Select Municipality'}
+                          : "Select Municipality"}
+
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -322,18 +318,20 @@ const PostForm = ({ action }: PostFormProps) => {
                     <Command>
                       <CommandInput placeholder="Search municipal..." />
                       <CommandEmpty>No municipal found.</CommandEmpty>
-                      <CommandGroup>
-                        {municipals.map((municipal) => (
-                          <CommandItem
-                            value={municipal.label}
-                            key={municipal.value}
-                            onSelect={() => {
-                              form.setValue('municipality', municipal.value);
-                            }}
-                          >
-                            {municipal.label}
-                          </CommandItem>
-                        ))}
+                      <CommandGroup className="max-h-[200px] overflow-y-auto">
+                        {selectedProvince &&
+                          municipalities[selectedProvince]?.map((municipal) => (
+                            <CommandItem
+                              value={municipal.label}
+                              key={municipal.value}
+                              onSelect={() => {
+                                form.setValue("municipality", municipal.label);
+                                console.log("Selected Municipality:", municipal.label);
+                              }}
+                            >
+                              {municipal.label}
+                            </CommandItem>
+                          ))}
                       </CommandGroup>
                     </Command>
                   </PopoverContent>

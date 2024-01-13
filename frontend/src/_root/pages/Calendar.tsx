@@ -48,7 +48,7 @@ const FormSchema = z.object({
     required_error: "Please select a province.",
   }),
   municipality: z.string({
-    required_error: "Please enter a municipality"
+    required_error: "Please enter a municipality",
   }),
   title: z.string({
     required_error: "Please enter a title.",
@@ -65,7 +65,7 @@ interface IEvent {
   id: number;
   title: string;
   details: string;
-  municipality: string,
+  municipality: string;
   date: string;
   provinceId: string;
 }
@@ -128,7 +128,7 @@ const Calendar = () => {
       details: data.details,
       provinceId: data.province,
       date: selectedDateToDate,
-      municipality: data.municipality
+      municipality: data.municipality,
     };
     try {
       const response = await fetch("http://localhost:8000/create-calendar", {
@@ -150,6 +150,8 @@ const Calendar = () => {
       toast.error(`Error creating an event Error message ${error}`)
     }
   }
+
+  console.log(selectedProvince);
   useEffect(() => {
     const fetchCalendar = async () => {
       if (!selectedProvince) {
@@ -157,17 +159,14 @@ const Calendar = () => {
         return;
       }
       try {
-
         if (!selectedProvince) {
           console.log("Please select a province");
           return;
         }
-        const response = await fetch(
-          `http://localhost:8000/province/${selectedProvince}`,
-          {
-            credentials: "include",
-          }
-        );
+
+        const response = await fetch(`http://localhost:8000/province/${selectedProvince}`, {
+          credentials: "include",
+        });
 
         if (!response.ok) {
           toast.error('Error fetching calendar')
