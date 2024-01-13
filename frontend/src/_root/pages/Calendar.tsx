@@ -45,6 +45,9 @@ const FormSchema = z.object({
   province: z.string({
     required_error: "Please select a province.",
   }),
+  municipality: z.string({
+    required_error: "Please enter a municipality",
+  }),
   title: z.string({
     required_error: "Please enter a title.",
   }),
@@ -60,6 +63,7 @@ interface IEvent {
   id: number;
   title: string;
   details: string;
+  municipality: string;
   date: string;
   provinceId: string;
 }
@@ -122,6 +126,7 @@ const Calendar = () => {
       details: data.details,
       provinceId: data.province,
       date: selectedDateToDate,
+      municipality: data.municipality,
     };
     try {
       const response = await fetch("http://localhost:8000/create-calendar", {
@@ -158,6 +163,7 @@ const Calendar = () => {
           console.log("Please select a province");
           return;
         }
+
         const response = await fetch(`http://localhost:8000/province/${selectedProvince}`, {
           credentials: "include",
         });
@@ -177,6 +183,7 @@ const Calendar = () => {
               id: event.id,
               title: event.title,
               details: event.details,
+              municipality: event.municipality,
               date: new Date(event.date).toISOString().replace(/T.*$/, ""),
             }))
           );
@@ -196,6 +203,7 @@ const Calendar = () => {
       id: event.id,
       title: event.title,
       details: event.details,
+      event: event.municipality,
       date: format(new Date(event.date), "yyyy-MM-dd"),
     })) || [];
 
@@ -283,6 +291,24 @@ const Calendar = () => {
                           type="text"
                           readOnly
                           value={selectedProvince?.toString()}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="municipality"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Municipality</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="text"
+                          placeholder="Enter Municipality"
+                          className="col-span-3"
                         />
                       </FormControl>
                       <FormMessage />

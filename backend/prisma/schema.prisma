@@ -32,7 +32,29 @@ model User {
   likes       Like[]
   comments    Comment[]
   reports     Report[] 
+  // followers   Following[] @relation("Followers", references: [followerId])
+  // following   Followers[] @relation("Following", references: [followingId])
 }
+
+// model Followers {
+//   id           Int      @id @default(autoincrement())
+//   followerId   Int
+//   followingId  Int
+//   createdAt    DateTime @default(now())
+//   updatedAt    DateTime @updatedAt
+//   follower     User     @relation(name: "UserFollowers", fields: [followerId], references: [id])
+//   following    User     @relation(name: "UserFollowing", fields: [followingId], references: [id])
+// }
+
+// model Following {
+//   id           Int      @id @default(autoincrement())
+//   followingId  Int
+//   followerId   Int
+//   createdAt    DateTime @default(now())
+//   updatedAt    DateTime @updatedAt
+//   following    User     @relation(name: "UserFollowing",fields: [followingId], references: [id])
+//   follower     User     @relation(name: "UserFollowers" , fields: [followerId], references: [id])
+// }
 
 model Post {
   id          Int       @id @default(autoincrement())
@@ -91,14 +113,16 @@ model Comment {
 model Calendar {
   id        Int      @id @default(autoincrement())
   title     String
+  municipality String @default("Balanga")
   details   String
+  location Json
   date DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   provinceId String
   province  Province  @relation(fields: [provinceId], references: [name])
-  
 }
+
 
 model Province {
   name      String   @id

@@ -9,11 +9,6 @@ const geocoder = Geocoding({ accessToken: mapboxToken });
 const calendarRoute = express.Router();
 calendarRoute.get('/province/:provinceId', async (req, res) => {
     try {
-        const geoData = await geocoder.forwardGeocode({
-            query: 'Balanga, Bataan',
-            limit: 1
-        }).send();
-        console.log(geoData.body.features[0].geometry.coordinates);
         const provinceId = req.params.provinceId;
         const provinceWithCalendars = await db.province.findUnique({
             where: { name: provinceId },
@@ -34,14 +29,26 @@ calendarRoute.get('/province/:provinceId', async (req, res) => {
 calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calendarSchema), async (req, res) => {
     try {
         const data = req.body;
+        const { municipality, provinceId } = data;
         const { date } = data;
         const parsedDate = new Date(date);
+        const geoData = await geocoder
+            .forwardGeocode({
+            query: `${municipality}, ${provinceId}`,
+            limit: 1,
+        })
+            .send();
+        const location = geoData.body.features[0].geometry;
+        console.log(data);
         const newCalendar = await db.calendar.create({
             data: {
                 ...data,
+                provinceId: data.provinceId,
+                location: location,
                 date: parsedDate,
             },
         });
+        console.log(newCalendar);
         return res.status(200).json(newCalendar);
     }
     catch (error) {
@@ -101,14 +108,11 @@ calendarRoute.delete('/delete-calendar/:calendarId', isAuthenticated, isAdmin, a
     }
 });
 calendarRoute.post('/createprovince', async (req, res) => {
-    for (let i = 0; i < provinces.length; i++) {
-        const data = await db.province.create({
-            data: {
-                name: `${provinces[i]}`,
-            },
-        });
-        console.log(`Created: ${data}`);
-    }
+    const provincesData = provinces.map((name) => ({ name }));
+    const result = await db.province.createMany({
+        data: provincesData,
+    });
+    console.log(result);
 });
 export default calendarRoute;
 //# sourceMappingURL=calendarRoute.js.map
