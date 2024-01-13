@@ -42,9 +42,6 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
     return [];
   });
 
-  console.log(photos);
-  console.log(fileUrls);
-
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
       const updatedFiles = [...files, ...acceptedFiles];

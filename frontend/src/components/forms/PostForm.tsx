@@ -67,22 +67,26 @@ const PostForm = ({ action }: PostFormProps) => {
   const [selectedMunicipal, setSelectedMunicipal] = useState<string | null>(null);
 
   useEffect(() => {
-    // const fetchPost = async () => {
-    //   try {
-    //     const response = await fetch(`http://localhost:8000/post/${id}`);
-    //     const data = await response.json();
-    //     if (response.ok) {
-    //       setPost(data);
-    //       console.log(data);
-    //     } else {
-    //       console.error("Error fetching post:", data);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching post:", error);
-    //   }
-    // };
-    // fetchPost();
-  }, [id]);
+    const fetchPost = async () => {
+      try {
+        // Check if the action is not "create" before making the fetch request
+        if (action !== "Create") {
+          const response = await fetch(`http://localhost:8000/post/${id}`);
+          const data = await response.json();
+          if (response.ok) {
+            setPost(data);
+            console.log(data);
+          } else {
+            console.error("Error fetching post:", data);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching post:", error);
+      }
+    };
+
+    fetchPost();
+  }, [id, action]); // Include action in the dependency array
 
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
