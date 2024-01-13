@@ -51,15 +51,12 @@ const RegisterForm = () => {
         },
         body: JSON.stringify(signUpValues),
       });
-
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
-        console.log(data.message);
-        console.log("Registration successful!");
         toast.success("Successfully created user!");
         return navigate("/signin");
       } else {
-        console.error("Registration failed");
+        toast.error(`${data.error}`)
       }
     } catch (error) {
       toast.error("Failed to sign-up");

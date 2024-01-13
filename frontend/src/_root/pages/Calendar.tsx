@@ -40,6 +40,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast'
+import { ToastDescription } from "@/components/ui/toast";
 
 const FormSchema = z.object({
   province: z.string({
@@ -137,19 +139,17 @@ const Calendar = () => {
           "Content-Type": "application/json",
         },
       });
-
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        navigate("/calendar");
+        setOpenModal(false)
+        toast.success("Event created!")
       } else {
-        console.log("SKDJFHKSDHJF");
+        toast.error("Can't create an event")
       }
     } catch (error) {
-      console.log(error);
+      toast.error(`Error creating an event Error message ${error}`)
     }
   }
-  console.log(selectedProvince);
   useEffect(() => {
     const fetchCalendar = async () => {
       if (!selectedProvince) {
@@ -170,9 +170,7 @@ const Calendar = () => {
         );
 
         if (!response.ok) {
-          // Handle non-success status codes
-
-          console.error("Error fetching calendar. Status:", response.status);
+          toast.error('Error fetching calendar')
           return;
         }
 
@@ -192,7 +190,7 @@ const Calendar = () => {
           console.log("NO DATAAAA");
         }
       } catch (error) {
-        console.error("Error fetching calendar:", error);
+        toast.error(`Error fetching calendar ${error}`)
         throw error;
       }
     };
@@ -224,9 +222,9 @@ const Calendar = () => {
   //     date: todayStr + "T12:00:00",
   //   },
   // ];
-  console.log(currentEvents);
-  console.log(INITIAL_EVENTS);
-  console.log("Calendar Data:", calendar?.calendars);
+  // console.log(currentEvents);
+  // console.log(INITIAL_EVENTS);
+  // console.log("Calendar Data:", calendar?.calendars);
 
   return (
     <div className="post_details-container">

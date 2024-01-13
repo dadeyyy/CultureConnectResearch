@@ -3,6 +3,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import toast from 'react-hot-toast';
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
