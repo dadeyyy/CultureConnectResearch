@@ -64,7 +64,6 @@ calendarRoute.post(
 
       const location: GeoJsonPoint = geoData.body.features[0].geometry;
 
-      console.log(data);
 
       const newCalendar = await db.calendar.create({
         data: {
@@ -75,7 +74,6 @@ calendarRoute.post(
         },
       });
 
-      console.log(newCalendar);
 
       return res.status(200).json(newCalendar);
     } catch (error) {

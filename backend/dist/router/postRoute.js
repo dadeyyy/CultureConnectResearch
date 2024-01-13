@@ -80,7 +80,7 @@ postRoute.get('/post/:id', async (req, res) => {
         console.log(error);
     }
 });
-postRoute.put('/post/:postId', isAuthenticated, upload.array('image'), validate(postSchema), async (req, res) => {
+postRoute.put('/post/:postId', isAuthenticated, isAuthor, upload.array('image'), validate(postSchema), async (req, res) => {
     try {
         const postId = parseInt(req.params.postId);
         const data = req.body;

@@ -39,7 +39,6 @@ calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calend
         })
             .send();
         const location = geoData.body.features[0].geometry;
-        console.log(data);
         const newCalendar = await db.calendar.create({
             data: {
                 ...data,
@@ -48,7 +47,6 @@ calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calend
                 date: parsedDate,
             },
         });
-        console.log(newCalendar);
         return res.status(200).json(newCalendar);
     }
     catch (error) {

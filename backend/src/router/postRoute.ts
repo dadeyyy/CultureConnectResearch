@@ -100,6 +100,7 @@ postRoute.get('/post/:id', async (req, res) => {
 postRoute.put(
   '/post/:postId',
   isAuthenticated,
+  isAuthor,
   upload.array('image'),
   validate(postSchema),
   async (req, res) => {
