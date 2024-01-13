@@ -4,6 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import App from "./App";
 import { PostProvider } from "./context/PostContext";
 
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <AuthProvider>
