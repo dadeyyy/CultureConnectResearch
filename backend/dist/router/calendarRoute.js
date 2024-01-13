@@ -114,5 +114,13 @@ calendarRoute.post('/createprovince', async (req, res) => {
     });
     console.log(result);
 });
+calendarRoute.get('/locations', isAuthenticated, async (req, res) => {
+    const calendars = await db.calendar.findMany({});
+    const locations = calendars.map((calendar) => calendar.location);
+    if (locations) {
+        return res.status(200).json(locations);
+    }
+    return res.status(404).json({ error: 'No locations found!' });
+});
 export default calendarRoute;
 //# sourceMappingURL=calendarRoute.js.map
