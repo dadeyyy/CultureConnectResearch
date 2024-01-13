@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+// Comments.tsx
+
+import React, { useState, useEffect } from "react";
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useNavigate } from "react-router-dom";
 import { filterInappropriateWords } from "@/lib/CaptionFilter";
+import CommentCard from "./CommentCard";
 
 interface CommentProps {
   postId: number;
@@ -68,29 +71,6 @@ const Comments = ({ postId, action }: CommentProps) => {
 
     fetchComments();
   }, [postId]);
-
-  useEffect(() => {
-    const fetchCommentUser = async (userId: number) => {
-      try {
-        const response = await fetch(`http://localhost:8000/user/${userId}`, {
-          credentials: "include",
-        });
-        const data = await response.json();
-
-        if (response.ok) {
-          console.log(data);
-          setCommentUser(data.user);
-        } else {
-          console.error("Failed to fetch comment user");
-        }
-      } catch (error) {
-        console.error("Error fetching comment user:", error);
-      }
-    };
-    if (comments.length > 0) {
-      fetchCommentUser(comments[0].userId);
-    }
-  }, [comments]);
 
   const handleOptionSelect = async (selectedValue: string, index: number) => {
     setOpenStates((prevOpenStates) =>
@@ -161,57 +141,14 @@ const Comments = ({ postId, action }: CommentProps) => {
 
       <div className={`mt-2 overflow-y-auto  ${action === "detail" ? "pt-5 h-96" : ""}`}>
         {displayedComments.map((comment, index) => (
-          <div key={comment.id} className="flex gap-3 mb-3 items-center">
-            <img
-              src={commentUser?.avatarUrl || "/assets/icons/profile-placeholder.svg"}
-              alt="profile picture"
-              className="h-8 w-8 rounded-full bg-cover"
-            />
-            <p className="text-dark-1">
-              <span className="font-bold">
-                {commentUser?.firstName} {commentUser?.lastName}:{" "}
-                <span className="text-gray-500 text-regular text-sm">
-                  {multiFormatDateString(comment.createdAt.toString())}
-                </span>
-              </span>
-              <div>{filterInappropriateWords(comment.content)}</div>
-            </p>
-            <p className="text-dark-3 subtle-regular"></p>
-            {comment.userId === user.id && (
-              <Popover
-                open={openStates[index]}
-                onOpenChange={(isOpen) =>
-                  setOpenStates((prevStates) =>
-                    prevStates.map((prev, i) => (i === index ? isOpen : prev))
-                  )
-                }
-              >
-                <PopoverTrigger asChild>
-                  <img
-                    src={"/assets/icons/three-dots.svg"}
-                    alt="profile picture"
-                    className="h-5 w-5 rounded-full hover:opacity-70 transition-opacity ml-auto"
-                  />
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0 bg-light-2" side="bottom" align="start">
-                  <Command>
-                    <CommandGroup>
-                      {options.map((option) => (
-                        <CommandItem
-                          key={option.value}
-                          value={option.value}
-                          onSelect={() => handleOptionSelect(option.value, index)}
-                          className="hover:bg-primary-1 cursor-pointer transition-colors"
-                        >
-                          {option.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            )}
-          </div>
+          <CommentCard
+            key={comment.id}
+            comment={comment}
+            index={index}
+            openStates={openStates}
+            setOpenStates={setOpenStates}
+            handleOptionSelect={handleOptionSelect}
+          />
         ))}
       </div>
       <div className="flex gap-3 items-center w-full">

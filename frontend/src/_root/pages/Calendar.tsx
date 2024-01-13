@@ -144,6 +144,8 @@ const Calendar = () => {
       console.log(error);
     }
   }
+
+  //npm i --save-dev @types/mapbox__mapbox-sdk
   console.log(selectedProvince);
   useEffect(() => {
     const fetchCalendar = async () => {
@@ -152,23 +154,13 @@ const Calendar = () => {
         return;
       }
       try {
-<<<<<<< HEAD
-
         if (!selectedProvince) {
           console.log("Please select a province");
           return;
         }
-        const response = await fetch(
-          `http://localhost:8000/province/${selectedProvince}`,
-          {
-            credentials: "include",
-          }
-        );
-=======
         const response = await fetch(`http://localhost:8000/province/${selectedProvince}`, {
           credentials: "include",
         });
->>>>>>> 44b93a23efb80d492b5bd963ef25e351dacb5707
 
         if (!response.ok) {
           // Handle non-success status codes

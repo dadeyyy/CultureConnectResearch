@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 interface PostStatsProps {
@@ -32,15 +32,56 @@ interface PostStatsProps {
   userId: number;
 }
 
-const PostStats = ({}: PostStatsProps) => {
+const PostStats = ({ post, userId }: PostStatsProps) => {
   const location = useLocation();
 
   const [isLiked, setIsLiked] = useState(false);
-  const [like, setLike] = useState(22);
+  const [likeCount, setLikeCount] = useState(0);
 
-  const handleLikePost = () => {
-    setIsLiked((prevIsLiked) => !prevIsLiked);
-    setLike((prevLike) => (isLiked ? prevLike - 1 : prevLike + 1));
+  useEffect(() => {
+    // Check if the post is liked by the user
+    const checkIfLiked = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/post/${post.id}/like`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          console.error("Error checking like status. Server responded with:", response);
+          return;
+        }
+
+        const data = await response.json();
+        setIsLiked(data.isLiked);
+        setLikeCount(data.count);
+      } catch (error) {
+        console.error("Error checking like status:", error);
+      }
+    };
+
+    checkIfLiked();
+  }, [post.id, userId]);
+
+  const handleLikePost = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/post/${post.id}/like`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        console.error("Error liking post. Server responded with:", response);
+        return;
+      }
+
+      const data = await response.json();
+      setLikeCount(data.count);
+      console.log("like count", data.count);
+      setIsLiked((prevIsLiked) => !prevIsLiked);
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
   };
 
   const containerStyles = location.pathname.startsWith("/profile") ? "w-full" : "";
@@ -56,7 +97,7 @@ const PostStats = ({}: PostStatsProps) => {
           onClick={handleLikePost}
           className="cursor-pointer"
         />
-        <p className="small-medium lg:base-medium">{like}</p>
+        <p className="small-medium lg:base-medium">{likeCount}</p>
       </div>
     </div>
   );
