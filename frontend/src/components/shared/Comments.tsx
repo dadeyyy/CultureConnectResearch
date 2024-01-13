@@ -1,16 +1,12 @@
 // Comments.tsx
 
-import React, { useState, useEffect } from "react";
-import { multiFormatDateString } from "@/lib/utils";
+import { useState, useEffect } from "react";
 import { useUserContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { filterInappropriateWords } from "@/lib/CaptionFilter";
 import CommentCard from "./CommentCard";
-import toast from 'react-hot-toast'
+import toast from "react-hot-toast";
 interface CommentProps {
   postId: number;
   action: "home" | "detail";
@@ -77,25 +73,25 @@ const Comments = ({ postId, action }: CommentProps) => {
     if (selectedValue === "edit") {
       // EDIT
     } else if (selectedValue === "delete") {
-      try{
-       const response = await fetch(`http://localhost:8000/post/${postId}/comment/${comments[index].id}`, {
-        credentials: 'include',
-        method: "DELETE",
-       })
+      try {
+        const response = await fetch(
+          `http://localhost:8000/post/${postId}/comment/${comments[index].id}`,
+          {
+            credentials: "include",
+            method: "DELETE",
+          }
+        );
 
-       const data = await response.json();
+        const data = await response.json();
 
-       if(response.ok){
-        toast.success(`${data.message}`)
-        return
-       }
-       else{
-        toast.error('Failed to delete comment')
-       }
-
-      }
-      catch(error){
-        toast.error(`${error}`)
+        if (response.ok) {
+          toast.success(`${data.message}`);
+          return;
+        } else {
+          toast.error("Failed to delete comment");
+        }
+      } catch (error) {
+        toast.error(`${error}`);
       }
     }
   };

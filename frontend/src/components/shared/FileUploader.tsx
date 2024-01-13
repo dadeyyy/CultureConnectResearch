@@ -64,7 +64,7 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
     const updatedFiles = [...files];
     updatedFiles.splice(index, 1);
 
-    const updatedFileUrls = updatedFiles.map((file) => URL.createObjectURL(file));
+    const updatedFileUrls = fileUrls.filter((url, i) => i !== index);
 
     setFiles(updatedFiles);
     setFileUrls(updatedFileUrls);
@@ -88,13 +88,13 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
   return (
     <div
       {...getRootProps()}
-      className="flex flex-center flex-col bg-light-2 rounded-xl cursor-pointer"
+      className="flex flex-center flex-col bg-light-1 rounded-xl cursor-pointer"
     >
       <input {...getInputProps()} className="cursor-pointer" ref={inputRef} />
 
       {fileUrls.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-3 justify-center gap-4 p-5 lg:p-10">
+          <div className="grid grid-cols-1 sm:grid-cols-1 max-h-screen justify-center overflow-y-auto gap-4 p-5 lg:p-10">
             {fileUrls.map((url, index) => (
               <div key={index} className="relative">
                 <img src={url} alt={`image-${index}`} className="file_uploader-img" />
@@ -107,8 +107,8 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
               </div>
             ))}
           </div>
-          <p className="file_uploader-label">Click or drag photos to replace</p>
-          <Button onClick={removeAllFiles} className="mt-4">
+          <p className="file_uploader-label">Drag photos to replace</p>
+          <Button onClick={removeAllFiles} className="mt-4 bg-red-500">
             Remove All Pictures
           </Button>
         </>

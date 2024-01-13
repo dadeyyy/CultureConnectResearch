@@ -1,17 +1,17 @@
-import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from '@/components/ui/command';
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -29,19 +29,19 @@ import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   caption: z.string().min(0, {
-    message: 'You cannot create a post without a caption.',
+    message: "You cannot create a post without a caption.",
   }),
   province: z.string({
-    required_error: 'Please select a province.',
+    required_error: "Please select a province.",
   }),
   municipality: z.string({
-    required_error: 'Please select a municipal.',
+    required_error: "Please select a municipal.",
   }),
   image: z.custom<File[]>(),
 });
 
 type PostFormProps = {
-  action: 'Create' | 'Update';
+  action: "Create" | "Update";
 };
 
 type PostProps = {
@@ -69,7 +69,7 @@ const PostForm = ({ action }: PostFormProps) => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        // Check if the action is not "create" before making the fetch request
+        // Check Action
         if (action !== "Create") {
           const response = await fetch(`http://localhost:8000/post/${id}`);
           const data = await response.json();
@@ -86,108 +86,102 @@ const PostForm = ({ action }: PostFormProps) => {
     };
 
     fetchPost();
-  }, [id, action]); // Include action in the dependency array
+  }, [id, action]);
 
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      caption: post ? post?.caption : '',
-      municipality: post ? post?.municipality : '',
-      province: post ? post?.province : '',
+      caption: post ? post?.caption : "",
+      municipality: post ? post?.municipality : "",
+      province: post ? post?.province : "",
     },
   });
 
-  // console.log(post?.caption);
-
-  // console.log(action);
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     const caption = values.caption;
 
     if (blacklist.includes(caption)) {
-      form.setError('caption', {
-        type: 'custom',
+      form.setError("caption", {
+        type: "custom",
         message: `${caption} is not a valid caption`,
       });
       return;
     }
 
-
     // ACTION = UPDATE
-    if (action === 'Update') {
-
-
+    if (action === "Update") {
       try {
-
         const formData = new FormData();
 
-        formData.append('caption', values.caption);
-        formData.append('province', values.province);
-        formData.append('municipality', values.municipality)
+        formData.append("caption", values.caption);
+        formData.append("province", values.province);
+        formData.append("municipality", values.municipality);
 
-        post?.photos.forEach((file) =>{
-          formData.append('existingImages', file.url)
-        })
+        post?.photos.forEach((file) => {
+          formData.append("existingImages", file.url);
+        });
 
-        if(values.image) {
-          values.image.forEach((file)=>{
-            formData.append('newImages', file)
-          })
+        if (values.image) {
+          values.image.forEach((file) => {
+            formData.append("newImages", file);
+          });
         }
 
         const response = await fetch(`http://localhost:8000/post/${post?.id}`, {
-          method: 'PUT',
+          method: "PUT",
           body: formData,
-          credentials: 'include',
+          credentials: "include",
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          console.log('Update successful!');
+          console.log("Update successful!");
           console.log(data);
-          navigate('/home');
+          navigate("/home");
         } else {
-          console.error('Update failed');
+          console.error("Update failed");
           console.log(data);
         }
       } catch (error) {
-        console.error('Error updating post:', error);
+        console.error("Error updating post:", error);
       }
       return navigate(`/home`);
     }
 
     // ACTION = CREATE
-    else if (action === 'Create') {
+    else if (action === "Create") {
       const formData = new FormData();
 
-      formData.append('caption', values.caption);
-      formData.append('province', values.province);
-      formData.append('municipality', values.municipality);
+      formData.append("caption", values.caption);
+      formData.append("province", values.province);
+      formData.append("municipality", values.municipality);
       if (values.image) {
         values.image.forEach((file) => {
           formData.append(`image`, file);
         });
       }
-      console.log('CREATEEE ');
+      console.log("CREATEEE ");
       try {
-        const response = await fetch('http://localhost:8000/post', {
-          method: 'POST',
+        const response = await fetch("http://localhost:8000/post", {
+          method: "POST",
           body: formData,
-          credentials: 'include',
+          credentials: "include",
         });
         if (!response.ok) {
-          console.error('Error during POST request:', response);
+          console.error("Error during POST request:", response);
           return;
         }
         const data = await response.json();
-        console.log('Posting successful!', data);
-        navigate('/home');
+        console.log("Posting successful!", data);
+        navigate("/home");
       } catch (error) {
-        console.error('Error during POST request:', error);
+        console.error("Error during POST request:", error);
       }
     }
   };
+
   console.log(selectedMunicipal);
   return (
     <Form {...form}>
@@ -221,10 +215,7 @@ const PostForm = ({ action }: PostFormProps) => {
             <FormItem>
               <FormLabel className="shad-form_label">Add Photos</FormLabel>
               <FormControl>
-                <FileUploader
-                  fieldChange={field.onChange}
-                  photos={post?.photos}
-                />
+                <FileUploader fieldChange={field.onChange} photos={post?.photos} />
               </FormControl>
               <FormMessage className="shad-form_message" />
             </FormItem>
@@ -243,10 +234,7 @@ const PostForm = ({ action }: PostFormProps) => {
                       <Button
                         variant="outline"
                         role="combobox"
-                        className={cn(
-                          'justify-between',
-                          !field.value && 'text-muted-foreground'
-                        )}
+                        className={cn("justify-between", !field.value && "text-muted-foreground")}
                       >
                         {field.value
                           ? provincesTest.find((province) => province.value === field.value)?.label
@@ -297,12 +285,11 @@ const PostForm = ({ action }: PostFormProps) => {
                         variant="outline"
                         role="combobox"
                         className={cn("justify-between", !field.value && "text-muted-foreground")}
-                        // Disable the button if selectedProvince is empty or municipalities list is empty
                         disabled={!selectedProvince || !municipalities[selectedProvince]?.length}
                       >
                         {selectedProvince !== null
                           ? (municipalities[selectedProvince] || []).find(
-                              (municipal) => municipal.label === field.value
+                              (municipal) => municipal.value === field.value
                             )?.label
                           : post?.province
                           ? (municipalities[post.province] || []).find(
@@ -325,7 +312,8 @@ const PostForm = ({ action }: PostFormProps) => {
                               value={municipal.label}
                               key={municipal.value}
                               onSelect={() => {
-                                form.setValue("municipality", municipal.label);
+                                form.setValue("municipality", municipal.value);
+                                field.onChange(municipal.value); // Update the field.value
                                 console.log("Selected Municipality:", municipal.label);
                               }}
                             >
@@ -342,17 +330,10 @@ const PostForm = ({ action }: PostFormProps) => {
           />
         </div>
         <div className="flex gap-4 items-center justify-end">
-          <Button
-            type="button"
-            className="shad-button_dark-4"
-            onClick={() => navigate(-1)}
-          >
+          <Button type="button" className="shad-button_dark-4" onClick={() => navigate(-1)}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            className="shad-button_primary whitespace-nowrap"
-          >
+          <Button type="submit" className="shad-button_primary whitespace-nowrap">
             Submit
           </Button>
         </div>
