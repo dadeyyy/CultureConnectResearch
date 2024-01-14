@@ -9,6 +9,7 @@ import userRoute from './router/userRoute.js';
 import commentRoute from './router/commentRoute.js';
 import likeRoute from './router/likeRoute.js';
 import calendarRoute from './router/calendarRoute.js';
+import algoRoute from './router/algoRoute.js';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -62,6 +63,7 @@ app.use('/', userRoute)
 app.use('/', commentRoute)
 app.use('/', likeRoute)
 app.use('/', calendarRoute)
+app.use('/', algoRoute)
 
 app.listen(PORT, () => {
   console.log(`LISTENING ON PORT ${PORT}`);
