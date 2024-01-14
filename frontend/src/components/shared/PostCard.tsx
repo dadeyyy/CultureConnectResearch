@@ -102,7 +102,7 @@ const PostCard = ({ post }: PostCardProps) => {
       window.location.href = "/home";
     }
   };
-  const options = [{ label: "Report", value: "report" }, { label: "Share", value: "share" }];
+  const options = [{ label: "Report", value: "report" }];
 
   if (!post.user) return null;
   console.log(post?.province);
@@ -146,7 +146,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <img src={"/assets/icons/three-dots.svg"} alt="edit" width={20} height={20} />
+            <img src={"/assets/icons/three-dots.svg"} alt="edit" width={20} height={20} className={user.id === post?.user.id ? `hidden` : ""} />
           </PopoverTrigger>
           <PopoverContent className="w-[200px] bg-light-2 p-0" side="top" align="end">
             <Command>

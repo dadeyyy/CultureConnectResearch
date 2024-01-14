@@ -57,7 +57,7 @@ export const ForYouProvider: React.FC<ForYouProviderProps> = ({ children }) => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      setPostData(data);
+      setPostData(data.data);
       setIsPostLoading(false);
     } catch (error) {
       console.error("Error fetching posts:", error);
