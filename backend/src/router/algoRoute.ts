@@ -53,6 +53,9 @@ algoRoute.get('/algorithm', isAuthenticated, async (req, res) => {
         id: {
           notIn: userLikesId,
         },
+        userId: {
+            not: currentUser
+        }
       },
       orderBy: {
         likes: {
