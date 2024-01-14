@@ -98,9 +98,11 @@ const PostCard = ({ post }: PostCardProps) => {
     setOpenNestedAlertDialog(false);
     if (value === "report") {
       window.location.href = "/home";
+    } else if (value === "share") {
+      window.location.href = "/home";
     }
   };
-  const options = [{ label: "Report", value: "report" }];
+  const options = [{ label: "Report", value: "report" }, { label: "Share", value: "share" }];
 
   if (!post.user) return null;
   console.log(post?.province);
@@ -140,6 +142,8 @@ const PostCard = ({ post }: PostCardProps) => {
           </div>
         </div>
 
+
+
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <img src={"/assets/icons/three-dots.svg"} alt="edit" width={20} height={20} />
@@ -147,21 +151,22 @@ const PostCard = ({ post }: PostCardProps) => {
           <PopoverContent className="w-[200px] bg-light-2 p-0" side="top" align="end">
             <Command>
               <CommandGroup>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={handleOptionSelect}
-                    className="hover:bg-primary-1 cursor-pointer transition-colors"
-                  >
-                    {option.label}
-                  </CommandItem>
-                ))}
+              {options.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  value={option.value}
+                  onSelect={handleOptionSelect}
+                  className={`hover:bg-primary-1 cursor-pointer transition-colors ${user.id === post?.user.id && option.value === "report" ? "hidden" : ""}`}
+                >
+                  {option.label}
+                </CommandItem>
+              ))}
               </CommandGroup>
+  
               <AlertDialog open={openAlertDialog}>
                 <AlertDialogContent className="bg-light-2">
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Report post.</AlertDialogTitle>
+                    <AlertDialogTitle>Report Post.</AlertDialogTitle>
                     <AlertDialogDescription>
                       Are you sure reporting this post?
                     </AlertDialogDescription>

@@ -156,7 +156,7 @@
   }
 
   /* Post Details */
-  .post_details-container {
+  .calendar_details-container {
     @apply flex flex-col flex-1 gap-10 overflow-scroll py-10 px-5 md:p-14 custom-scrollbar items-center;
   }
 

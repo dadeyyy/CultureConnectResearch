@@ -38,20 +38,21 @@ interface IPostContext {
 
 const PostContext = createContext<IPostContext | undefined>(undefined);
 
-interface PostProviderProps {
+interface ForYouProviderProps {
   children: ReactNode;
 }
 
-export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
+export const ForYouProvider: React.FC<ForYouProviderProps> = ({ children }) => {
   const [postData, setPostData] = useState<IPost[]>([]);
   const [isPostLoading, setIsPostLoading] = useState(true);
   const [error, setError] = useState("");
 
   const fetchPosts = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8000/post", { credentials: "include" });
-      const data = await response.json();
-      console.log(data);
+      const response = await fetch("http://localhost:8000/algorithm", { credentials: "include" });
+      const data= await response.json();
+      console.log(data)
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -79,7 +80,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
 export const usePostContext = () => {
   const context = useContext(PostContext);
   if (!context) {
-    throw new Error("usePostContext must be used within a PostProvider");
+    throw new Error("usePostContext must be used within a ForYouProvider");
   }
   return context;
 };

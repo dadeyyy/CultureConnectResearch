@@ -1,22 +1,4 @@
 // Comments.tsx
-
-<<<<<<< HEAD
-import React, { useState, useEffect } from 'react';
-import { multiFormatDateString } from '@/lib/utils';
-import { useUserContext } from '@/context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { Command, CommandGroup, CommandItem } from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { filterInappropriateWords } from '@/lib/CaptionFilter';
-import CommentCard from './CommentCard';
-import toast from 'react-hot-toast';
-=======
 import { useState, useEffect } from "react";
 import { useUserContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +6,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import CommentCard from "./CommentCard";
 import toast from "react-hot-toast";
->>>>>>> 5556e92ba406400636c02e9dae5daa832f92d1f2
+
 interface CommentProps {
   postId: number;
   action: 'home' | 'detail';
@@ -97,22 +79,14 @@ const Comments = ({ postId, action }: CommentProps) => {
 
     if (selectedValue === 'edit') {
       // EDIT
-<<<<<<< HEAD
     } else if (selectedValue === 'delete') {
-=======
-    } else if (selectedValue === "delete") {
->>>>>>> 5556e92ba406400636c02e9dae5daa832f92d1f2
+
       try {
         const response = await fetch(
           `http://localhost:8000/post/${postId}/comment/${comments[index].id}`,
           {
-<<<<<<< HEAD
             credentials: 'include',
             method: 'DELETE',
-=======
-            credentials: "include",
-            method: "DELETE",
->>>>>>> 5556e92ba406400636c02e9dae5daa832f92d1f2
           }
         );
 
@@ -122,11 +96,7 @@ const Comments = ({ postId, action }: CommentProps) => {
           toast.success(`${data.message}`);
           return;
         } else {
-<<<<<<< HEAD
           toast.error('Failed to delete comment');
-=======
-          toast.error("Failed to delete comment");
->>>>>>> 5556e92ba406400636c02e9dae5daa832f92d1f2
         }
       } catch (error) {
         toast.error(`${error}`);

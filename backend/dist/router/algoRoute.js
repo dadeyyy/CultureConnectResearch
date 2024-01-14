@@ -42,6 +42,9 @@ algoRoute.get('/algorithm', isAuthenticated, async (req, res) => {
                 id: {
                     notIn: userLikesId,
                 },
+                userId: {
+                    not: currentUser
+                }
             },
             orderBy: {
                 likes: {
@@ -49,9 +52,12 @@ algoRoute.get('/algorithm', isAuthenticated, async (req, res) => {
                 },
             },
             take: 10,
+            include: {
+                user: true,
+                photos: true
+            }
         });
-        console.log(suggestedPosts);
-        res.status(200).json({ data: suggestedPosts });
+        res.status(200).json(suggestedPosts);
     }
     catch (error) {
         console.error('Error in algorithm route:', error);
