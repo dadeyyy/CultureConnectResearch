@@ -51,13 +51,13 @@ export const ForYouProvider: React.FC<ForYouProviderProps> = ({ children }) => {
     try {
       const response = await fetch("http://localhost:8000/algorithm", { credentials: "include" });
       const data= await response.json();
-      console.log(data)
+      console.log("ALGORITHM", data)
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      setPostData(data.data);
+      setPostData(data);
       setIsPostLoading(false);
     } catch (error) {
       console.error("Error fetching posts:", error);

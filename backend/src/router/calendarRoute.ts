@@ -10,13 +10,9 @@ import { provinces } from './province.js';
 
 import Geocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
 
-<<<<<<< Updated upstream
 const mapboxToken =
   'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';
-=======
 
-const mapboxToken = "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
->>>>>>> Stashed changes
 const geocoder = Geocoding({ accessToken: mapboxToken as string });
 
 const calendarRoute = express.Router();

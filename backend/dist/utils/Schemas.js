@@ -15,6 +15,12 @@ export const postSchema = z.object({
     municipality: z.string({ required_error: 'municipality is required!' }),
     userId: z.number().optional()
 });
+export const exploreSchema = z.object({
+    title: z.string({ required_error: 'title is required' }),
+    description: z.string({ required_error: 'description is required' }),
+    province: z.string({ required_error: 'province is required' }),
+    municipality: z.string({ required_error: 'municipality is required' }),
+});
 export const commentSchema = z.object({
     content: z.string({ required_error: 'content is required' })
 });

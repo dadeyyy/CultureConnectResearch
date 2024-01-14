@@ -89,6 +89,23 @@ model Photo {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
+model Explore {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  province    String
+  municipality String
+  photos      ExplorePhotos[]  
+}
+
+model ExplorePhotos {
+  id          Int       @id @default(autoincrement())
+  url         String
+  filename    String
+  postId    Int
+  explore      Explore     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
 model Like {
   id        Int      @id @default(autoincrement())
   postId    Int
