@@ -109,14 +109,11 @@ const Calendar = () => {
     const selectedDateValue = selectInfo.start.toString();
     console.log(selectedDateValue);
     setSelectedDate(selectedDateValue);
-    // Add this line to log the date
     setOpenModal(user.role === "USER" ? false : true);
   }, []);
 
   const handleEventClick = useCallback((clickInfo: EventClickArg) => {
-    if (window.confirm(`Do you want to delete the event "${clickInfo.event.title}"?`)) {
-      clickInfo.event.remove();
-    }
+    setOpenModal(true);
   }, []);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -205,47 +202,29 @@ const Calendar = () => {
       date: format(new Date(event.date), "yyyy-MM-dd"),
     })) || [];
 
-  // let eventGuid = 0;
-  // const todayStr = new Date().toISOString().replace(/T.*$/, "");
-  // const createEventId = () => String(eventGuid++);
-  // const INITIAL_EVENTS: EventInput[] = [
-  //   {
-  //     id: createEventId(),
-  //     title: "new year",
-  //     details: "hey hey hey",
-  //     date: "2024-01-01",
-  //   },
-  //   {
-  //     id: createEventId(),
-  //     title: "Timed event",
-  //     date: todayStr + "T12:00:00",
-  //   },
-  // ];
-  // console.log(currentEvents);
-  // console.log(INITIAL_EVENTS);
-  // console.log("Calendar Data:", calendar?.calendars);
 
+  console.log(selectedProvince);
   return (
-    <div className="post_details-container">
-      <div className="w-full h-full">
+    <div className="calendar_details-container">
+      <div className="w-full h-full ">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
-              className={cn("w-[200px] justify-between", !value && "text-muted-foreground")}
+              className={cn("w-[200px] justify-between", selectedProvince && "text-muted-foreground")}
             >
-              {value
-                ? provinces.find((province) => province.value === value)?.label
+              {selectedProvince
+                ? provinces.find((province) => province.value === selectedProvince)?.label
                 : "Select province"}
               <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandInput placeholder="Search province..." className="h-9" />
+            <Command className="bg-white" >
+              <CommandInput placeholder="Search province..." className="h-9 bg-white" />
               <CommandEmpty>No province found.</CommandEmpty>
-              <CommandGroup>
+              <CommandGroup className="h-96 overflow-y-scroll bg-white">
                 {provinces.map((province) => (
                   <CommandItem
                     value={province.label}
@@ -270,7 +249,7 @@ const Calendar = () => {
         </Popover>
 
         <Dialog open={openModal} onOpenChange={setOpenModal}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] bg-white">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <DialogHeader>
@@ -388,3 +367,4 @@ const Calendar = () => {
 };
 
 export default Calendar;
+

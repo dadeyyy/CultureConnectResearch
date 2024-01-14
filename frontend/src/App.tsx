@@ -8,7 +8,7 @@ import { LandingPage } from './_root/pages';
 import Explore from './_root/pages/Explore';
 import MapForm from './_root/pages/MapForm';
 import LiveStream from './_root/pages/LiveStream';
-import Notification from './_root/pages/Notification';
+import ForYou from './_root/pages/ForYou';
 import CreatePost from './_root/pages/CreatePost';
 import EditPost from './_root/pages/EditPost';
 import PostDetails from './_root/pages/PostDetails';
@@ -37,7 +37,7 @@ const App = () => {
           <Route path="/map" element={<MapForm />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/live-streams" element={<LiveStream />} />
-          <Route path="/notifications" element={<Notification />} />
+          <Route path="/for-you" element={<ForYou />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />
           <Route path="/posts/:id" element={<PostDetails />} />

@@ -31,6 +31,11 @@ const LeftSidebar = () => {
       imgURL: "/assets/icons/home.svg",
       route: "/home",
       label: "Home",
+    },    
+    {
+      imgURL: "/assets/icons/for-you.svg",
+      route: "/for-you",
+      label: "For You",
     },
     {
       imgURL: "/assets/icons/explore.svg",
@@ -52,11 +57,7 @@ const LeftSidebar = () => {
       route: "/live-streams",
       label: "Live Streams",
     },
-    {
-      imgURL: "/assets/icons/notification.svg",
-      route: "/notifications",
-      label: "Notifications",
-    },
+
     {
       route: "/create-post",
       label: "Create Post",

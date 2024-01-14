@@ -248,7 +248,7 @@ const PostForm = ({ action }: PostFormProps) => {
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="p-0">
-                    <Command>
+                    <Command className="bg-white">
                       <CommandInput placeholder="Search province..." />
                       <CommandEmpty>No province found.</CommandEmpty>
                       <CommandGroup className="max-h-[200px] overflow-y-auto">
@@ -302,10 +302,10 @@ const PostForm = ({ action }: PostFormProps) => {
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="p-0">
-                    <Command>
+                    <Command className="bg-white w-screen">
                       <CommandInput placeholder="Search municipal..." />
                       <CommandEmpty>No municipal found.</CommandEmpty>
-                      <CommandGroup className="max-h-[200px] overflow-y-auto">
+                      <CommandGroup className="max-h-screen overflow-y-auto">
                         {selectedProvince &&
                           municipalities[selectedProvince]?.map((municipal) => (
                             <CommandItem
