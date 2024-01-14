@@ -4,7 +4,7 @@ import { calendarSchema } from '../utils/Schemas.js';
 import { db } from '../utils/db.server.js';
 import { provinces } from './province.js';
 import Geocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
-const mapboxToken = "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
+const mapboxToken = 'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';
 const geocoder = Geocoding({ accessToken: mapboxToken });
 const calendarRoute = express.Router();
 calendarRoute.get('/province/:provinceId', async (req, res) => {
@@ -56,34 +56,39 @@ calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calend
             .json({ error, message: 'INTERNAL SERVER ERROR!!' });
     }
 });
-calendarRoute.put('/update-calendar/:calendarId', isAuthenticated, isAdmin, validate(calendarSchema), async (req, res) => {
-    try {
-        const calendarId = parseInt(req.params.calendarId);
-        const updatedData = req.body;
-        const { date } = updatedData;
-        const parsedDate = new Date(date);
-        const existingCalendar = await db.calendar.findUnique({
-            where: { id: calendarId },
-        });
-        if (!existingCalendar) {
-            return res.status(404).json({ message: 'Calendar not found' });
-        }
-        const updatedCalendar = await db.calendar.update({
-            where: { id: calendarId },
-            data: {
-                ...updatedData,
-                date: parsedDate,
-            },
-        });
-        return res.status(200).json(updatedCalendar);
-    }
-    catch (error) {
-        console.error(error);
-        return res
-            .status(500)
-            .json({ error, message: 'INTERNAL SERVER ERROR!!' });
-    }
-});
+// calendarRoute.put(
+//   '/update-calendar/:calendarId',
+//   isAuthenticated,
+//   isAdmin,
+//   validate(calendarSchema),
+//   async (req, res) => {
+//     try {
+//       const calendarId = parseInt(req.params.calendarId);
+//       const updatedData: calendarTypeSchema = req.body;
+//       const { date } = updatedData;
+//       const parsedDate = new Date(date);
+//       const existingCalendar = await db.calendar.findUnique({
+//         where: { id: calendarId },
+//       });
+//       if (!existingCalendar) {
+//         return res.status(404).json({ message: 'Calendar not found' });
+//       }
+//       const updatedCalendar = await db.calendar.update({
+//         where: { id: calendarId },
+//         data: {
+//           ...updatedData,
+//           date: parsedDate,
+//         },
+//       });
+//       return res.status(200).json(updatedCalendar);
+//     } catch (error) {
+//       console.error(error);
+//       return res
+//         .status(500)
+//         .json({ error, message: 'INTERNAL SERVER ERROR!!' });
+//     }
+//   }
+// );
 calendarRoute.delete('/delete-calendar/:calendarId', isAuthenticated, isAdmin, async (req, res) => {
     try {
         const calendarId = parseInt(req.params.calendarId);
@@ -105,6 +110,23 @@ calendarRoute.delete('/delete-calendar/:calendarId', isAuthenticated, isAdmin, a
             .json({ error, message: 'INTERNAL SERVER ERROR!!' });
     }
 });
+calendarRoute.get('/get-event/:eventId', async (req, res) => {
+    try {
+        const eventId = parseInt(req.params.eventId);
+        const event = await db.calendar.findUnique({
+            where: { id: eventId },
+        });
+        console.log(event);
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+        return res.status(200).json(event);
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ error, message: 'INTERNAL SERVER ERROR!!' });
+    }
+});
 calendarRoute.post('/createprovince', async (req, res) => {
     const provincesData = provinces.map((name) => ({ name }));
     const result = await db.province.createMany({
@@ -114,9 +136,9 @@ calendarRoute.post('/createprovince', async (req, res) => {
 });
 calendarRoute.get('/locations', isAuthenticated, async (req, res) => {
     const calendars = await db.calendar.findMany({});
-    const locations = calendars.map((calendar) => calendar.location);
-    if (locations) {
-        return res.status(200).json(locations);
+    // const locations = calendars.map((calendar) => calendar.location);
+    if (calendars) {
+        return res.status(200).json(calendars);
     }
     return res.status(404).json({ error: 'No locations found!' });
 });
