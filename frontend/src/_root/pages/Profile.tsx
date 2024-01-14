@@ -91,8 +91,8 @@ const Profile = () => {
 
             <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
               {/* <StatBlock value={currentUser.posts.length} label="Posts" /> */}
-              <StatBlock value={20} label="Followers" />
-              <StatBlock value={20} label="Following" />
+              <StatBlock value={0} label="Followers" />
+              <StatBlock value={0} label="Following" />
             </div>
 
             <p className="small-medium md:base-medium text-center xl:text-left mt-7 max-w-screen-sm">
@@ -125,7 +125,9 @@ const Profile = () => {
         <div className="flex max-w-5xl w-full">
           <Link
             to={`/profile/${id}`}
-            className={`profile-tab rounded-l-lg ${pathname === `/profile/${id}` && "!bg-light-4"}`}
+            className={`profile-tab rounded-l-lg ${
+              pathname === `/profile/${id}` && "!bg-blue-200"
+            }`}
           >
             <img src={"/assets/icons/posts.svg"} alt="posts" width={20} height={20} />
             Posts
@@ -133,7 +135,7 @@ const Profile = () => {
           <Link
             to={`/profile/${id}/liked-posts`}
             className={`profile-tab rounded-r-lg ${
-              pathname === `/profile/${id}/liked-posts` && "!bg-light-4"
+              pathname === `/profile/${id}/liked-posts` && "!bg-blue-200"
             }`}
           >
             <img src={"/assets/icons/like.svg"} alt="like" width={20} height={20} />

@@ -146,11 +146,12 @@ const PostDetails = () => {
                     </p>
                     •
                     <p className="subtle-semibold lg:small-regular">
+                      {"In "}
                       {post?.municipality &&
                         municipalities[post.province]?.find(
                           (municipal) => municipal.value === post.municipality
-                        )?.label}{" "}
-                      {" at "}
+                        )?.label}
+                      {", "}
                       {post?.province &&
                         provincesTest.find((province) => province.value === post.province)?.label}
                     </p>

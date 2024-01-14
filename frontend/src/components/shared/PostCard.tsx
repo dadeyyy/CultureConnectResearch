@@ -103,7 +103,8 @@ const PostCard = ({ post }: PostCardProps) => {
   const options = [{ label: "Report", value: "report" }];
 
   if (!post.user) return null;
-
+  console.log(post?.province);
+  console.log(post?.municipality);
   return (
     <div className="post-card">
       <div className="flex-between">
@@ -126,11 +127,12 @@ const PostCard = ({ post }: PostCardProps) => {
               </p>
               •
               <p className="subtle-semibold lg:small-regular">
+                {"In "}
                 {post?.municipality &&
                   municipalities[post.province]?.find(
                     (municipal) => municipal.value === post.municipality
-                  )?.label}{" "}
-                {" at "}
+                  )?.label}
+                {", "}
                 {post?.province &&
                   provincesTest.find((province) => province.value === post.province)?.label}
               </p>
