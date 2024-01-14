@@ -26,14 +26,18 @@ const ForYou = () => {
             </div>
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full">
-              {postData
-                .slice()
-                .reverse()
-                .map((post) => (
-                  <li key={post.id} className="flex justify-center w-full">
-                    <PostCard post={post} userId={user.id} />
-                  </li>
-                ))}
+              {postData && Array.isArray(postData) ? (
+  postData
+    .slice()
+    .reverse()
+    .map((post) => (
+      <li key={post.id} className="flex justify-center w-full">
+        <PostCard post={post} userId={user.id} />
+      </li>
+    ))
+) : (
+  <p className="body-medium text-dark-1">No posts available</p>
+)}
             </ul>
           )}
         </div>
