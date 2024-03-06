@@ -10,6 +10,7 @@ import commentRoute from './router/commentRoute.js';
 import likeRoute from './router/likeRoute.js';
 import calendarRoute from './router/calendarRoute.js';
 import algoRoute from './router/algoRoute.js';
+import archiveRoute from './router/archive.js';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -33,10 +34,12 @@ declare module 'express-session' {
 }
 
 app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:5173', // Specify the origin of your frontend
-  credentials: true, // Enable credentials (including cookies)
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Specify the origin of your frontend
+    credentials: true, // Enable credentials (including cookies)
+  })
+);
 
 app.use(
   session({
@@ -46,24 +49,22 @@ app.use(
     cookie: {
       maxAge: 3600000, // 1 hour
       secure: false, // Set to true if using HTTPS
-      sameSite: 'lax'
-    }
+      sameSite: 'lax',
+    },
   })
 );
 
-
 app.use(morgan('tiny'));
-
-
 
 //Routers
 app.use('/', authRouter);
 app.use('/', postRoute);
-app.use('/', userRoute)
-app.use('/', commentRoute)
-app.use('/', likeRoute)
-app.use('/', calendarRoute)
-app.use('/', algoRoute)
+app.use('/', userRoute);
+app.use('/', commentRoute);
+app.use('/', likeRoute);
+app.use('/', calendarRoute);
+app.use('/', algoRoute);
+app.use('/', archiveRoute);
 
 app.listen(PORT, () => {
   console.log(`LISTENING ON PORT ${PORT}`);

@@ -10,6 +10,7 @@ import commentRoute from './router/commentRoute.js';
 import likeRoute from './router/likeRoute.js';
 import calendarRoute from './router/calendarRoute.js';
 import algoRoute from './router/algoRoute.js';
+import archiveRoute from './router/archive.js';
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
 }
@@ -30,8 +31,8 @@ app.use(session({
     cookie: {
         maxAge: 3600000, // 1 hour
         secure: false, // Set to true if using HTTPS
-        sameSite: 'lax'
-    }
+        sameSite: 'lax',
+    },
 }));
 app.use(morgan('tiny'));
 //Routers
@@ -42,6 +43,7 @@ app.use('/', commentRoute);
 app.use('/', likeRoute);
 app.use('/', calendarRoute);
 app.use('/', algoRoute);
+app.use('/', archiveRoute);
 app.listen(PORT, () => {
     console.log(`LISTENING ON PORT ${PORT}`);
 });

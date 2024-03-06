@@ -51,3 +51,13 @@ export const calendarSchema = z.object({
 export type calendarTypeSchema = z.infer<typeof calendarSchema>
 
 
+export const archiveSchema = z.object({
+  title: z.string({required_error: 'title is required'}),
+  description: z.string({required_error: 'description is required'}),
+  municipality: z.string({required_error: 'municipality is required'}),
+  province: z.string({required_error: 'province is required'})
+})
+
+export type archiveTypeSchema = z.infer<typeof archiveSchema>
+
+

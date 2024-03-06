@@ -31,4 +31,10 @@ export const calendarSchema = z.object({
     date: z.string({ required_error: 'date is required' }),
     provinceId: z.string({ required_error: 'provinceId is required' })
 });
+export const archiveSchema = z.object({
+    title: z.string({ required_error: 'title is required' }),
+    description: z.string({ required_error: 'description is required' }),
+    municipality: z.string({ required_error: 'municipality is required' }),
+    province: z.string({ required_error: 'province is required' })
+});
 //# sourceMappingURL=Schemas.js.map
