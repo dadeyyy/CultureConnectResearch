@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { provincesTest, municipalities } from '@/lib/provinces';
+import React, { useState } from "react";
+import { provincesTest, municipalities } from "@/lib/provinces";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,56 +15,47 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Form, FormControl } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { ChevronsUpDown } from 'lucide-react';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormControl } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from '@/components/ui/command';
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import FileUploader from '@/components/shared/FileUploader';
-import { Card, CardContent } from '@/components/ui/card';
+} from "@/components/ui/command";
+import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import FileUploader from "@/components/shared/FileUploader";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+} from "@/components/ui/carousel";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   title: z.string().min(0, {
-    message: 'You cannot create a post without a caption.',
+    message: "You cannot create a post without a caption.",
   }),
   description: z.string({
-    required_error: 'Please select a province.',
+    required_error: "Please select a province.",
   }),
   province: z.string({
-    required_error: 'Please select a province.',
+    required_error: "Please select a province.",
   }),
   municipality: z.string({
-    required_error: 'Please select a municipal.',
+    required_error: "Please select a municipal.",
   }),
   image: z.custom<File[]>(),
 });
@@ -81,33 +72,31 @@ const Explore = () => {
   const navigate = useNavigate();
   const dummyArchives = [
     {
-      title: 'Archive 1',
-      description: 'Description for Archive 1',
-      province: 'Province 1',
-      municipality: 'Municipality 1',
+      title: "Archive 1",
+      description: "Description for Archive 1",
+      province: "Province 1",
+      municipality: "Municipality 1",
       image:
-        'https://static.vecteezy.com/system/resources/thumbnails/025/181/412/small/picture-a-captivating-scene-of-a-tranquil-lake-at-sunset-ai-generative-photo.jpg',
+        "https://static.vecteezy.com/system/resources/thumbnails/025/181/412/small/picture-a-captivating-scene-of-a-tranquil-lake-at-sunset-ai-generative-photo.jpg",
     },
     {
-      title: 'Archive 2',
-      description: 'Description for Archive 2',
-      province: 'Province 2',
-      municipality: 'Municipality 2',
+      title: "Archive 2",
+      description: "Description for Archive 2",
+      province: "Province 2",
+      municipality: "Municipality 2",
       image:
-        'https://images.unsplash.com/photo-1603984973710-e915353b35fa?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YW1hemluZyUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D',
+        "https://images.unsplash.com/photo-1603984973710-e915353b35fa?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YW1hemluZyUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D",
     },
     // Add more dummy archives as needed
   ];
-  const [archives, setArchives] = useState<ExploreProps | null>(
-    dummyArchives[0]
-  );
+  const [archives, setArchives] = useState<ExploreProps | null>(dummyArchives[0]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      province: '',
-      municipality: '',
+      title: "",
+      description: "",
+      province: "",
+      municipality: "",
     },
   });
 
@@ -118,10 +107,10 @@ const Explore = () => {
 
     const formData = new FormData();
 
-    formData.append('title', values.title);
-    formData.append('description', values.description);
-    formData.append('municipality', values.municipality);
-    formData.append('province', values.province);
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    formData.append("municipality", values.municipality);
+    formData.append("province", values.province);
     if (values.image) {
       values.image.forEach((file) => {
         formData.append(`image`, file);
@@ -131,24 +120,24 @@ const Explore = () => {
     console.log(formData);
 
     try {
-      const response = await fetch('http://localhost:8000/explore', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/explore", {
+        method: "POST",
         body: formData,
-        credentials: 'include',
+        credentials: "include",
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Error during POST request:', response);
-        toast.error('Cant create new archieve');
+        console.error("Error during POST request:", response);
+        toast.error("Cant create new archieve");
         return;
       }
-      console.log(data)
-      toast.success('Successfully created new archieve');
-      navigate('/home');
+      console.log(data);
+      toast.success("Successfully created new archieve");
+      navigate("/home");
     } catch (error) {
-      console.error('Error during POST request:', error);
+      console.error("Error during POST request:", error);
     }
   };
 
@@ -159,7 +148,7 @@ const Explore = () => {
   return (
     <div className="p-5 overflow-y-scroll w-full">
       <div className="flex flex-col">
-        <h1 className="font-bold mb-5">Provinces: </h1>{' '}
+        <h1 className="font-bold mb-5">Provinces: </h1>{" "}
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" className="mb-5 mx-96 bg-blue-300">
@@ -231,16 +220,14 @@ const Explore = () => {
                                 variant="outline"
                                 role="combobox"
                                 className={cn(
-                                  'justify-between',
-                                  !field.value && 'text-muted-foreground'
+                                  "justify-between",
+                                  !field.value && "text-muted-foreground"
                                 )}
                               >
                                 {field.value
-                                  ? provincesTest.find(
-                                      (province) =>
-                                        province.value === field.value
-                                    )?.label
-                                  : 'Select Province'}
+                                  ? provincesTest.find((province) => province.value === field.value)
+                                      ?.label
+                                  : "Select Province"}
 
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
@@ -256,7 +243,7 @@ const Explore = () => {
                                     value={province.label}
                                     key={province.value}
                                     onSelect={() => {
-                                      form.setValue('province', province.value);
+                                      form.setValue("province", province.value);
                                       setSelectedProvince(province.value);
                                     }}
                                   >
@@ -284,22 +271,18 @@ const Explore = () => {
                                 variant="outline"
                                 role="combobox"
                                 className={cn(
-                                  'justify-between',
-                                  !field.value && 'text-muted-foreground'
+                                  "justify-between",
+                                  !field.value && "text-muted-foreground"
                                 )}
                                 disabled={
-                                  !selectedProvince ||
-                                  !municipalities[selectedProvince]?.length
+                                  !selectedProvince || !municipalities[selectedProvince]?.length
                                 }
                               >
                                 {selectedProvince !== null
-                                  ? (
-                                      municipalities[selectedProvince] || []
-                                    ).find(
-                                      (municipal) =>
-                                        municipal.value === field.value
+                                  ? (municipalities[selectedProvince] || []).find(
+                                      (municipal) => municipal.value === field.value
                                     )?.label
-                                  : 'Select Municipality'}
+                                  : "Select Municipality"}
 
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
@@ -311,27 +294,19 @@ const Explore = () => {
                               <CommandEmpty>No municipal found.</CommandEmpty>
                               <CommandGroup className="max-h-[200px] overflow-y-auto">
                                 {selectedProvince &&
-                                  municipalities[selectedProvince]?.map(
-                                    (municipal) => (
-                                      <CommandItem
-                                        value={municipal.label}
-                                        key={municipal.value}
-                                        onSelect={() => {
-                                          form.setValue(
-                                            'municipality',
-                                            municipal.value
-                                          );
-                                          field.onChange(municipal.value); // Update the field.value
-                                          console.log(
-                                            'Selected Municipality:',
-                                            municipal.label
-                                          );
-                                        }}
-                                      >
-                                        {municipal.label}
-                                      </CommandItem>
-                                    )
-                                  )}
+                                  municipalities[selectedProvince]?.map((municipal) => (
+                                    <CommandItem
+                                      value={municipal.label}
+                                      key={municipal.value}
+                                      onSelect={() => {
+                                        form.setValue("municipality", municipal.value);
+                                        field.onChange(municipal.value); // Update the field.value
+                                        console.log("Selected Municipality:", municipal.label);
+                                      }}
+                                    >
+                                      {municipal.label}
+                                    </CommandItem>
+                                  ))}
                               </CommandGroup>
                             </Command>
                           </PopoverContent>
@@ -346,9 +321,7 @@ const Explore = () => {
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="shad-form_label">
-                        Add Photos
-                      </FormLabel>
+                      <FormLabel className="shad-form_label">Add Photos</FormLabel>
                       <FormControl>
                         <FileUploader fieldChange={field.onChange} />
                       </FormControl>
@@ -366,58 +339,20 @@ const Explore = () => {
           </DialogContent>
         </Dialog>
       </div>
-      <Accordion
-        type="single"
-        collapsible
-        className="w-full bg-blue-200 p-2 border border-rounded"
-      >
+      <Accordion type="single" collapsible className="w-full bg-blue-200 p-3 rounded-md">
         {provincesTest.map((province) => (
           <AccordionItem key={province.value} value={province.value}>
-            <AccordionTrigger
-              onClick={() => handleProvinceChange(province.value)}
-            >
+            <AccordionTrigger onClick={() => handleProvinceChange(province.value)}>
               {province.label}
             </AccordionTrigger>
             <AccordionContent>
               {selectedProvince === province.value && (
-                <Accordion
-                  type="single"
-                  collapsible
-                  className="w-full bg-blue-50 p-2 "
-                >
+                <Accordion type="single" collapsible className="w-full bg-blue-100 p-3 rounded-md">
                   {municipalities[province.value].map((municipality) => (
-                    <AccordionItem
-                      key={municipality.value}
-                      value={municipality.value}
-                    >
+                    <AccordionItem key={municipality.value} value={municipality.value}>
                       <AccordionTrigger>{municipality.label}</AccordionTrigger>
                       <AccordionContent className=" w-full justify-items-center ">
-                        {/* <div>
-                      <Carousel className="w-full max-w-xs mx-auto bg-white">
-                      <CarouselContent style={{width: '100%'}}>
-                      {dummyArchives.map((archive, index) => (
-      <CarouselItem key={index}>
-        <div className="p-1">
-          <Card className='w-full'>
-            <CardContent className="w-full flex aspect-square items-center justify-center p-10">
-              <img src={archive.image}/>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className='border-4 p-2 '>
-          <h1>Title:</h1>
-          <span>{archive.title}</span>
-          <h2>Description:</h2>
-          <span>{archive.description}</span>
-        </div>
-                        </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      <CarouselPrevious />
-                      <CarouselNext />
-                    </Carousel>
-                      </div> */}
+                        {/* Content here */}
                       </AccordionContent>
                     </AccordionItem>
                   ))}

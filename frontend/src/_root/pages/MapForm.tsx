@@ -1,9 +1,7 @@
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { useEffect, useState } from 'react';
-import ReactMapGl, { Marker, Popup } from 'react-map-gl';
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl, { Marker, Popup } from "mapbox-gl";
 
-type Point = {
+interface Point {
   id: number;
   title: string;
   municipality: string;
@@ -16,20 +14,21 @@ type Point = {
   createdAt: string;
   updatedAt: string;
   provinceId: string;
-};
+}
 
 mapboxgl.accessToken =
-  'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';
+  "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
 
-const MapForm = () => {
+const MapForm: React.FC = () => {
+  const mapContainer = useRef<HTMLDivElement | null>(null);
   const [mapData, setMapData] = useState<Point[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<Point | null>(null);
 
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('http://localhost:8000/locations', {
-          credentials: 'include',
+        const response = await fetch("http://localhost:8000/locations", {
+          credentials: "include",
         });
 
         const data = await response.json();
@@ -47,50 +46,63 @@ const MapForm = () => {
     fetchLocations();
   }, []);
 
-  return (
-    <ReactMapGl
-      mapLib={mapboxgl}
-      initialViewState={{
-        longitude: 121.774,
-        latitude: 13.8797,
+  useEffect(() => {
+    if (mapContainer.current) {
+      const map = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/streets-v9",
+        center: [121.774, 12.8797],
         zoom: 5.1,
-      }}
-      style={{ height: '100vh' }}
-      mapStyle="mapbox://styles/mapbox/streets-v9"
-    >
-      {mapData.map((item) => (
-        <Marker
-          key={item.id}
-          latitude={item.location.coordinates[1]}
-          
-          longitude={item.location.coordinates[0]}
-          onClick={() =>  {
-            console.log('Marker clicked!')
-            setSelectedMarker(item)
-          }}
-          style={{cursor: 'pointer'}}
-        />
-      ))}
+        accessToken: mapboxgl.accessToken,
+      });
 
+      map.on("load", () => {
+        // Add markers to the map
+        mapData.forEach((item) => {
+          new mapboxgl.Marker()
+            .setLngLat(item.location.coordinates)
+            .addTo(map)
+            .setPopup(
+              new mapboxgl.Popup().setHTML(
+                `<h3 style="font-weight: bold; font-size: 1.5em;">${item.title}</h3>
+                <h2 style="font-weight: 500; font-size: 1.25em;">• ${formatDateToWord(
+                  item.date
+                )}</h2><p>${item.details}</p>`
+              )
+            )
+            .addTo(map);
+        });
+      });
+
+      // Handle marker click events
+      map.on("click", "markers", (e) => {
+        if (e.features && e.features.length > 0) {
+          const clickedMarker = e.features[0].properties as Point;
+          setSelectedMarker(clickedMarker);
+        }
+      });
+
+      // Clean up the map when the component is unmounted
+      return () => map.remove();
+    }
+  }, [mapData]);
+
+  const formatDateToWord = (dateString: string): string => {
+    const options: Intl.DateTimeFormatOptions = { month: "long", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", options);
+  };
+
+  return (
+    <div className="top-0 bottom-0 w-full p-5">
+      <div ref={mapContainer} className="h-full rounded-lg" />
       {selectedMarker && (
-        <Popup
-        longitude={selectedMarker.location.coordinates[0]}
-        latitude={selectedMarker.location.coordinates[1]}
-        onClose={() => setSelectedMarker(null)}
-        closeOnClick={false}
-      >
-        <div style={{
-          padding: '20px',
-          background: 'white',
-          borderRadius: '5px',
-          boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-        }}>
-          <h3 style={{ marginBottom: '5px' }}>{selectedMarker.title}</h3>
+        <div>
+          <h3 className="font-bold mb-2">{selectedMarker.title}</h3>
           <p>{selectedMarker.details}</p>
         </div>
-      </Popup>
       )}
-    </ReactMapGl>
+    </div>
   );
 };
 

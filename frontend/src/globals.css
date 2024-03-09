@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -157,7 +157,7 @@
 
   /* Post Details */
   .calendar_details-container {
-    @apply flex flex-col flex-1 gap-10 w-1/2 overflow-scroll py-10 px-5 md:p-14 custom-scrollbar items-center;
+    @apply flex flex-col flex-1 gap-10 w-full h-full overflow-scroll custom-scrollbar items-center;
   }
 
   .post_details-card {
@@ -298,18 +298,18 @@
     width: 100%;
     height: 100%;
   }
-  
+
   .swiper-slide {
     text-align: center;
     font-size: 18px;
     background: #fff;
-  
+
     /* Center slide text vertically */
     display: flex;
     justify-content: center;
     align-items: center;
   }
-  
+
   .swiper-slide img {
     display: block;
     width: 100%;
@@ -321,8 +321,7 @@
 @layer utilities {
   .gradient-red-to-blue {
     filter: drop-shadow(
-      invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%)
-        contrast(119%)
+      invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)
     );
   }
 }
