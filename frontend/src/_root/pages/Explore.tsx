@@ -29,6 +29,16 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -43,6 +53,7 @@ import {
 } from "@/components/ui/carousel";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { invoices } from "@/dummy/dummy";
 
 const formSchema = z.object({
   title: z.string().min(0, {
@@ -347,12 +358,55 @@ const Explore = () => {
             </AccordionTrigger>
             <AccordionContent>
               {selectedProvince === province.value && (
-                <Accordion type="single" collapsible className="w-full bg-blue-100 p-3 rounded-md">
+                <Accordion type="single" collapsible className="w-full bg-blue-50 p-3 rounded-md">
                   {municipalities[province.value].map((municipality) => (
                     <AccordionItem key={municipality.value} value={municipality.value}>
                       <AccordionTrigger>{municipality.label}</AccordionTrigger>
                       <AccordionContent className=" w-full justify-items-center ">
                         {/* Content here */}
+                        <div className="w-full h-full flex justify-center items-center">
+                          <Carousel className="w-10/12">
+                            <CarouselContent className="h-full">
+                              {Array.from({ length: 5 }).map((_, index) => (
+                                <CarouselItem key={index}>
+                                  <div className="p-1">
+                                    <Card>
+                                      <CardContent className="aspect-[2/1] p-6">
+                                        <div className="bg-green-100 p-2">
+                                          <span>
+                                            Status: <span className="font-bold">Verified</span>
+                                          </span>
+                                        </div>
+                                        <Table>
+                                          <TableHeader>
+                                            <TableRow>
+                                              <TableHead className="w-[100px] font-bold">
+                                                Invoice
+                                              </TableHead>
+                                              <TableHead className="font-bold">Status</TableHead>
+                                            </TableRow>
+                                          </TableHeader>
+                                          <TableBody>
+                                            {invoices.map((invoice) => (
+                                              <TableRow key={invoice.invoice}>
+                                                <TableCell className="font-medium">
+                                                  {invoice.invoice}
+                                                </TableCell>
+                                                <TableCell>{invoice.paymentStatus}</TableCell>
+                                              </TableRow>
+                                            ))}
+                                          </TableBody>
+                                        </Table>
+                                      </CardContent>
+                                    </Card>
+                                  </div>
+                                </CarouselItem>
+                              ))}
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                          </Carousel>
+                        </div>
                       </AccordionContent>
                     </AccordionItem>
                   ))}

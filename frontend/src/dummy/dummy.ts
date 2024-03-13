@@ -313,3 +313,34 @@ export const getUserById = (userId?: string) => {
     posts: [],
   };
 };
+
+export const invoices = [
+  {
+    invoice: "INV001",
+    paymentStatus: "Paid",
+  },
+  {
+    invoice: "INV002",
+    paymentStatus: "Pending",
+  },
+  {
+    invoice: "INV003",
+    paymentStatus: "Unpaid",
+  },
+  {
+    invoice: "INV004",
+    paymentStatus: "Paid",
+  },
+  {
+    invoice: "INV005",
+    paymentStatus: "Paid",
+  },
+  {
+    invoice: "INV006",
+    paymentStatus: "Pending",
+  },
+  {
+    invoice: "INV007",
+    paymentStatus: "Unpaid",
+  },
+];

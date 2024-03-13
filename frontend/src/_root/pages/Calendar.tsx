@@ -89,7 +89,7 @@ const Calendar = () => {
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedProvince, setSelectedProvince] = useState("Bataan");
   const [value, setValue] = useState("");
   const [calendarDetails, setCalendarDetails] = useState<IEvent>();
   const [calendar, setCalendar] = useState<ICalendar>();
