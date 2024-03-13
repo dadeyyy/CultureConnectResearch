@@ -104,7 +104,7 @@ const MapForm: React.FC = () => {
       </div>
       <div ref={mapContainer} className="h-full rounded-lg" />
       {selectedMarker && (
-        <div className="absolute bg-white p-10 shadow-lg rounded-lg top-0 right-0 h-full w-[350px] opacity-50">
+        <div className="absolute bg-white p-10 shadow-lg rounded-lg top-0 right-0 h-full w-[350px] opacity-70">
           <h3 className="font-bold my-2 text-2xl">{selectedMarker.title}</h3>
           <h2 className="font-semibold mb-1">Date: {formatDateToWord(selectedMarker.date)}</h2>
           <p className="font-semibold mb-1">
