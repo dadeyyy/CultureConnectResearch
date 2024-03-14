@@ -316,31 +316,27 @@ export const getUserById = (userId?: string) => {
 
 export const invoices = [
   {
-    invoice: "INV001",
-    paymentStatus: "Paid",
+    invoice: "Title: ",
+    paymentStatus: "Example Title",
   },
   {
-    invoice: "INV002",
-    paymentStatus: "Pending",
+    invoice: "Creator Name: ",
+    paymentStatus: "Juan Dela Cruz",
   },
   {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
+    invoice: "Language: ",
+    paymentStatus: "English",
   },
   {
-    invoice: "INV004",
-    paymentStatus: "Paid",
+    invoice: "Medium: ",
+    paymentStatus: "Image",
   },
   {
-    invoice: "INV005",
-    paymentStatus: "Paid",
+    invoice: "Date Issued: ",
+    paymentStatus: "February 2022",
   },
   {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
+    invoice: "Keyword: ",
+    paymentStatus: "Love",
   },
 ];

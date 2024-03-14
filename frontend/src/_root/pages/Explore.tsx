@@ -362,10 +362,10 @@ const Explore = () => {
                   {municipalities[province.value].map((municipality) => (
                     <AccordionItem key={municipality.value} value={municipality.value}>
                       <AccordionTrigger>{municipality.label}</AccordionTrigger>
-                      <AccordionContent className=" w-full justify-items-center ">
+                      <AccordionContent>
                         {/* Content here */}
-                        <div className="w-full h-full flex justify-center items-center">
-                          <Carousel className="w-10/12">
+                        <div className="h-full flex justify-center items-center">
+                          <Carousel className="w-full max-w-[800px]">
                             <CarouselContent className="h-full">
                               {Array.from({ length: 5 }).map((_, index) => (
                                 <CarouselItem key={index}>
@@ -380,7 +380,7 @@ const Explore = () => {
                                         <Table>
                                           <TableHeader>
                                             <TableRow>
-                                              <TableHead className="w-[100px] font-bold">
+                                              <TableHead className="w-[150px] font-bold">
                                                 Invoice
                                               </TableHead>
                                               <TableHead className="font-bold">Status</TableHead>

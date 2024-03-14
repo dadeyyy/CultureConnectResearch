@@ -21,6 +21,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { municipalities, provincesTest } from "@/lib/provinces";
 
 const PostDetails = () => {
@@ -105,7 +108,7 @@ const PostDetails = () => {
   const options = [{ label: "Report", value: "report" }];
 
   return (
-    <div className="post_details-container">
+    <div className="flex-1 p-5">
       <div className="hidden md:flex max-w-5xl w-full">
         <Button onClick={() => navigate(-1)} variant="ghost" className="shad-button_ghost">
           <img
@@ -126,7 +129,7 @@ const PostDetails = () => {
       {isLoading || !post ? (
         <Loader />
       ) : (
-        <div className="post_details-card p-5 ">
+        <div className="post_details-card mx-auto p-2 ">
           <div className="post_details-info">
             <div className="flex-between w-full">
               <Link to={`/profile/${post?.user.id}`} className="flex items-center gap-3">
@@ -204,7 +207,25 @@ const PostDetails = () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Report post.</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure reporting this post?
+                              <p>State your reason for reporting this post.</p>
+                              <div className="p-5">
+                                <RadioGroup defaultValue="flex mt-5">
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="radioFake" id="r1" />
+                                    <Label htmlFor="r1">
+                                      Contains fake news and misinformation.
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="radioIna" id="r2" />
+                                    <Label htmlFor="r2">Inappropriate Content.</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="radioSpam" id="r3" />
+                                    <Label htmlFor="r3">Spam</Label>
+                                  </div>
+                                </RadioGroup>
+                              </div>
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -254,9 +275,9 @@ const PostDetails = () => {
       )}
 
       <div className="w-full max-w-5xl">
-        <hr className="border w-full border-dark-4/80" />
+        <hr className="border w-full border-dark-4/80 m-10" />
 
-        <h3 className="body-bold md:h3-bold w-full my-10">More Related Posts</h3>
+        <h3 className="body-bold md:h3-bold w-full m-10">More Related Posts</h3>
         {/* {isUserPostLoading || !relatedPosts ? <Loader /> : <GridPostList posts={relatedPosts} />} */}
       </div>
     </div>
