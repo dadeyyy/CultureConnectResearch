@@ -394,3 +394,11 @@
   margin: 12px;
   border-radius: 4px;
 }
+
+.archive-container {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: auto auto auto auto;
+  background-color: #ffff;
+  padding: 1.25rem;
+}

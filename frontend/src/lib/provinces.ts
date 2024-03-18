@@ -175,6 +175,473 @@ export const provincesTest = [
   { value: "zamboanga_sibugay", label: "Zamboanga Sibugay" },
 ];
 
+export const provincesWithImage = [
+  {
+    value: "abra",
+    label: "Abra",
+    image: "https://upload.wikimedia.org/wikipedia/commons/b/b0/Abra_Valley.jpg",
+  },
+  {
+    value: "agusan_del_norte",
+    label: "Agusan del Norte",
+    image:
+      "https://www.vigattintourism.com/assets/article_main_photos/optimize/1348470590lZVPASyl.jpg",
+  },
+  {
+    value: "agusan_del_sur",
+    label: "Agusan del Sur",
+    image:
+      "https://i0.wp.com/peoplaid.com/wp-content/uploads/2019/04/Agusan-Del-Sur-Welcome-Sign.jpg?fit=554%2C463&ssl=1",
+  },
+  {
+    value: "aklan",
+    label: "Aklan",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/0/0e/Boracay_Island%2C_Philippines_-_panoramio.jpg",
+  },
+  {
+    value: "albay",
+    label: "Albay",
+    image: "https://albay.gov.ph/wp-content/uploads/2020/02/djdisny_20200226_121241_0-1024x767.jpg",
+  },
+  {
+    value: "antique",
+    label: "Antique",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/f/f4/Tibiao%2C_Antique_%28P._Martin%29_-_Flickr.jpg",
+  },
+  {
+    value: "apayao",
+    label: "Apayao",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Dibagat_river.JPG/1200px-Dibagat_river.JPG",
+  },
+  {
+    value: "aurora",
+    label: "Aurora",
+    image:
+      "https://geoscopesite.files.wordpress.com/2017/11/dingalan-aurora-michael-yap-photography-1.jpg",
+  },
+  {
+    value: "basilan",
+    label: "Basilan",
+    image: "https://wanderingfeetph.files.wordpress.com/2020/01/af399-basilan-island.jpg?w=1200",
+  },
+  {
+    value: "bataan",
+    label: "Bataan",
+    image: "https://ik.imagekit.io/tvlk/blog/2023/07/shutterstock_2141829985.jpg?tr=dpr-2,w-675",
+  },
+  {
+    value: "batanes",
+    label: "Batanes",
+    image: "https://ik.imagekit.io/tvlk/blog/2018/09/Basco-Lighthouse-Batanes.jpg",
+  },
+  {
+    value: "batangas",
+    label: "Batangas",
+    image:
+      "https://res.klook.com/image/upload/fl_lossy.progressive,w_800,c_fill,q_85/Batangas1-1125x624_jlwrv9.png",
+  },
+  {
+    value: "benguet",
+    label: "Benguet",
+    image:
+      "https://ik.imagekit.io/tvlk/blog/2023/08/shutterstock_1946685400.jpg?tr=dpr-2.625,h-320,q-25,w-320",
+  },
+  {
+    value: "biliran",
+    label: "Biliran",
+    image:
+      "https://tourism.biliranisland.com/wp-content/uploads/2017/11/Sampao-Rice-Terraces-1.jpg",
+  },
+  {
+    value: "bohol",
+    label: "Bohol",
+    image: "https://www.kkday.com/en/blog/wp-content/uploads/beginners_boholchocolatehills.jpg",
+  },
+  {
+    value: "bukidnon",
+    label: "Bukidnon",
+    image:
+      "https://ik.imagekit.io/tvlk/blog/2023/07/shutterstock_1481502635.jpg?tr=dpr-2.625,h-320,q-25,w-320",
+  },
+  {
+    value: "bulacan",
+    label: "Bulacan",
+    image: "https://ik.imagekit.io/tvlk/blog/2023/08/JdlD3t1A-image.png?tr=dpr-2,w-675",
+  },
+  {
+    value: "cagayan",
+    label: "Cagayan",
+    image:
+      "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhK-cAKiGI0vtmzYGFk_g_2G_shwuPMPz8e-4IlyQICPC9JK1O6QfqDdR-R9bFpcwtBE8ss3g-y4WePf9krMW4SPBJXAGc0GIzr5qk3jczqV8b_C-Qm35zv_KII4cWdhIGpDXj-6Y6WU7M16Ew0UGZoTb6roXf7ky8lJVARy-RvjPWmV5v0mmhZpw2J/s1600/Explore%20the%20Best%20of%20Cagayan%20Valley-%207%20Must-Visit%20Tourist%20Spots%20-%20metroscenemag_.jpg",
+  },
+  {
+    value: "camarines_norte",
+    label: "Camarines Norte",
+    image:
+      "https://ik.imagekit.io/tvlk/blog/2018/09/Mampurog-River-Camarines-Norte.jpg?tr=dpr-2,w-675",
+  },
+  {
+    value: "camarines_sur",
+    label: "Camarines Sur",
+    image: "https://ik.imagekit.io/tvlk/blog/2023/08/shutterstock_486173527.jpg?tr=dpr-2,w-675",
+  },
+  {
+    value: "camiguin",
+    label: "Camiguin",
+    image:
+      "https://deih43ym53wif.cloudfront.net/white-siland-Camiguin-Philippines-shutterstock_1439447942.jpg_2f20ecb1f5.jpg",
+  },
+  {
+    value: "capiz",
+    label: "Capiz",
+    image:
+      "https://images.saymedia-content.com/.image/t_share/MTc2Mjg3MzE2NTI3OTQ4OTkw/the-silent-splendor-and-mystery-of-the-province-of-capiz-in-the-philippines.jpg",
+  },
+  {
+    value: "catanduanes",
+    label: "Catanduanes",
+    image: "https://7641islands.ph/wp-content/uploads/2022/03/PLYGRND-0614-scaled.jpg",
+  },
+  {
+    value: "cavite",
+    label: "Cavite",
+    image: "https://ik.imagekit.io/tvlk/blog/2023/07/shutterstock_1899695731.jpg?tr=dpr-2,w-675",
+  },
+  {
+    value: "cebu",
+    label: "Cebu",
+    image:
+      "https://www.bria.com.ph/wp-content/uploads/2021/10/why-you-should-invest-in-cebu-queen-of-the-south-png-e1635386837273.jpg",
+  },
+  {
+    value: "compostela_valley",
+    label: "Compostela Valley",
+    image:
+      "https://filmphilippines.com/sites/default/files/THEMATIC-SPOTS---Compostela-Valley_Davao-de-Oro.jpg",
+  },
+  {
+    value: "cotabato",
+    label: "Cotabato",
+    image: "https://upload.wikimedia.org/wikipedia/commons/d/d8/Eagle_eye_view_Cotabato_City.jpg",
+  },
+  {
+    value: "davao_de_oro",
+    label: "Davao de Oro (Compostela Valley)",
+    image: "https://businessmirror.com.ph/wp-content/uploads/2020/01/dreamstime_s_93716709.jpg",
+  },
+  {
+    value: "davao_del_norte",
+    label: "Davao del Norte",
+    image: "https://media-cdn.tripadvisor.com/media/photo-c/1280x250/09/5b/73/4e/hagimit-falls.jpg",
+  },
+  {
+    value: "davao_del_sur",
+    label: "Davao del Sur",
+    image: "https://media-cdn.tripadvisor.com/media/photo-s/12/37/e8/6e/eden-nature-park.jpg",
+  },
+  {
+    value: "davao_occidental",
+    label: "Davao Occidental",
+    image:
+      "https://scontent.fmnl14-1.fna.fbcdn.net/v/t39.30808-6/405926449_674395564839852_4742002738588956463_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeGCinVw3EvXPxNMX8j1LTHzu9rtwYfExpe72u3Bh8TGl7FO8abTpiBaOhRHspsh9pDKHXduLfdq2BnE916EUFab&_nc_ohc=dShpl2HuaPQAX-dWvg7&_nc_ht=scontent.fmnl14-1.fna&oh=00_AfDRWMf6htHfMOIS9IBlbc4aWHwXG4umsaP0dUmeIeL2lg&oe=65FD24C9",
+  },
+  {
+    value: "davao_oriental",
+    label: "Davao Oriental",
+    image: "https://www.rappler.com/tachyon/2023/01/Cape-San-Agustin-Davao-Oriental.jpg",
+  },
+  {
+    value: "dinagat_islands",
+    label: "Dinagat Islands",
+    image: "https://dinagatisland98105699.files.wordpress.com/2018/11/maxresdefault.jpg",
+  },
+  {
+    value: "eastern_samar",
+    label: "Eastern Samar",
+    image: "https://easternsamar.gov.ph/wp-content/uploads/2017/11/borongal-festival.png",
+  },
+  {
+    value: "guimaras",
+    label: "Guimaras",
+    image: "https://www.sanlorenzoguimaras.gov.ph/wp-content/uploads/2022/01/750_2071-1024x678.jpg",
+  },
+  {
+    value: "ifugao",
+    label: "Ifugao",
+    image:
+      "https://www.remotelands.com/travelogues/app/uploads/2018/12/Ifugao-elders-in-tradtional-dress.jpg",
+  },
+  {
+    value: "ilocos_norte",
+    label: "Ilocos Norte",
+    image:
+      "https://lh3.googleusercontent.com/proxy/HPqBBKmViIzNRgn3SeM8Gq5e_7vHfIL_Pud4htNiCU_WtJBJ7JqYQoSKQb9uc4mxHIbLeBW24vSJbqe2qH_5SV6JvrqOgcbQDhBsY6jdzQW97-3XH5BhWG6roXdct77vhs9Ux_eGVc2l358d0Q",
+  },
+  {
+    value: "ilocos_sur",
+    label: "Ilocos Sur",
+    image:
+      "https://cdn.tatlerasia.com/tatlerasia/i/2022/04/25112030-gettyimages-116030925_cover_1280x853.jpg",
+  },
+  {
+    value: "iloilo",
+    label: "Iloilo",
+    image:
+      "https://onevirtualsolutions.com/wp-content/uploads/2020/02/philippines-dinagyang-festival.jpg",
+  },
+  {
+    value: "isabela",
+    label: "Isabela",
+    image:
+      "https://www.rappler.com/tachyon/r3-assets/AD0C38A7AAF248B59E52282617BE27E1/img/47FBE0FCF8C04898B061610DD0D023CA/01252018-bambanti-streetdance-isabela-rmr_65_of_68.jpg",
+  },
+  {
+    value: "kalinga",
+    label: "Kalinga",
+    image:
+      "https://lh3.googleusercontent.com/proxy/mHJAF5Z5aB1Rw29G6KdKu0jBZ5E1iaR_6E3BktLcaB8Uebhy70bcLfczunPBMUGRBR_VoEOr1HiKEDD8KZV6PcMX7gkNb5FODKcmTxggzs_Dd2uaYSbj2Kbo1vdMjg",
+  },
+  {
+    value: "la_union",
+    label: "La Union",
+    image:
+      "https://launion.gov.ph/wp-content/uploads/2023/03/335433281_866900377734366_8627830339969251003_n.jpg",
+  },
+  {
+    value: "laguna",
+    label: "Laguna",
+    image:
+      "https://lessandra.com.ph/img/asset/bWFpbi9CbG9nSW1hZ2VzL2xlc3NhbmRyYS1jYWxhbWJhLWxhZ3VuYS9uYWdjYXJsYW4tdW5kZXJncm91bmQtY2VtZXRlcnktbmVhci1hZmZvcmRhYmxlLWhvdXNlLWFuZC1sb3QtZm9yLXNhbGUtaW4tY2FsYW1iYS1sYWd1bmEtYXQtbGVzc2FuZHJhLWhvbWVzLWNhbGFtYmEuanBn?p=seo&s=4a55f3617491b5ec20365da0474db6dc",
+  },
+  {
+    value: "lanao_del_norte",
+    label: "Lanao del Norte",
+    image: "https://ranaostardotnet.files.wordpress.com/2019/12/3c627-ldn2bcultural2bdance.png",
+  },
+  {
+    value: "lanao_del_sur",
+    label: "Lanao del Sur",
+    image:
+      "https://lh3.googleusercontent.com/proxy/6YdvEUUB0LC7WQvxqrfYwYN7aLnaguKf1qGhefM_7eYw56Q5u_CHVm7GPW3MbMrreTLH2HwSRfoFaDQOHDQ-Lni5nkdw-ZuirPW8xdMUeAY6mtIdqzFVTSRkS_-pp87bge5Y",
+  },
+  {
+    value: "leyte",
+    label: "Leyte",
+    image: "https://www.beholdphilippines.com/wp-content/uploads/2012/09/Leyte.jpg",
+  },
+  {
+    value: "maguindanao",
+    label: "Maguindanao",
+    image: "https://nolisoli.ph/wp-content/uploads/2018/09/DSC06454-scaled.jpg",
+  },
+  {
+    value: "marinduque",
+    label: "Marinduque",
+    image: "https://upload.wikimedia.org/wikipedia/commons/3/37/Boac_cathedral%2C_Marinduque.jpg",
+  },
+  {
+    value: "masbate",
+    label: "Masbate",
+    image: "https://shoestringdiary.files.wordpress.com/2017/04/sanpascual_church01ss_diaries.jpg",
+  },
+  {
+    value: "metro_manila",
+    label: "Metro Manila",
+    image:
+      "https://images.summitmedia-digital.com/spotph/images/2019/07/24/manila-attention-lunetapark-1563956886.jpg",
+  },
+  {
+    value: "misamis_occidental",
+    label: "Misamis Occidental",
+    image:
+      "https://lh3.googleusercontent.com/proxy/uDX6kQjKybYN0F5Rs_aqnx6WOpf8AOiV1VdrNa8MyqadlfCcY8XgJ-cEnK6_nx5W4Jc_57xtLegiEjYE23dx_7r-O6ggZn8IiXr0RuZb4C30VxkR4IpHvbQAOj_9I0cYv3qbnkHjoVSGeENB7uwUxJDc8vab4A",
+  },
+  {
+    value: "misamis_oriental",
+    label: "Misamis Oriental",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Misamis_Oriental_Heritage_Monument.jpg/640px-Misamis_Oriental_Heritage_Monument.jpg",
+  },
+  {
+    value: "mountain_province",
+    label: "Mountain Province",
+    image:
+      "https://lh3.googleusercontent.com/proxy/WtAealYjcPlc2S7p_gW-k7bXE-4eLrmvjsq0njf7wtVnstwM2b1hJqLcLSUpK-61wcK5w193LwdF1WNBfHyVQyGrf6GGGoEIRoqpyFtt1kuDYlNzGGAOxyxOOxRpxRrRjH5gXMuHXpkR6pkiMw",
+  },
+  {
+    value: "negros_occidental",
+    label: "Negros Occidental",
+    image:
+      "https://www.kkday.com/en/blog/wp-content/uploads/philippines_negros_occidental_talisay_ruins.jpg",
+  },
+  {
+    value: "negros_oriental",
+    label: "Negros Oriental",
+    image:
+      "https://philippine-real-estate.com/wp-content/uploads/2024/01/Negros-Oriental-1024x536.webp",
+  },
+  {
+    value: "northern_samar",
+    label: "Northern Samar",
+    image: "https://kahimyang.com/resources-6/capul-church.jpg",
+  },
+  {
+    value: "nueva_ecija",
+    label: "Nueva Ecija",
+    image: "https://i.pinimg.com/originals/5a/b3/b5/5ab3b549f6b8728b71a7a4c7461f07b5.jpg",
+  },
+  {
+    value: "nueva_vizcaya",
+    label: "Nueva Vizcaya",
+    image:
+      "https://i1.wp.com/www.wkadventures.com/wp-content/uploads/2023/10/things-to-do-in-nueva-vizcaya.jpg?fit=665%2C445&ssl=1",
+  },
+  {
+    value: "occidental_mindoro",
+    label: "Occidental Mindoro",
+    image: "https://www.ucanews.com/directory/uploads/dioceses/promo/1693829731.png",
+  },
+  {
+    value: "oriental_mindoro",
+    label: "Oriental Mindoro",
+    image:
+      "https://travelorientalmindoro.ph/Content/img/uploads/e5f38c0e-0362-4d3d-85e0-1867004a8b3f.jpg",
+  },
+  {
+    value: "palawan",
+    label: "Palawan",
+    image:
+      "https://i0.wp.com/www.traveling-up.com/wp-content/uploads/2019/06/COVER-puerto-princesa-palawan-underground-river-cave-UNESCO-boat.jpg?fit=840%2C473&ssl=1",
+  },
+  {
+    value: "pampanga",
+    label: "Pampanga",
+    image:
+      "https://hare-media-cdn.tripadvisor.com/media/attractions-splice-spp-720x480/09/e2/db/bd.jpg",
+  },
+  {
+    value: "pangasinan",
+    label: "Pangasinan",
+    image: "https://i.pinimg.com/474x/f8/00/2d/f8002df2fd054da614d2ff1ca5168438.jpg",
+  },
+  {
+    value: "quezon",
+    label: "Quezon",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Mt._Banahaw_of_Lucban%2C_Quezon.jpg/1200px-Mt._Banahaw_of_Lucban%2C_Quezon.jpg",
+  },
+  {
+    value: "quirino",
+    label: "Quirino",
+    image:
+      "https://primer.com.ph/event/wp-content/uploads/sites/10/2016/09/photo-2-e1472920962142.jpg",
+  },
+  {
+    value: "rizal",
+    label: "Rizal",
+    image:
+      "https://www.lumina.com.ph/assets/news-and-blogs-photos/Reasons-Why-Rizal-Province-Makes-a-Perfect-Home-Location/Access-the-benefits-rolling-hills-refreshing-cool-winds-and-idyllic-lifestyle-in-the-East.webp",
+  },
+  {
+    value: "romblon",
+    label: "Romblon",
+    image:
+      "https://www.vigattintourism.com/assets/article_main_photos/optimize/1350717095RYIkZYrK.jpg",
+  },
+  {
+    value: "samar",
+    label: "Samar",
+    image:
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/c2/76/4c/the-balangiga-bells-back.jpg?w=1200&h=-1&s=1",
+  },
+  {
+    value: "sarangani",
+    label: "Sarangani",
+    image:
+      "https://media-cdn.tripadvisor.com/media/photo-c/1280x250/0e/20/53/6c/one-of-the-beautiful.jpg",
+  },
+  {
+    value: "siquijor",
+    label: "Siquijor",
+    image: "https://gttp.imgix.net/375971/x/0/aerial-view-of-cambugahay-falls-in-siquijor.jpg",
+  },
+  {
+    value: "sorsogon",
+    label: "Sorsogon",
+    image:
+      "https://gttp.imgix.net/317317/x/0/top-22-sorsogon-bicol-tourist-spots-beaches-islands-hot-springs-falls-24.jpg?auto=compress%2Cformat&ch=Width%2CDPR&dpr=1&ixlib=php-3.3.0&w=883",
+  },
+  {
+    value: "south_cotabato",
+    label: "South Cotabato",
+    image:
+      "https://www.lumina.com.ph/assets/news-and-blogs-photos/Why-Live-in-South-Cotabato-Here-Are-the-Things-Youll-Love-About-the-Land-of-the-Dreamweavers/e98d973999/Holon-Lake-South-Cotabato-Philippines-min__ResizedImageWzY1MCw0NTVd.jpg",
+  },
+  {
+    value: "southern_leyte",
+    label: "Southern Leyte",
+    image:
+      "https://lh3.googleusercontent.com/-E9Sqq7SDfj4/UzEte2zaDTI/AAAAAAAAAQE/FGd-UMGyYS8/s640/first%2520cross%2520monument.jpg",
+  },
+  {
+    value: "sultan_kudarat",
+    label: "Sultan Kudarat",
+    image:
+      "https://philippine-real-estate.com/wp-content/uploads/2023/05/Sultan-Kudarat-Province-scaled.jpg",
+  },
+  {
+    value: "sulu",
+    label: "Sulu",
+    image: "https://philippine-real-estate.com/wp-content/uploads/2023/05/Sulu-Province-scaled.jpg",
+  },
+  {
+    value: "surigao_del_norte",
+    label: "Surigao del Norte",
+    image: "https://images.gmanews.tv/v3/webpics/v3/2014/02/2014_02_27_21_32_01.jpg",
+  },
+  {
+    value: "surigao_del_sur",
+    label: "Surigao del Sur",
+    image:
+      "https://i0.wp.com/caragaregion.com/wp-content/uploads/2016/03/tinuy-an-falls.jpg?resize=2048%2C1093&ssl=1",
+  },
+  {
+    value: "tarlac",
+    label: "Tarlac",
+    image:
+      "https://tarlac.gov.ph/wp-content/uploads/2022/07/GOSHEN-RESORT-AND-HOTEL-%E2%80%93-BAMBAN-TARLAC-1024x681.jpg",
+  },
+  {
+    value: "tawi_tawi",
+    label: "Tawi-Tawi",
+    image: "https://bangsamoro.gov.ph/wp-content/uploads/2023/09/50_3.jpg",
+  },
+  {
+    value: "zambales",
+    label: "Zambales",
+    image: "https://edzambales.files.wordpress.com/2018/11/fa.jpg",
+  },
+  {
+    value: "zamboanga_del_norte",
+    label: "Zamboanga del Norte",
+    image:
+      "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg_N7EGUR4cieaJnBF7UgCZN3GsXZZPZt1ymifaWqY77dbrT8WFZfUqwgBVQSSr0ezZixCxV0AG-v8OKclRaz_-ooMJI0hvpXEix2BbEILGusQ6SJsOQapjburp-HwUS25QLBFk5d9gztTsWc7oTdoV9luSurWvLdpkPzLsaE2uKsB6yCf0Xq0JtgOwkvE/w1200-h630-p-k-no-nu/Situbo.jpg",
+  },
+  {
+    value: "zamboanga_del_sur",
+    label: "Zamboanga del Sur",
+    image: "https://www.zamboangadelsur.com/images/zambo32.jpg",
+  },
+  {
+    value: "zamboanga_sibugay",
+    label: "Zamboanga Sibugay",
+    image: "https://foodphilippines.com/wp-content/uploads/2023/08/Banner-Photo-Zamboanga.jpeg",
+  },
+];
+
 export const municipalities: { [key: string]: { value: string; label: string }[] } = {
   abra: [
     { value: "bangued", label: "Bangued" },
