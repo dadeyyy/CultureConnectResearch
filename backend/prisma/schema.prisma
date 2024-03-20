@@ -24,6 +24,7 @@ model User {
   firstName String
   lastName String
   role Role @default(USER)
+  province String? @default("bataan")
   bio         String?
   avatarUrl   String?
   createdAt   DateTime  @default(now())
@@ -31,9 +32,8 @@ model User {
   posts       Post[]
   likes       Like[]
   comments    Comment[]
-  reports     Report[] 
-  // followers   Following[] @relation("Followers", references: [followerId])
-  // following   Followers[] @relation("Following", references: [followingId])
+  reports     Report[]
+  archives Archive[]
 }
 
 // model Followers {
@@ -78,8 +78,19 @@ model Archive {
   description String
   province String
   municipality String
+  files Files[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userId Int?
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Files {
+  id Int @id @default(autoincrement())
+  url String
+  filename String
+  archiveId Int
+  archive Archive @relation(fields: [archiveId], references: [id], onDelete: Cascade)
 }
 
 model Report {
@@ -91,6 +102,7 @@ model Report {
   post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user    User     @relation(fields: [userId], references: [id])
 }
+
 model Photo {
   id          Int       @id @default(autoincrement())
   url         String

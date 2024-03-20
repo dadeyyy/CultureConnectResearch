@@ -29,6 +29,7 @@ declare module 'express-session' {
       id: number;
       username: string;
       role: string;
+      province: string | null;
     };
   }
 }

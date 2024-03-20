@@ -107,3 +107,16 @@ export const isAdmin = (req: Request, res: Response, next: () => void) => {
   }
 
 };
+
+export const isProvinceAdmin = (req: Request, res: Response, next: () => void) => {
+  const {province} = req.params;
+
+  if(req.session.user?.role === "ADMIN" && req.session.user.province === province){
+    next()
+  }
+  else{
+    return res.status(401).json({error: `Not an admin of province ${province}`})
+  }
+
+};
+

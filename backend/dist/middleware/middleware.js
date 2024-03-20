@@ -90,4 +90,13 @@ export const isAdmin = (req, res, next) => {
         return res.status(401).json({ error: "NOT AN ADMIN!!" });
     }
 };
+export const isProvinceAdmin = (req, res, next) => {
+    const { province } = req.params;
+    if (req.session.user?.role === "ADMIN" && req.session.user.province === province) {
+        next();
+    }
+    else {
+        return res.status(401).json({ error: `Not an admin of province ${province}` });
+    }
+};
 //# sourceMappingURL=middleware.js.map

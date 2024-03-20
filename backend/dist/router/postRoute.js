@@ -2,7 +2,7 @@ import express from 'express';
 import { isAuthenticated, isAuthor, validate, } from '../middleware/middleware.js';
 import { db } from '../utils/db.server.js';
 import { upload } from '../utils/cloudinary.js';
-import { exploreSchema, postSchema } from '../utils/Schemas.js';
+import { postSchema, } from '../utils/Schemas.js';
 const postRoute = express.Router();
 //ADD POST
 postRoute.post('/post', isAuthenticated, upload.array('image'), validate(postSchema), async (req, res) => {
@@ -38,49 +38,48 @@ postRoute.post('/post', isAuthenticated, upload.array('image'), validate(postSch
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-postRoute.post('/explore', isAuthenticated, upload.array('image'), validate(exploreSchema), async (req, res) => {
-    try {
-        const data = req.body;
-        const files = req.files;
-        console.log(data);
-        console.log(files);
-        const images = files?.map((file) => ({
-            url: file.path,
-            filename: file.filename,
-        }));
-        const newPost = await db.explore.create({
-            data: {
-                ...data,
-                photos: {
-                    create: images,
-                },
-            },
-            include: {
-                photos: true
-            }
-        });
-        res
-            .status(201)
-            .json({ message: 'Successfully created new archive!', data: newPost });
-    }
-    catch (error) {
-        console.log("TEST");
-        console.log(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-postRoute.get('/explore', isAuthenticated, async (req, res) => {
-    try {
-        const explore = await db.explore.findMany();
-        if (explore) {
-            return res.status(200).json(explore);
-        }
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
-    }
-});
+// postRoute.post('/explore', isAuthenticated, upload.array('image'), validate(exploreSchema) , async(req,res)=>{
+//   try {
+//     const data: exploreTypeSchema = req.body;
+//     const files: Express.Multer.File[] = req.files as Express.Multer.File[];
+//     console.log(data);
+//     console.log(files);
+//     const images = files?.map((file) => ({
+//       url: file.path,
+//       filename: file.filename,
+//     }));
+//     const newPost = await db.explore.create({
+//       data: {
+//         ...data,
+//         photos: {
+//           create: images,
+//         },
+//       },
+//       include: {
+//         photos: true
+//       }
+//     });
+//     res
+//       .status(201)
+//       .json({ message: 'Successfully created new archive!', data: newPost });
+//   } catch (error) {
+//     console.log("TEST");
+//     console.log(error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// })
+// postRoute.get('/explore',isAuthenticated, async(req,res) =>{
+//   try{
+//     const explore = await db.explore.findMany()
+//     if(explore){
+//       return res.status(200).json(explore)
+//     }
+//   }
+//   catch(error){
+//     console.log(error)
+//     return res.status(500).json(error)
+//   }
+// })
 // GET ALL THE POST
 postRoute.get('/post', isAuthenticated, async (req, res) => {
     try {
@@ -222,7 +221,9 @@ postRoute.post('/post/:postId/report', async (req, res) => {
         });
         // Determine if the post is the current user's post, if not, proceed to report
         if (!post || post.user.id === currentUser) {
-            return res.status(403).json({ error: "You cannot report your own post or the post does not exist" });
+            return res.status(403).json({
+                error: 'You cannot report your own post or the post does not exist',
+            });
         }
         // Check if the user has already reported this post
         const existingReport = await db.report.findFirst({
@@ -232,7 +233,9 @@ postRoute.post('/post/:postId/report', async (req, res) => {
             },
         });
         if (existingReport) {
-            return res.status(400).json({ error: "You have already reported this post" });
+            return res
+                .status(400)
+                .json({ error: 'You have already reported this post' });
         }
         // Create a report record
         await db.report.create({
@@ -252,25 +255,27 @@ postRoute.post('/post/:postId/report', async (req, res) => {
                 },
             },
             include: {
-                reports: true
-            }
+                reports: true,
+            },
         });
         if (updatedPost.reports.length > 2) {
             const deletedReportedPost = await db.post.delete({
                 where: {
-                    id: +postId
+                    id: +postId,
                 },
                 include: {
-                    reports: true
-                }
+                    reports: true,
+                },
             });
-            return res.json({ deletedReportedPost, message: "Post was deleted" });
+            return res.json({ deletedReportedPost, message: 'Post was deleted' });
         }
-        return res.status(200).json({ message: "Post reported successfully", updatedPost });
+        return res
+            .status(200)
+            .json({ message: 'Post reported successfully', updatedPost });
     }
     catch (error) {
-        console.log("Error");
-        return res.status(500).json({ error: "Internal server error" });
+        console.log('Error');
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });
 export default postRoute;

@@ -21,18 +21,26 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
                 req.session.user = {
                     id: user.id,
                     username: user.username,
+                    province: user.province,
                     role: user.role,
                 };
                 req.session.save((err) => {
                     if (err) {
                         console.log('Error saving the session', err);
                     }
-                    console.log("SESSION", req.session);
+                    console.log('SESSION', req.session);
                     res.json({
                         message: 'authenticated',
                         status: 200,
-                        user: { id: user.id, firstName: user.firstName, lastName: user.lastName,
-                            username: user.username, email: user.email, role: user.role }
+                        user: {
+                            id: user.id,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            username: user.username,
+                            email: user.email,
+                            role: user.role,
+                            province: user.province,
+                        },
                     });
                 });
             }
@@ -55,12 +63,34 @@ authRouter.post('/signin', validate(signInSchema), async (req, res) => {
 authRouter.post('/signup', validate(signUpSchema), async (req, res) => {
     try {
         const data = req.body;
-        const user = await db.user.findFirst({
+        //Check if someone is trying to create an admin
+        if (data.role === 'ADMIN') {
+            //Superadmin can only create admins, check for superadmins
+            if (!req.session || req.session.user?.role !== 'SUPERADMIN') {
+                return res
+                    .status(403)
+                    .json({ error: 'Only superadmins can create admins' });
+            }
+            //Check if there is an existing admin for a province
+            const existingAdmin = await db.user.findFirst({
+                where: {
+                    role: 'ADMIN',
+                    province: data.province,
+                },
+            });
+            if (existingAdmin) {
+                return res
+                    .status(400)
+                    .json({ error: `An admin for ${data.province} already exists` });
+            }
+        }
+        //Check for existing user
+        const existingUser = await db.user.findFirst({
             where: {
                 OR: [{ username: data.username }, { email: data.email }],
             },
         });
-        if (user) {
+        if (existingUser) {
             return res
                 .status(400)
                 .json({ error: 'Username or email is already taken' });
@@ -91,7 +121,9 @@ authRouter.post('/logout', (req, res) => {
                     .status(500)
                     .json({ message: 'Error destroying the session' });
             }
-            return res.status(200).json({ message: 'successfully destroyed session' });
+            return res
+                .status(200)
+                .json({ message: 'successfully destroyed session' });
         });
     }
     console.log(req.session);

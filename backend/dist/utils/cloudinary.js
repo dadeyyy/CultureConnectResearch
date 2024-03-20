@@ -9,10 +9,19 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'uploads', // Specify the folder in Cloudinary
-        allowedFormats: ['jpg', 'png'], // Specify allowed file formats
-    }
+        folder: 'uploads',
+        allowedFormats: ['jpg', 'png'],
+    },
 });
 const upload = multer({ storage });
-export { cloudinary, storage, upload };
+const archiveStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'archives',
+        allowedFormats: ['jpg', 'png', 'jpeg', 'pdf', 'mp4'],
+        resource_type: 'auto'
+    },
+});
+const uploadArchive = multer({ storage: archiveStorage });
+export { cloudinary, storage, upload, uploadArchive, archiveStorage };
 //# sourceMappingURL=cloudinary.js.map
