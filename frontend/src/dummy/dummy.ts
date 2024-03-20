@@ -313,3 +313,30 @@ export const getUserById = (userId?: string) => {
     posts: [],
   };
 };
+
+export const invoices = [
+  {
+    invoice: "Title: ",
+    paymentStatus: "Example Title",
+  },
+  {
+    invoice: "Creator Name: ",
+    paymentStatus: "Juan Dela Cruz",
+  },
+  {
+    invoice: "Language: ",
+    paymentStatus: "English",
+  },
+  {
+    invoice: "Medium: ",
+    paymentStatus: "Image",
+  },
+  {
+    invoice: "Date Issued: ",
+    paymentStatus: "February 2022",
+  },
+  {
+    invoice: "Keyword: ",
+    paymentStatus: "Love",
+  },
+];

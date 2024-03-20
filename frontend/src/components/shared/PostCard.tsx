@@ -15,6 +15,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import Carousel from "./Carousel";
@@ -142,33 +144,55 @@ const PostCard = ({ post }: PostCardProps) => {
           </div>
         </div>
 
-
-
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <img src={"/assets/icons/three-dots.svg"} alt="edit" width={20} height={20} className={user.id === post?.user.id ? `hidden` : ""} />
+            <img
+              src={"/assets/icons/three-dots.svg"}
+              alt="edit"
+              width={20}
+              height={20}
+              className={user.id === post?.user.id ? `hidden` : ""}
+            />
           </PopoverTrigger>
           <PopoverContent className="w-[200px] bg-light-2 p-0" side="top" align="end">
             <Command>
               <CommandGroup>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  onSelect={handleOptionSelect}
-                  className={`hover:bg-primary-1 cursor-pointer transition-colors ${user.id === post?.user.id && option.value === "report" ? "hidden" : ""}`}
-                >
-                  {option.label}
-                </CommandItem>
-              ))}
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={handleOptionSelect}
+                    className={`hover:bg-primary-1 cursor-pointer transition-colors ${
+                      user.id === post?.user.id && option.value === "report" ? "hidden" : ""
+                    }`}
+                  >
+                    {option.label}
+                  </CommandItem>
+                ))}
               </CommandGroup>
-  
+
               <AlertDialog open={openAlertDialog}>
                 <AlertDialogContent className="bg-light-2">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Report Post.</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure reporting this post?
+                      <p>State your reason for reporting this post.</p>
+                      <div className="p-5">
+                        <RadioGroup defaultValue="flex mt-5">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="radioFake" id="r1" />
+                            <Label htmlFor="r1">Contains fake news and misinformation.</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="radioIna" id="r2" />
+                            <Label htmlFor="r2">Inappropriate Content.</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="radioSpam" id="r3" />
+                            <Label htmlFor="r3">Spam</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

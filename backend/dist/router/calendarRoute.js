@@ -1,32 +1,36 @@
-import express from 'express';
-import { isAdmin, isAuthenticated, validate, } from '../middleware/middleware.js';
-import { calendarSchema } from '../utils/Schemas.js';
-import { db } from '../utils/db.server.js';
-import { provinces } from './province.js';
-import Geocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
-const mapboxToken = 'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';
+import express from "express";
+import { isAdmin, isAuthenticated, validate } from "../middleware/middleware.js";
+import { calendarSchema } from "../utils/Schemas.js";
+import { db } from "../utils/db.server.js";
+import { provinces } from "./province.js";
+import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
+const mapboxToken = "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
 const geocoder = Geocoding({ accessToken: mapboxToken });
 const calendarRoute = express.Router();
-calendarRoute.get('/province/:provinceId', async (req, res) => {
+calendarRoute.get("/province/:provinceId", async (req, res) => {
     try {
         const provinceId = req.params.provinceId;
         const provinceWithCalendars = await db.province.findUnique({
             where: { name: provinceId },
             include: {
-                calendars: true,
+                calendars: {
+                    orderBy: {
+                        date: "asc", // Sorting by date in ascending order
+                    },
+                },
             },
         });
         if (!provinceWithCalendars) {
-            return res.status(404).json({ message: 'Province not found' });
+            return res.status(404).json({ message: "Province not found" });
         }
         return res.status(200).json(provinceWithCalendars);
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ error, message: 'INTERNAL SERVER ERROR!!' });
+        return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!!" });
     }
 });
-calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calendarSchema), async (req, res) => {
+calendarRoute.post("/create-calendar", isAuthenticated, isAdmin, validate(calendarSchema), async (req, res) => {
     try {
         const data = req.body;
         const { municipality, provinceId } = data;
@@ -51,9 +55,7 @@ calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calend
     }
     catch (error) {
         console.log(error);
-        return res
-            .status(500)
-            .json({ error, message: 'INTERNAL SERVER ERROR!!' });
+        return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!!" });
     }
 });
 // calendarRoute.put(
@@ -89,28 +91,26 @@ calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calend
 //     }
 //   }
 // );
-calendarRoute.delete('/delete-calendar/:calendarId', isAuthenticated, isAdmin, async (req, res) => {
+calendarRoute.delete("/delete-calendar/:calendarId", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const calendarId = parseInt(req.params.calendarId);
         const existingCalendar = await db.calendar.findUnique({
             where: { id: calendarId },
         });
         if (!existingCalendar) {
-            return res.status(404).json({ message: 'Calendar not found' });
+            return res.status(404).json({ message: "Calendar not found" });
         }
         await db.calendar.delete({
             where: { id: calendarId },
         });
-        return res.status(200).json({ message: 'Calendar deleted successfully' });
+        return res.status(200).json({ message: "Calendar deleted successfully" });
     }
     catch (error) {
         console.error(error);
-        return res
-            .status(500)
-            .json({ error, message: 'INTERNAL SERVER ERROR!!' });
+        return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!!" });
     }
 });
-calendarRoute.get('/get-event/:eventId', async (req, res) => {
+calendarRoute.get("/get-event/:eventId", async (req, res) => {
     try {
         const eventId = parseInt(req.params.eventId);
         const event = await db.calendar.findUnique({
@@ -118,29 +118,29 @@ calendarRoute.get('/get-event/:eventId', async (req, res) => {
         });
         console.log(event);
         if (!event) {
-            return res.status(404).json({ message: 'Event not found' });
+            return res.status(404).json({ message: "Event not found" });
         }
         return res.status(200).json(event);
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ error, message: 'INTERNAL SERVER ERROR!!' });
+        return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!!" });
     }
 });
-calendarRoute.post('/createprovince', async (req, res) => {
+calendarRoute.post("/createprovince", async (req, res) => {
     const provincesData = provinces.map((name) => ({ name }));
     const result = await db.province.createMany({
         data: provincesData,
     });
     console.log(result);
 });
-calendarRoute.get('/locations', isAuthenticated, async (req, res) => {
+calendarRoute.get("/locations", isAuthenticated, async (req, res) => {
     const calendars = await db.calendar.findMany({});
     // const locations = calendars.map((calendar) => calendar.location);
     if (calendars) {
         return res.status(200).json(calendars);
     }
-    return res.status(404).json({ error: 'No locations found!' });
+    return res.status(404).json({ error: "No locations found!" });
 });
 export default calendarRoute;
 //# sourceMappingURL=calendarRoute.js.map
