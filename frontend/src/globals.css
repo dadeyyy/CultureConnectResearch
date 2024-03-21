@@ -396,9 +396,9 @@
 }
 
 .archive-container {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: auto auto auto auto;
-  background-color: #ffff;
-  padding: 1.25rem;
+  @apply grid lg:grid-cols-4 xs:grid-cols-2 sm:grid-cols-3 gap-5 bg-white p-5;
+}
+
+.archive-province-container {
+  @apply grid lg:grid-cols-3 xs:grid-cols-1 sm:grid-cols-2 gap-5 bg-white p-5;
 }

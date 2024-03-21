@@ -1,22 +1,24 @@
-import './globals.css';
-import { Routes, Route } from 'react-router-dom';
-import AuthLayout from './_auth/AuthLayout';
-import LoginForm from './_auth/forms/LoginForm';
-import RegisterForm from './_auth/forms/RegisterForm';
-import RootLayout from './_root/RootLayout';
-import { LandingPage } from './_root/pages';
-import Explore from './_root/pages/Explore';
-import MapForm from './_root/pages/MapForm';
-import LiveStream from './_root/pages/LiveStream';
-import ForYou from './_root/pages/ForYou';
-import CreatePost from './_root/pages/CreatePost';
-import EditPost from './_root/pages/EditPost';
-import PostDetails from './_root/pages/PostDetails';
-import Profile from './_root/pages/Profile';
-import UpdateProfile from './_root/pages/UpdateProfile';
-import Calendar from './_root/pages/Calendar';
-import Home from './_root/pages/Home';
-import { Toaster } from 'react-hot-toast';
+import "./globals.css";
+import { Routes, Route } from "react-router-dom";
+import AuthLayout from "./_auth/AuthLayout";
+import LoginForm from "./_auth/forms/LoginForm";
+import RegisterForm from "./_auth/forms/RegisterForm";
+import RootLayout from "./_root/RootLayout";
+import { LandingPage } from "./_root/pages";
+import Explore from "./_root/pages/Explore";
+import MapForm from "./_root/pages/MapForm";
+import LiveStream from "./_root/pages/LiveStream";
+import ForYou from "./_root/pages/ForYou";
+import CreatePost from "./_root/pages/CreatePost";
+import EditPost from "./_root/pages/EditPost";
+import PostDetails from "./_root/pages/PostDetails";
+import Profile from "./_root/pages/Profile";
+import UpdateProfile from "./_root/pages/UpdateProfile";
+import Calendar from "./_root/pages/Calendar";
+import Home from "./_root/pages/Home";
+import { Toaster } from "react-hot-toast";
+import ArchiveProvince from "./_root/pages/ArchiveProvince";
+import ArchiveDetails from "./components/shared/ArchiveDetails";
 
 const App = () => {
   return (
@@ -43,6 +45,8 @@ const App = () => {
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
+          <Route path="/explore/:province" element={<ArchiveProvince />} />
+          <Route path="/explore/:province/archive/:id" element={<ArchiveDetails />} />
         </Route>
       </Routes>
 

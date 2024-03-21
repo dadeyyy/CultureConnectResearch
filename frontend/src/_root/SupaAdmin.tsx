@@ -1,5 +1,5 @@
 const SupaAdmin = () => {
-  return <div>SupaAdmin</div>;
+  return <div></div>;
 };
 
 export default SupaAdmin;
