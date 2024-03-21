@@ -17,6 +17,45 @@ function generateRandomId() {
   return Math.floor(Math.random() * 90000) + 10000;
 }
 
+//Get specific archive
+archiveRoute.get('/archive/:province/:archiveId', isAuthenticated, async (req, res) => {
+  try {
+    const archiveId = parseInt(req.params.archiveId);
+    const province = req.params.province;
+
+    const archive = await db.archive.findUnique({
+      where: {
+        id: archiveId,
+        province: province,
+      },
+      include: {
+        files: true,
+      },
+    });
+
+    if (!archive) {
+      return res.status(404).json({ message: 'Archive not found' });
+    }
+
+    const extractedData = {
+      id: archive.id,
+      title: archive.title,
+      description: archive.description,
+      province: archive.province,
+      municipality: archive.municipality,
+      files: archive.files.map((file) => ({
+        url: file.url,
+        filename: file.filename,
+      })),
+    };
+
+    res.status(200).json({ data: extractedData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error', error });
+  }
+});
+
 //Viewing of archives;
 archiveRoute.get('/archive/:province', isAuthenticated, async (req, res) => {
   try {
@@ -34,8 +73,11 @@ archiveRoute.get('/archive/:province', isAuthenticated, async (req, res) => {
         id: item.id,
         title: item.title,
         description: item.description,
+        province: item.province,
         municipality: item.municipality,
-        files: item.files.map((file) => file.url),
+        files: item.files.map((file) => ({
+          url: file.url,
+          filename: file.filename})),
       }));
 
       return res.status(200).json({ data: extractedData });
@@ -90,97 +132,89 @@ archiveRoute.post(
   }
 );
 
-// archiveRoute.put(
-//   '/archive/:id',
-//   isAuthenticated,
-//   // isProvinceAdmin,
-//   uploadArchive.array('archive'),
-//   validate(archiveSchema),
-//   async (req, res) => {
-//     try {
-//       const { id } = req.params;
-//       const files = req.files as Express.Multer.File[];
-//       const data: archiveTypeSchema = req.body;
+// Edit archive
+archiveRoute.put(
+  '/archive/:province/:archiveId',
+  isAuthenticated,
+  isProvinceAdmin,
+  uploadArchive.array('archive'),
+  validate(archiveSchema),
+  async (req, res) => {
+    try {
+      const archiveId = parseInt(req.params.archiveId);
+      const data: archiveTypeSchema = req.body;
+      const files = req.files as Express.Multer.File[];
 
-//       // Find archive
-//       const existingArchive = await db.archive.findUnique({
-//         where: {
-//           id: parseInt(id),
-//         },
-//         include: {
-//           files: true,
-//         },
-//       });
+      // If you allow file uploads during editing, handle the new files
+      let newFiles: { url: string; filename: string }[] = [];
+      if (files && files.length > 0) {
+        newFiles = files.map((file) => ({
+          url: file.path,
+          filename: file.filename,
+        }));
+      }
 
-//       if (!existingArchive) {
-//         return res.status(404).json({ message: 'Archive not found' });
-//       }
+      const updatedArchive = await db.archive.update({
+        where: {
+          id: archiveId,
+        },
+        data: {
+          ...data,
+          files: {
+            create: newFiles,
+          },
+        },
+        include: {
+          files: true,
+        },
+      });
 
-//       const existingFiles = existingArchive.files;
-
-//       // Construct updated files array by merging existing files and new files
-//       const updatedFiles = [
-//         ...existingFiles,
-//         ...files.map(file => ({
-//           archiveId: parseInt(id),
-//           id: generateRandomId(),
-//           url: file.path, // Assuming file.path contains the Cloudinary URL
-//           filename: file.filename,
-//         }))
-//       ];
-
-//       // Update the archive with the combined files
-//       await db.archive.update({
-//         where: {
-//           id: parseInt(id),
-//         },
-//         data: {
-//           ...data,
-//           files: {
-//             create: updatedFiles,
-//           },
-//         },
-//       });
-
-//       res.status(200).json({ message: 'Archive updated successfully' });
-//     } catch (error) {
-//       console.log(error);
-//       res.status(500).json({ message: 'Cannot update archive', error });
-//     }
-//   }
-// );
+      res.status(200).json({
+        message: 'Archive updated successfully',
+        data: updatedArchive,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error', error });
+    }
+  }
+);
 
 // Delete archive
-archiveRoute.delete('/archive/:province/:archiveId', isAuthenticated, isProvinceAdmin, async (req, res) => {
-  try {
-    const archiveId = parseInt(req.params.archiveId);
-    
-    const archive = await db.archive.findUnique({
-      where: {
-        id: archiveId,
-      },
-      include: {
-        user: true,
-      },
-    });
+archiveRoute.delete(
+  '/archive/:province/:archiveId',
+  isAuthenticated,
+  isProvinceAdmin,
+  async (req, res) => {
+    try {
+      const archiveId = parseInt(req.params.archiveId);
 
-    if (!archive) {
-      return res.status(404).json({ message: 'Archive not found' });
+      const archive = await db.archive.findUnique({
+        where: {
+          id: archiveId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      if (!archive) {
+        return res.status(404).json({ message: 'Archive not found' });
+      }
+
+      // Delete the archive
+      await db.archive.delete({
+        where: {
+          id: archiveId,
+        },
+      });
+
+      res.status(200).json({ message: 'Archive deleted successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error', error });
     }
-
-    // Delete the archive
-    await db.archive.delete({
-      where: {
-        id: archiveId,
-      },
-    });
-
-    res.status(200).json({ message: 'Archive deleted successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error', error });
   }
-});
-
+);
 
 export default archiveRoute;
