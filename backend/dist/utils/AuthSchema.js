@@ -6,8 +6,7 @@ export const signInSchema = z.object({
 export const signUpSchema = z.object({
     username: z.string({ required_error: 'username is required' }),
     password: z
-        .string({ required_error: 'password is required' })
-        .min(5, { message: 'Password must be atleast 5 characters' }),
+        .string({ required_error: 'password is required' }),
     firstName: z.string({ required_error: 'First Name is required' }),
     lastName: z.string({ required_error: 'Last Name is required' }),
     email: z.string({ required_error: 'Email is required' }).email(),

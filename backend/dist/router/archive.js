@@ -2,7 +2,7 @@ import express from 'express';
 import { db } from '../utils/db.server.js';
 import { isAuthenticated, isProvinceAdmin, validate, } from '../middleware/middleware.js';
 import { archiveSchema } from '../utils/Schemas.js';
-import { uploadArchive } from '../utils/cloudinary.js';
+import { cloudinary, uploadArchive } from '../utils/cloudinary.js';
 const archiveRoute = express.Router();
 function generateRandomId() {
     return Math.floor(Math.random() * 90000) + 10000;
@@ -63,7 +63,7 @@ archiveRoute.get('/archive/:province', isAuthenticated, async (req, res) => {
                 municipality: item.municipality,
                 files: item.files.map((file) => ({
                     url: file.url,
-                    filename: file.filename
+                    filename: file.filename,
                 })),
             }));
             return res.status(200).json({ data: extractedData });
@@ -114,6 +114,11 @@ archiveRoute.put('/archive/:province/:archiveId', isAuthenticated, isProvinceAdm
         const archiveId = parseInt(req.params.archiveId);
         const data = req.body;
         const files = req.files;
+        const dataWithoutFiles = {
+            title: data.title,
+            description: data.description,
+            municipality: data.municipality,
+        };
         // If you allow file uploads during editing, handle the new files
         let newFiles = [];
         if (files && files.length > 0) {
@@ -122,12 +127,12 @@ archiveRoute.put('/archive/:province/:archiveId', isAuthenticated, isProvinceAdm
                 filename: file.filename,
             }));
         }
-        const updatedArchive = await db.archive.update({
+        await db.archive.update({
             where: {
                 id: archiveId,
             },
             data: {
-                ...data,
+                ...dataWithoutFiles,
                 files: {
                     create: newFiles,
                 },
@@ -136,10 +141,32 @@ archiveRoute.put('/archive/:province/:archiveId', isAuthenticated, isProvinceAdm
                 files: true,
             },
         });
-        res.status(200).json({
-            message: 'Archive updated successfully',
-            data: updatedArchive,
-        });
+        if (data.deletedFiles) {
+            for (let filename of data.deletedFiles) {
+                await cloudinary.uploader.destroy(filename);
+            }
+            const filesToDelete = await db.archive.findUnique({
+                where: {
+                    id: archiveId,
+                },
+                include: {
+                    files: true,
+                },
+            });
+            const dataToDelete = data.deletedFiles.filter((file) => filesToDelete?.files.some((filename) => file === filename.filename));
+            const updatedFiles = await db.archive.update({
+                where: { id: archiveId },
+                data: {
+                    files: {
+                        deleteMany: { filename: { in: dataToDelete } },
+                    },
+                },
+                include: {
+                    files: true,
+                },
+            });
+            res.status(200).json(updatedFiles);
+        }
     }
     catch (error) {
         console.error(error);
@@ -173,6 +200,9 @@ archiveRoute.delete('/archive/:province/:archiveId', isAuthenticated, isProvince
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error', error });
     }
+});
+archiveRoute.delete('/archive/', async (req, res) => {
+    await db.archive.deleteMany();
 });
 export default archiveRoute;
 //# sourceMappingURL=archive.js.map

@@ -55,7 +55,7 @@ export const archiveSchema = z.object({
   title: z.string({required_error: 'title is required'}),
   description: z.string({required_error: 'description is required'}),
   municipality: z.string({required_error: 'municipality is required'}),
-  deletedImages: z.array(z.string()).optional()
+  deletedFiles: z.array(z.string()).optional()
 })
 
 export type archiveTypeSchema = z.infer<typeof archiveSchema>
