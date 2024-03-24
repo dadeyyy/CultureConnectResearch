@@ -402,3 +402,11 @@
 .archive-province-container {
   @apply grid lg:grid-cols-3 xs:grid-cols-1 sm:grid-cols-2 gap-5 bg-white p-5;
 }
+
+.add-archive-cancel {
+  @apply border-2 rounded-lg bg-red-500 text-white hover:text-black hover:border-red-500 hover:bg-white ease-in-out delay-150;
+}
+
+.add-archive-submit {
+  @apply border-2 rounded-lg bg-blue-500 text-white hover:text-black hover:border-blue-500 hover:bg-white ease-in-out delay-150;
+}

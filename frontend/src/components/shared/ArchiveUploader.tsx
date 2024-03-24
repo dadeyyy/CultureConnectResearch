@@ -2,25 +2,24 @@ import React, { useCallback, useEffect, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 
-type FileUploaderProps = {
+type ArchiveUploaderProps = {
   fieldChange: (files: File[]) => void;
   photos?:
     | {
-        id?: number;
         url: string;
         filename: string;
-        postId?: number;
       }[]
     | {
-        id?: number;
         url: string;
         filename: string;
-        postId?: number;
       };
 };
 
-const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
+const ArchiveUploader = ({ fieldChange, photos }: ArchiveUploaderProps) => {
   const [files, setFiles] = useState<File[]>([]);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [numPages, setNumPages] = useState<number>();
+
   useEffect(() => {
     if (photos) {
       if (Array.isArray(photos) && photos.length > 0) {
@@ -71,10 +70,13 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
     fieldChange(updatedFiles);
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, acceptedFiles, getInputProps } = useDropzone({
     onDrop,
     accept: {
-      "image/*": [".png", ".jpeg", ".jpg"],
+      "image/jpeg": [],
+      "image/png": [],
+      "application/pdf": [],
+      "video/mp4": [],
     },
     noClick: true,
   });
@@ -88,16 +90,40 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
   return (
     <div
       {...getRootProps()}
-      className="flex flex-center flex-col bg-light-1 rounded-xl cursor-pointer"
+      className="flex flex-center flex-col bg-light-1 rounded-xl cursor-pointer overflow-auto w-full"
     >
       <input {...getInputProps()} className="cursor-pointer" ref={inputRef} />
-
+      {/* <a href={url} target="_blank" rel="noopener noreferrer">
+                  {acceptedFiles.map((file) => (
+                    <li key={file.name}>
+                      {file.name} - {file.size} bytes
+                    </li>
+                  ))}
+                </a> */}
       {fileUrls.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-1 max-h-screen justify-center overflow-y-auto gap-4 p-5 lg:p-10">
+          <div className="grid grid-cols-1 sm:grid-cols-1 max-h-[400px] justify-center overflow-y-auto gap-4 p-5 lg:p-10 w-full">
             {fileUrls.map((url, index) => (
               <div key={index} className="relative">
-                <img src={url} alt={`image-${index}`} className="file_uploader-img" />
+                {acceptedFiles[index].name.endsWith(".pdf") ? (
+                  <div
+                    className="p-1 border-2 active:border-white active:bg-blue-300 hover:border-blue-300 rounded-lg w-full hover:underline hover:text-blue-500 cursor-pointer"
+                    onClick={() => window.open(url, "_blank")}
+                  >
+                    {acceptedFiles[index].name}
+                  </div>
+                ) : acceptedFiles[index].name.endsWith(".mp4") ? (
+                  <video controls width="100%" height="auto">
+                    <source src={url} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img
+                    src={url}
+                    alt={`file-${index}`}
+                    className="file_uploader-img aspect-square"
+                  />
+                )}
                 <button
                   onClick={() => removeFile(index)}
                   className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
@@ -107,13 +133,12 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
               </div>
             ))}
           </div>
-          <p className="file_uploader-label">Drag photos to replace</p>
           <Button onClick={removeAllFiles} className="mt-4 bg-red-500">
-            Remove All Pictures
+            Remove All Files
           </Button>
         </>
       ) : (
-        <div className="file_uploader-box">
+        <div className="flex-center flex-col p-7 h-80 lg:h-[550px]">
           <img src="/assets/icons/file-upload.svg" width={96} height={77} alt="file upload" />
           <h3 className="base-medium text-dark-2 mb-2 mt-6">Drag photos here</h3>
           <p className="text-light-4 small-regular mb-6">SVG, PNG, JPG</p>
@@ -126,4 +151,4 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
   );
 };
 
-export default FileUploader;
+export default ArchiveUploader;

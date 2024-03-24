@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -15,7 +17,13 @@ interface ArchiveData {
   title: string;
   description: string;
   municipality: string;
-  files: string[];
+  files: File[];
+  dateCreated: string;
+}
+
+interface File {
+  url: string;
+  filename: string;
 }
 
 const ArchiveDetails: React.FC = () => {
@@ -24,6 +32,9 @@ const ArchiveDetails: React.FC = () => {
   const [archiveData, setArchiveData] = useState<ArchiveData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const updateIndex = ({ index: current }: { index: number }) => setIndex(current);
+  const [index, setIndex] = React.useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +45,7 @@ const ArchiveDetails: React.FC = () => {
           throw new Error("Failed to fetch archive data");
         }
         const data = await response.json();
+        console.log(data.data);
         setArchiveData(data.data);
       } catch (error: any) {
         console.error(error);
@@ -58,8 +70,12 @@ const ArchiveDetails: React.FC = () => {
     return <div>Error: Archive data not available</div>;
   }
 
+  const handleOpenLightbox = () => {
+    setOpen(true);
+  };
+
   return (
-    <div className="w-full">
+    <div className="w-full overflow-auto">
       <div className="bg-red-100 w-full p-2 flex justify-between">
         <button
           className="border-2 hover:border-black ease-in-out duration-300 rounded-lg p-2"
@@ -72,40 +88,112 @@ const ArchiveDetails: React.FC = () => {
         <Table className="mb-2">
           <TableBody>
             <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold w-1/4">Title</TableCell>
+              <TableCell className="font-bold w-1/5 border-2">Archive Id:</TableCell>
+              <TableCell>{archiveData.id}</TableCell>
+            </TableRow>
+            <TableRow className="border-2 hover:border-b-black">
+              <TableCell className="font-bold w-1/5 border-2">Title:</TableCell>
               <TableCell>{archiveData.title}</TableCell>
             </TableRow>
             <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold">Municipality</TableCell>
+              <TableCell className="font-bold border-2">Municipality:</TableCell>
               <TableCell>{archiveData.municipality}</TableCell>
             </TableRow>
             <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold">Description</TableCell>
+              <TableCell className="font-bold border-2">Description:</TableCell>
               <TableCell>{archiveData.description}</TableCell>
             </TableRow>
+            <TableRow className="border-2 hover:border-b-black">
+              <TableCell className="font-bold border-2">Date Created:</TableCell>
+              <TableCell>{archiveData.dateCreated}</TableCell>
+            </TableRow>
 
-            <TableRow></TableRow>
+            {archiveData.files.some((file) => file.url.endsWith(".pdf")) && (
+              <TableRow>
+                <TableCell className="font-bold">PDF:</TableCell>
+                <TableCell>
+                  {archiveData.files.map(
+                    (file, index) =>
+                      file.url.endsWith(".pdf") && (
+                        <div key={index}>
+                          <a href={file.url} download={file.filename}>
+                            {file.filename}
+                          </a>
+                        </div>
+                      )
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+
+            {archiveData.files.some(
+              (file) => file.url.endsWith(".jpg") || file.url.endsWith(".png")
+            ) && (
+              <TableRow>
+                <TableCell className="font-bold">Image(s):</TableCell>
+                <TableCell>
+                  <div className="w-full flex flex-wrap">
+                    {archiveData.files
+                      .filter((file) => file.url.endsWith(".jpg") || file.url.endsWith(".png"))
+                      .map((file, index) => (
+                        <div key={index} className="w-full px-2 mb-4">
+                          <Carousel className="max-w-lg mx-auto">
+                            <CarouselContent>
+                              <CarouselItem>
+                                <div className="p-1">
+                                  <Card className="min-w-full ">
+                                    <CardContent className="flex items-center justify-center p-6 min-w-full">
+                                      <img
+                                        src={file.url}
+                                        onClick={() => handleOpenLightbox()}
+                                        width="300"
+                                        key={index}
+                                        style={{ margin: "2px", objectFit: "cover" }}
+                                        alt=""
+                                      />
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              </CarouselItem>
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                          </Carousel>
+                        </div>
+                      ))}
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+
+            {archiveData.files.some((file) => file.url.endsWith(".mp4")) && (
+              <TableRow>
+                <TableCell className="font-bold">Video(s):</TableCell>
+                <TableCell>
+                  <div className="w-full flex flex-wrap">
+                    {archiveData.files.map(
+                      (file, index) =>
+                        file.url.endsWith(".mp4") && (
+                          <div key={index}>
+                            <video controls src={file.url} className="w-full aspect-square" />
+                          </div>
+                        )
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
-
-        <Carousel className="w-full max-w-lg mx-auto">
-          <CarouselContent>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <CarouselItem key={index}>
-                <div className="p-1">
-                  <Card>
-                    <CardContent className="flex aspect-square items-center justify-center p-6">
-                      <span className="text-4xl font-semibold">{index + 1}</span>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
       </div>
+      {/* Render Lightbox component with slides */}
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        slides={archiveData.files
+          .filter((file) => file.url.endsWith(".jpg") || file.url.endsWith(".png"))
+          .map((file) => ({ src: file.url }))}
+      />
     </div>
   );
 };

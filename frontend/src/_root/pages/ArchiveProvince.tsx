@@ -15,48 +15,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-
-const data = [
-  {
-    goal: 400,
-  },
-  {
-    goal: 300,
-  },
-  {
-    goal: 200,
-  },
-  {
-    goal: 300,
-  },
-  {
-    goal: 200,
-  },
-  {
-    goal: 278,
-  },
-  {
-    goal: 189,
-  },
-  {
-    goal: 239,
-  },
-  {
-    goal: 300,
-  },
-  {
-    goal: 200,
-  },
-  {
-    goal: 278,
-  },
-  {
-    goal: 189,
-  },
-  {
-    goal: 349,
-  },
-];
+import ArchiveForm from "@/components/forms/ArchiveForm";
+import Loader from "@/components/shared/Loader";
 
 interface ArchiveProps {
   description: string;
@@ -69,12 +29,13 @@ interface ArchiveProps {
 const ArchiveProvince = () => {
   const { province } = useParams<{ province: string }>();
   const [archives, setArchives] = useState<ArchiveProps[]>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
-  const [goal, setGoal] = useState(350);
+  const [loading, isLoading] = useState(true);
 
-  function onClick(adjustment: number) {
-    setGoal(Math.max(200, Math.min(400, goal + adjustment)));
-  }
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+  };
 
   useEffect(() => {
     const fetchArchives = async () => {
@@ -89,6 +50,7 @@ const ArchiveProvince = () => {
         if (response.ok) {
           const data = await response.json();
           setArchives(data.data);
+          isLoading(false);
         } else {
           throw new Error("Failed to fetch archives");
         }
@@ -105,73 +67,54 @@ const ArchiveProvince = () => {
     setProvinceLabel(label);
   }, [province]);
 
+  console.log(province);
+
   return (
     <div className="w-full">
       <div className="bg-red-200 w-full p-5 flex justify-between">
-        <h2>{provinceLabel ?? province} Archives</h2>
-        <Drawer>
+        <h2 className="text-center font-bold text-2xl">{provinceLabel ?? province} Archives</h2>
+        <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <DrawerTrigger asChild>
-            <Button variant="outline">Add Archive</Button>
+            <Button
+              variant="outline"
+              className="border-2 hover:border-blue-500"
+              onClick={() => setIsDrawerOpen(true)}
+            >
+              Add Archive
+            </Button>
           </DrawerTrigger>
-          <DrawerContent className="min-h-[720px] bg-white">
-            <div className="bg-red-200 w-full p-5 flex justify-end">
-              <DrawerHeader>
-                <DrawerTitle>Move Goal</DrawerTitle>
-                <DrawerDescription>Set your daily activity goal.</DrawerDescription>
-              </DrawerHeader>
-              <div className="p-4 pb-0">
-                <div className="flex items-center justify-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 shrink-0 rounded-full"
-                    onClick={() => onClick(-10)}
-                    disabled={goal <= 200}
-                  >
-                    <Minus className="h-4 w-4" />
-                    <span className="sr-only">Decrease</span>
-                  </Button>
-                  <div className="flex-1 text-center">
-                    <div className="text-7xl font-bold tracking-tighter">{goal}</div>
-                    <div className="text-[0.70rem] uppercase text-muted-foreground">
-                      Calories/day
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 shrink-0 rounded-full"
-                    onClick={() => onClick(10)}
-                    disabled={goal >= 400}
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span className="sr-only">Increase</span>
-                  </Button>
-                </div>
+          <DrawerContent className="min-h-[720px] max-h-[800px] bg-white">
+            <div className="w-full flex px-4 flex-col">
+              <div className="flex justify-between">
+                <DrawerTitle className="font-bold text-lg">
+                  Add an archive in {provinceLabel}
+                </DrawerTitle>
               </div>
-              <DrawerFooter>
-                <Button>Submit</Button>
-                <DrawerClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DrawerClose>
-              </DrawerFooter>
+              <ArchiveForm closeDrawer={closeDrawer} provinceData={province} action="Create" />
             </div>
           </DrawerContent>
         </Drawer>
       </div>
-      <div className="archive-province-container">
-        {archives.map((archive) => (
-          <ArchiveComponent
-            key={archive.id}
-            description={archive.description}
-            files={archive.files}
-            id={archive.id}
-            municipality={archive.municipality}
-            title={archive.title}
-            province={province}
-          />
-        ))}
-      </div>
+
+      {loading ? (
+        <div className="p-5">
+          <Loader />
+        </div>
+      ) : (
+        <div className="archive-province-container">
+          {archives.map((archive) => (
+            <ArchiveComponent
+              key={archive.id}
+              description={archive.description}
+              files={archive.files}
+              id={archive.id}
+              municipality={archive.municipality}
+              title={archive.title}
+              province={province}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
