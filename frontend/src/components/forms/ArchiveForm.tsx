@@ -1,15 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import * as z from "zod";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import * as z from 'zod';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Form,
   FormControl,
@@ -17,20 +17,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { provincesTest, municipalities } from "@/lib/provinces";
-import { FileWithPath, useDropzone } from "react-dropzone";
-import React, { useCallback, useEffect, useState } from "react";
-import { Textarea } from "../ui/textarea";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import ArchiveUploader from "../shared/ArchiveUploader";
-import { useNavigate } from "react-router-dom";
+} from '@/components/ui/form';
+import { provincesTest, municipalities } from '@/lib/provinces';
+import { FileWithPath, useDropzone } from 'react-dropzone';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Textarea } from '../ui/textarea';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import ArchiveUploader from '../shared/ArchiveUploader';
+import { useNavigate } from 'react-router-dom';
 
 interface ArchiveFormProps {
   closeDrawer: () => void;
   provinceData: string | undefined;
-  action: "Create" | "Update";
+  action: 'Create' | 'Update';
   photos?:
     | {
         id: number;
@@ -48,15 +48,15 @@ interface ArchiveFormProps {
 
 const formSchema = z.object({
   title: z.string().min(2, {
-    message: "You cannot create an archive without a title.",
+    message: 'You cannot create an archive without a title.',
   }),
   description: z.string({
-    required_error: "Add a description.",
+    required_error: 'Add a description.',
   }),
   municipality: z.string({
-    required_error: "Please select a municipal.",
+    required_error: 'Please select a municipal.',
   }),
-  fileData: z.custom<File[]>(),
+  archive: z.custom<File[]>(),
 });
 
 type Archive = {
@@ -73,11 +73,18 @@ type Archive = {
   updatedAt: string;
 };
 
-const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, action, photos }) => {
+const ArchiveForm: React.FC<ArchiveFormProps> = ({
+  closeDrawer,
+  provinceData,
+  action,
+  photos,
+}) => {
   const [province, setProvince] = useState(provinceData);
   const [archive, setArchive] = useState<Archive | null>(null);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
-  const [selectedMunicipality, setSelectedMunicipality] = useState<string | undefined>();
+  const [selectedMunicipality, setSelectedMunicipality] = useState<
+    string | undefined
+  >();
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
 
@@ -85,8 +92,8 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, ac
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: archive ? archive?.title : "",
-      municipality: archive ? archive?.municipality : "",
+      title: archive ? archive?.title : '',
+      municipality: archive ? archive?.municipality : '',
     },
   });
 
@@ -100,48 +107,55 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, ac
     console.log(values);
 
     // ACTION = UPDATE
-    if (action === "Update") {
+    if (action === 'Update') {
     }
 
     // ACTION = CREATE
-    else if (action === "Create") {
+    else if (action === 'Create') {
       const formData = new FormData();
 
-      formData.append("title", values.title);
-      formData.append("description", values.description);
+      formData.append('title', values.title);
+      formData.append('description', values.description);
       if (provinceData !== undefined) {
-        formData.append("province", provinceData);
+        formData.append('province', provinceData);
       }
-      formData.append("municipality", values.municipality);
-      // formData.append("files", values.fileData);
-      if (values.fileData) {
-        values.fileData.forEach((file) => {
-          formData.append(`files`, file);
+      formData.append('municipality', values.municipality);
+      // formData.append("files", values.archive);
+      if (values.archive) {
+        console.log(values.archive);
+        values.archive.forEach((file) => {
+          formData.append(`archive`, file);
         });
       }
-      console.log("CREATEEE ");
+      console.log('CREATEEE ');
       try {
-        const response = await fetch(`http://localhost:8000/archive/${provinceData}`, {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        });
+        const response = await fetch(
+          `http://localhost:8000/archive/${provinceData}`,
+          {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+          }
+        );
         if (!response.ok) {
-          console.error("Error during POST request:", response);
+          console.error('Error during POST request:', response);
           return;
         }
         const data = await response.json();
-        console.log("Creation successful!", data);
-        navigate("/explore/${province}");
+        console.log('Creation successful!', data);
+        navigate('/explore/${province}');
       } catch (error) {
-        console.error("Error during POST request:", error);
+        console.error('Error during POST request:', error);
       }
     }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} encType="multipart/form-data">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        encType="multipart/form-data"
+      >
         <div className="p-2">
           <div className="grid grid-cols-2 w-full h-full">
             <div className="lg:min-h-[550px] m-2">
@@ -154,7 +168,9 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, ac
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="shad-form_label">Title</FormLabel>
+                            <FormLabel className="shad-form_label">
+                              Title
+                            </FormLabel>
                             <FormControl>
                               <Textarea
                                 className="shad-textarea custom-scrollbar"
@@ -174,7 +190,9 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, ac
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="shad-form_label">Description</FormLabel>
+                            <FormLabel className="shad-form_label">
+                              Description
+                            </FormLabel>
                             <FormControl>
                               <Textarea
                                 className="shad-textarea custom-scrollbar"
@@ -196,9 +214,14 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, ac
                             name="municipality"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="shad-form_label">Title</FormLabel>
+                                <FormLabel className="shad-form_label">
+                                  Title
+                                </FormLabel>
                                 <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
                                     <SelectTrigger id="municipality">
                                       <SelectValue
                                         placeholder={`Select municipality from ${provinceLabel}`}
@@ -206,18 +229,25 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, ac
                                         {selectedMunicipality}
                                       </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent position="popper" className="bg-white">
-                                      {municipalities[provinceData].map((municipality) => (
-                                        <SelectItem
-                                          key={municipality.value}
-                                          value={municipality.value}
-                                          onSelect={() =>
-                                            setSelectedMunicipality(municipality.value)
-                                          }
-                                        >
-                                          {municipality.label}
-                                        </SelectItem>
-                                      ))}
+                                    <SelectContent
+                                      position="popper"
+                                      className="bg-white"
+                                    >
+                                      {municipalities[provinceData].map(
+                                        (municipality) => (
+                                          <SelectItem
+                                            key={municipality.value}
+                                            value={municipality.value}
+                                            onSelect={() =>
+                                              setSelectedMunicipality(
+                                                municipality.value
+                                              )
+                                            }
+                                          >
+                                            {municipality.label}
+                                          </SelectItem>
+                                        )
+                                      )}
                                     </SelectContent>
                                   </Select>
                                 </FormControl>
@@ -237,14 +267,17 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ closeDrawer, provinceData, ac
                 <CardContent>
                   <FormField
                     control={form.control}
-                    name="fileData"
+                    name="archive"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="font-bold text-lg">
                           Add photos, video, or pdf.
                         </FormLabel>
                         <FormControl>
-                          <ArchiveUploader fieldChange={field.onChange} photos={archive?.files} />
+                          <ArchiveUploader
+                            fieldChange={field.onChange}
+                            photos={archive?.files}
+                          />
                         </FormControl>
                         <FormMessage className="shad-form_message" />
                       </FormItem>

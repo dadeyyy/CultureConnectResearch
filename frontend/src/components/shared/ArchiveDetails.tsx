@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import Loader from "./Loader";
-import { useUserContext } from "@/context/AuthContext";
-import { Button } from "../ui/button";
+} from '@/components/ui/carousel';
+import Loader from './Loader';
+import { useUserContext } from '@/context/AuthContext';
+import { Button } from '../ui/button';
 
 interface ArchiveData {
   id: number;
@@ -46,17 +46,20 @@ const ArchiveDetails: React.FC = () => {
     const fetchArchiveData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/archive/${province}/${id}`
+          `http://localhost:8000/archive/${province}/${id}`,
+          {
+            credentials: 'include',
+          }
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch archive data");
+          throw new Error('Failed to fetch archive data');
         }
         const data = await response.json();
         console.log(data.data);
         setArchiveData(data.data);
       } catch (error: any) {
         console.error(error);
-        setError(error.message || "Failed to fetch archive data");
+        setError(error.message || 'Failed to fetch archive data');
       } finally {
         setLoading(false);
       }
@@ -104,13 +107,13 @@ const ArchiveDetails: React.FC = () => {
         >
           Back
         </button>
-        {user.role === "ADMIN" ? (
+        {user.role === 'ADMIN' ? (
           <div className="px-3">
             <Button className="w-1/2 add-archive-submit ">Edit</Button>
             <Button className="w-1/2 add-archive-cancel ">Delete</Button>
           </div>
         ) : (
-          ""
+          ''
         )}
       </div>
       <div className="p-5">
@@ -143,13 +146,13 @@ const ArchiveDetails: React.FC = () => {
               <TableCell>{archiveData.dateCreated}</TableCell>
             </TableRow>
 
-            {archiveData.files.some((file) => file.url.endsWith(".pdf")) && (
+            {archiveData.files.some((file) => file.url.endsWith('.pdf')) && (
               <TableRow>
                 <TableCell className="font-bold">PDF:</TableCell>
                 <TableCell>
                   {archiveData.files.map(
                     (file, index) =>
-                      file.url.endsWith(".pdf") && (
+                      file.url.endsWith('.pdf') && (
                         <div key={index}>
                           <a href={file.url} download={file.filename}>
                             {file.filename}
@@ -162,7 +165,7 @@ const ArchiveDetails: React.FC = () => {
             )}
 
             {archiveData.files.some(
-              (file) => file.url.endsWith(".jpg") || file.url.endsWith(".png")
+              (file) => file.url.endsWith('.jpg') || file.url.endsWith('.png')
             ) && (
               <TableRow>
                 <TableCell className="font-bold">Image(s):</TableCell>
@@ -171,7 +174,7 @@ const ArchiveDetails: React.FC = () => {
                     {archiveData.files
                       .filter(
                         (file) =>
-                          file.url.endsWith(".jpg") || file.url.endsWith(".png")
+                          file.url.endsWith('.jpg') || file.url.endsWith('.png')
                       )
                       .map((file, index) => (
                         <div key={index} className="w-full px-2 mb-4">
@@ -187,8 +190,8 @@ const ArchiveDetails: React.FC = () => {
                                         width="300"
                                         key={index}
                                         style={{
-                                          margin: "2px",
-                                          objectFit: "cover",
+                                          margin: '2px',
+                                          objectFit: 'cover',
                                         }}
                                         alt=""
                                       />
@@ -207,14 +210,14 @@ const ArchiveDetails: React.FC = () => {
               </TableRow>
             )}
 
-            {archiveData.files.some((file) => file.url.endsWith(".mp4")) && (
+            {archiveData.files.some((file) => file.url.endsWith('.mp4')) && (
               <TableRow>
                 <TableCell className="font-bold">Video(s):</TableCell>
                 <TableCell>
                   <div className="w-full flex flex-wrap">
                     {archiveData.files.map(
                       (file, index) =>
-                        file.url.endsWith(".mp4") && (
+                        file.url.endsWith('.mp4') && (
                           <div key={index}>
                             <video
                               controls
@@ -237,7 +240,7 @@ const ArchiveDetails: React.FC = () => {
         close={() => setOpen(false)}
         slides={archiveData.files
           .filter(
-            (file) => file.url.endsWith(".jpg") || file.url.endsWith(".png")
+            (file) => file.url.endsWith('.jpg') || file.url.endsWith('.png')
           )
           .map((file) => ({ src: file.url }))}
       />

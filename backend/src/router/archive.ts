@@ -46,6 +46,7 @@ archiveRoute.get(
         description: archive.description,
         province: archive.province,
         municipality: archive.municipality,
+        dateCreated: archive.createdAt,
         files: archive.files.map((file) => ({
           url: file.url,
           filename: file.filename,

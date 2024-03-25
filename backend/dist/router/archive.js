@@ -30,6 +30,7 @@ archiveRoute.get('/archive/:province/:archiveId', isAuthenticated, async (req, r
             description: archive.description,
             province: archive.province,
             municipality: archive.municipality,
+            dateCreated: archive.createdAt,
             files: archive.files.map((file) => ({
                 url: file.url,
                 filename: file.filename,
@@ -201,8 +202,8 @@ archiveRoute.delete('/archive/:province/:archiveId', isAuthenticated, isProvince
         res.status(500).json({ message: 'Internal Server Error', error });
     }
 });
-archiveRoute.delete('/archive/', async (req, res) => {
-    await db.archive.deleteMany();
-});
+// archiveRoute.delete('/archive/', async (req,res)=>{
+//   await db.archive.deleteMany();
+// })
 export default archiveRoute;
 //# sourceMappingURL=archive.js.map
