@@ -34,8 +34,6 @@ const LoginForm = () => {
       if (response.ok) {
         const { user } = await response.json();
         toast.success("Successfully logged in");
-        console.log(user);
-        console.log("TESTTT");
 
         // Update the AuthContext with the user information from the login response
         setUser({
@@ -47,6 +45,7 @@ const LoginForm = () => {
           imageUrl: "",
           bio: "Bio means life",
           role: user.role,
+          province: user.province,
         });
 
         setIsAuthenticated(true);

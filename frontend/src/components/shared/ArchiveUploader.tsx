@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 type ArchiveUploaderProps = {
   fieldChange: (files: File[]) => void;
+  action: "Create" | "Update";
   photos?:
     | {
         url: string;
@@ -13,12 +14,14 @@ type ArchiveUploaderProps = {
         url: string;
         filename: string;
       };
+  onFilesRemoved: (removedFileNames: string[]) => void;
 };
 
-const ArchiveUploader = ({ fieldChange, photos }: ArchiveUploaderProps) => {
+const ArchiveUploader = ({ fieldChange, action, photos, onFilesRemoved }: ArchiveUploaderProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [numPages, setNumPages] = useState<number>();
+  const [removedFileNames, setRemovedFileNames] = useState<string[]>([]);
+
+  console.log(removedFileNames);
 
   useEffect(() => {
     if (photos) {
@@ -61,6 +64,7 @@ const ArchiveUploader = ({ fieldChange, photos }: ArchiveUploaderProps) => {
 
   const removeFile = (index: number) => {
     const updatedFiles = [...files];
+    const removedFileName = getRemovedFileNames(index);
     updatedFiles.splice(index, 1);
 
     const updatedFileUrls = fileUrls.filter((url, i) => i !== index);
@@ -68,6 +72,11 @@ const ArchiveUploader = ({ fieldChange, photos }: ArchiveUploaderProps) => {
     setFiles(updatedFiles);
     setFileUrls(updatedFileUrls);
     fieldChange(updatedFiles);
+
+    if (removedFileName) {
+      setRemovedFileNames((prevRemovedFileNames) => [...prevRemovedFileNames, removedFileName]);
+      onFilesRemoved([removedFileName]);
+    }
   };
 
   const { getRootProps, acceptedFiles, getInputProps } = useDropzone({
@@ -87,49 +96,90 @@ const ArchiveUploader = ({ fieldChange, photos }: ArchiveUploaderProps) => {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  const getRemovedFileNames = (index: number) => {
+    if (Array.isArray(photos) && photos.length > index) {
+      const removedFileName = photos[index]?.filename;
+      console.log(`Removed file name at index ${index}:`, removedFileName);
+      return removedFileName;
+    }
+    return null; // or handle the case where the index is out of bounds
+  };
+
+  console.log(removedFileNames);
+
   return (
     <div
       {...getRootProps()}
       className="flex flex-center flex-col bg-light-1 rounded-xl cursor-pointer overflow-auto w-full"
     >
       <input {...getInputProps()} className="cursor-pointer" ref={inputRef} />
-      {/* <a href={url} target="_blank" rel="noopener noreferrer">
-                  {acceptedFiles.map((file) => (
-                    <li key={file.name}>
-                      {file.name} - {file.size} bytes
-                    </li>
-                  ))}
-                </a> */}
+
       {fileUrls.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-1 max-h-[400px] justify-center overflow-y-auto gap-4 p-5 lg:p-10 w-full">
             {fileUrls.map((url, index) => (
               <div key={index} className="relative">
-                {acceptedFiles[index].name.endsWith(".pdf") ? (
-                  <div
-                    className="p-1 border-2 active:border-white active:bg-blue-300 hover:border-blue-300 rounded-lg w-full hover:underline hover:text-blue-500 cursor-pointer"
-                    onClick={() => window.open(url, "_blank")}
-                  >
-                    {acceptedFiles[index].name}
-                  </div>
-                ) : acceptedFiles[index].name.endsWith(".mp4") ? (
-                  <video controls width="100%" height="auto">
-                    <source src={url} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+                {action === "Create" ? (
+                  <>
+                    {index < acceptedFiles.length && acceptedFiles[index].name.endsWith(".pdf") ? (
+                      <div
+                        className="p-1 border-2 active:border-white active:bg-blue-300 hover:border-blue-300 rounded-lg w-full hover:underline hover:text-blue-500 cursor-pointer"
+                        onClick={() => window.open(url, "_blank")}
+                      >
+                        {acceptedFiles[index].name}
+                      </div>
+                    ) : index < acceptedFiles.length &&
+                      acceptedFiles[index].name.endsWith(".mp4") ? (
+                      <video controls width="100%" height="auto">
+                        <source src={url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <img
+                        src={url}
+                        alt={`file-${index}`}
+                        className="file_uploader-img aspect-square"
+                      />
+                    )}
+                    <button
+                      onClick={() => removeFile(index)}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      X
+                    </button>
+                  </>
                 ) : (
-                  <img
-                    src={url}
-                    alt={`file-${index}`}
-                    className="file_uploader-img aspect-square"
-                  />
+                  <>
+                    {url.endsWith(".pdf") ? (
+                      <div
+                        className="p-1 border-2 active:border-white active:bg-blue-300 hover:border-blue-300 rounded-lg w-full hover:underline hover:text-blue-500 cursor-pointer"
+                        onClick={() => window.open(url, "_blank")}
+                      >
+                        {Array.isArray(photos) && photos.length > 0 ? photos[0].filename : ""}
+                      </div>
+                    ) : url.endsWith(".mp4") ? (
+                      <video controls width="100%" height="auto">
+                        <source src={url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <img
+                        src={url}
+                        alt={`file-${index}`}
+                        className="file_uploader-img aspect-square"
+                      />
+                    )}
+                    <button
+                      onClick={() => {
+                        removeFile(index);
+                        // setRemovedFileNames([...removedFileNames, getFilenameFromUrl(url, photos)]);
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      X
+                    </button>
+                  </>
                 )}
-                <button
-                  onClick={() => removeFile(index)}
-                  className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
-                >
-                  X
-                </button>
               </div>
             ))}
           </div>

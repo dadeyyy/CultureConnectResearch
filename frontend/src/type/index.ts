@@ -34,6 +34,7 @@ export type IUser = {
   imageUrl: string;
   bio: string;
   role: string;
+  province?: string;
 };
 
 export type INewUser = {

@@ -51,7 +51,6 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     try {
       const response = await fetch("http://localhost:8000/post", { credentials: "include" });
       const data = await response.json();
-      console.log(data);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }

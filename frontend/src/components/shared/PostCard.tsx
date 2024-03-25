@@ -107,8 +107,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const options = [{ label: "Report", value: "report" }];
 
   if (!post.user) return null;
-  console.log(post?.province);
-  console.log(post?.municipality);
+
   return (
     <div className="post-card">
       <div className="flex-between">

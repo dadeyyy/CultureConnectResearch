@@ -1,22 +1,12 @@
 import ArchiveComponent from "@/components/shared/ArchiveComponent";
 import { provincesTest } from "@/lib/provinces";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Minus, Plus } from "lucide-react";
-
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import ArchiveForm from "@/components/forms/ArchiveForm";
 import Loader from "@/components/shared/Loader";
+import { useUserContext } from "@/context/AuthContext";
 
 interface ArchiveProps {
   description: string;
@@ -32,6 +22,8 @@ const ArchiveProvince = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
   const [loading, isLoading] = useState(true);
+  const { user } = useUserContext();
+  const navigate = useNavigate();
 
   const closeDrawer = () => {
     setIsDrawerOpen(false);
@@ -45,7 +37,7 @@ const ArchiveProvince = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials : 'include'
+          credentials: "include",
         });
 
         if (response.ok) {
@@ -72,17 +64,24 @@ const ArchiveProvince = () => {
 
   return (
     <div className="w-full">
-      <div className="bg-red-200 w-full p-5 flex justify-between">
+      <div className="bg-red-200 w-full p-4 flex justify-between">
+        <button className="button-back" onClick={() => navigate(-1)}>
+          Back
+        </button>
         <h2 className="text-center font-bold text-2xl">{provinceLabel ?? province} Archives</h2>
         <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <DrawerTrigger asChild>
-            <Button
-              variant="outline"
-              className="border-2 hover:border-blue-500"
-              onClick={() => setIsDrawerOpen(true)}
-            >
-              Add Archive
-            </Button>
+            {user.role === "ADMIN" && user.province === province ? (
+              <Button
+                variant="outline"
+                className="add-archive"
+                onClick={() => setIsDrawerOpen(true)}
+              >
+                Add Archive
+              </Button>
+            ) : (
+              <div className="bg-red-200"></div>
+            )}
           </DrawerTrigger>
           <DrawerContent className="min-h-[720px] max-h-[800px] bg-white">
             <div className="w-full flex px-4 flex-col">
