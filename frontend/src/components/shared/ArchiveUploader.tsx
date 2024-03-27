@@ -21,8 +21,6 @@ const ArchiveUploader = ({ fieldChange, action, photos, onFilesRemoved }: Archiv
   const [files, setFiles] = useState<File[]>([]);
   const [removedFileNames, setRemovedFileNames] = useState<string[]>([]);
 
-  console.log(removedFileNames);
-
   useEffect(() => {
     if (photos) {
       if (Array.isArray(photos) && photos.length > 0) {
@@ -50,28 +48,38 @@ const ArchiveUploader = ({ fieldChange, action, photos, onFilesRemoved }: Archiv
       setFiles(updatedFiles);
       fieldChange(updatedFiles);
 
-      const updatedFileUrls = updatedFiles.map((file) => URL.createObjectURL(file));
+      const newFileUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
+      const updatedFileUrls = [...fileUrls, ...newFileUrls];
       setFileUrls(updatedFileUrls);
     },
-    [files]
+    [files, fieldChange, fileUrls]
   );
 
   const removeAllFiles = () => {
     setFiles([]);
     setFileUrls([]);
     fieldChange([]);
+
+    if (photos) {
+      const removedFileNames = Array.isArray(photos)
+        ? photos.map((photo) => photo.filename)
+        : [photos.filename];
+      setRemovedFileNames(removedFileNames);
+      onFilesRemoved(removedFileNames);
+    }
   };
 
   const removeFile = (index: number) => {
     const updatedFiles = [...files];
-    const removedFileName = getRemovedFileNames(index);
-    updatedFiles.splice(index, 1);
-
-    const updatedFileUrls = fileUrls.filter((url, i) => i !== index);
+    const removedFile = updatedFiles.splice(index, 1)[0]; // Remove the file from the array and get the removed file
+    const updatedFileUrls = [...fileUrls];
+    updatedFileUrls.splice(index, 1); // Remove the corresponding URL
 
     setFiles(updatedFiles);
     setFileUrls(updatedFileUrls);
     fieldChange(updatedFiles);
+
+    const removedFileName = getRemovedFileNames(index);
 
     if (removedFileName) {
       setRemovedFileNames((prevRemovedFileNames) => [...prevRemovedFileNames, removedFileName]);
@@ -99,13 +107,10 @@ const ArchiveUploader = ({ fieldChange, action, photos, onFilesRemoved }: Archiv
   const getRemovedFileNames = (index: number) => {
     if (Array.isArray(photos) && photos.length > index) {
       const removedFileName = photos[index]?.filename;
-      console.log(`Removed file name at index ${index}:`, removedFileName);
       return removedFileName;
     }
-    return null; // or handle the case where the index is out of bounds
+    return null;
   };
-
-  console.log(removedFileNames);
 
   return (
     <div
@@ -183,6 +188,9 @@ const ArchiveUploader = ({ fieldChange, action, photos, onFilesRemoved }: Archiv
               </div>
             ))}
           </div>
+          <Button type="button" className="shad-button_primary" onClick={openFile}>
+            Click here to add more
+          </Button>
           <Button onClick={removeAllFiles} className="mt-4 bg-red-500">
             Remove All Files
           </Button>

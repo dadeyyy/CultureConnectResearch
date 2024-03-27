@@ -396,7 +396,7 @@
 }
 
 .archive-container {
-  @apply grid lg:grid-cols-4 xs:grid-cols-2 sm:grid-cols-3 gap-5 bg-white p-5;
+  @apply grid xl:grid-cols-5 lg:grid-cols-4 xs:grid-cols-2 sm:grid-cols-3 gap-5 bg-white p-5;
 }
 
 .archive-province-container {
@@ -416,5 +416,5 @@
 }
 
 .button-back {
-  @apply border-2 border-red-200 hover:border-black ease-in-out duration-300 rounded-lg p-2;
+  @apply border-2  border-red-200 hover:border-black ease-in-out duration-300 rounded-lg p-2;
 }

@@ -17,6 +17,8 @@ import { useUserContext } from "@/context/AuthContext";
 import { Button } from "../ui/button";
 import ArchiveForm from "../forms/ArchiveForm";
 import { provincesTest } from "@/lib/provinces";
+import { multiFormatDateString } from "@/lib/utils";
+import { useMediaQuery } from "@react-hook/media-query";
 
 interface ArchiveData {
   id: number;
@@ -45,6 +47,7 @@ const ArchiveDetails: React.FC = () => {
   const { user } = useUserContext();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const closeDrawer = () => {
     setIsDrawerOpen(false);
@@ -65,7 +68,6 @@ const ArchiveDetails: React.FC = () => {
           throw new Error("Failed to fetch archive data");
         }
         const data = await response.json();
-        console.log(data.data);
         setArchiveData(data.data);
       } catch (error: any) {
         console.error(error);
@@ -82,9 +84,15 @@ const ArchiveDetails: React.FC = () => {
     return (
       <div className="w-full h-full">
         <div className="bg-red-200 w-full p-4 flex justify-between">
-          <button className="button-back" onClick={() => navigate(-1)}>
-            Back
-          </button>
+          {isMobile ? (
+            <button className="hidden button-back" onClick={() => navigate(-1)}>
+              Back
+            </button>
+          ) : (
+            <button className="button-back" onClick={() => navigate(-1)}>
+              Back
+            </button>
+          )}
           <h2 className="text-center font-bold text-2xl">Archives Details</h2>
           <div></div>
         </div>
@@ -132,10 +140,14 @@ const ArchiveDetails: React.FC = () => {
   return (
     <div className="w-full overflow-auto">
       <div className="bg-red-200 w-full p-4 flex justify-between">
-        <button className="button-back" onClick={() => navigate(-1)}>
-          Back
-        </button>
-        <h2 className="text-center font-bold text-2xl">Archives Details</h2>
+        {isMobile ? (
+          <></>
+        ) : (
+          <button className="button-back" onClick={() => navigate(-1)}>
+            Back
+          </button>
+        )}
+        <h2 className="text-center font-bold text-2xl p-2">Archives Details</h2>
         {user.role === "ADMIN" && user.province === province ? (
           <div className="px-3">
             <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
@@ -173,28 +185,30 @@ const ArchiveDetails: React.FC = () => {
         )}
       </div>
 
-      <div className="p-5">
+      <div className="py-5 lg:px-24 sm:px-5">
         <Table className="mb-2">
           <TableBody>
             <TableRow className="border-2 hover:border-b-black">
               <TableCell className="font-bold w-1/5 border-2">Archive Id:</TableCell>
-              <TableCell>{archiveData.id}</TableCell>
+              <TableCell className="text-wrap w-full">{archiveData.id}</TableCell>
             </TableRow>
             <TableRow className="border-2 hover:border-b-black">
               <TableCell className="font-bold w-1/5 border-2">Title:</TableCell>
-              <TableCell>{archiveData.title}</TableCell>
+              <TableCell className="text-wrap w-full">{archiveData.title}</TableCell>
             </TableRow>
             <TableRow className="border-2 hover:border-b-black">
               <TableCell className="font-bold border-2">Municipality:</TableCell>
-              <TableCell>{archiveData.municipality}</TableCell>
+              <TableCell className="text-wrap w-full">{archiveData.municipality}</TableCell>
             </TableRow>
             <TableRow className="border-2 hover:border-b-black">
               <TableCell className="font-bold border-2">Description:</TableCell>
-              <TableCell>{archiveData.description}</TableCell>
+              <TableCell className="text-wrap w-full">{archiveData.description}</TableCell>
             </TableRow>
             <TableRow className="border-2 hover:border-b-black">
               <TableCell className="font-bold border-2">Date Created:</TableCell>
-              <TableCell>{archiveData.dateCreated}</TableCell>
+              <TableCell className="text-wrap w-full">
+                {multiFormatDateString(archiveData.dateCreated)}
+              </TableCell>
             </TableRow>
 
             {archiveData.files.some((file) => file.url.endsWith(".pdf")) && (
@@ -207,8 +221,8 @@ const ArchiveDetails: React.FC = () => {
                         <div key={index}>
                           <a
                             href={file.url}
-                            download={file.url}
-                            className="flex items-center border-2 p-2 gap-2 w-96 rounded-xl border-white hover:border-red-200"
+                            target="_blank"
+                            className="flex items-center border-2 p-2 gap-2 w-full rounded-xl border-white hover:border-red-200"
                           >
                             <img
                               src="/public/assets/images/pdf-image.svg"
@@ -217,8 +231,7 @@ const ArchiveDetails: React.FC = () => {
                               width={100}
                             />
                             <div className="text-center flex-col flex">
-                              <span className="font-bold">{file.filename}</span>
-                              <span> - Click to download</span>
+                              <span className="font-bold"> - Click to view or open</span>
                             </div>
                           </a>
                         </div>
