@@ -131,7 +131,7 @@ const ArchiveUploader = ({ fieldChange, action, photos, onFilesRemoved }: Archiv
                         className="p-1 border-2 active:border-white active:bg-blue-300 hover:border-blue-300 rounded-lg w-full hover:underline hover:text-blue-500 cursor-pointer"
                         onClick={() => window.open(url, "_blank")}
                       >
-                        {acceptedFiles[index].name}
+                        {url}
                       </div>
                     ) : index < acceptedFiles.length &&
                       acceptedFiles[index].name.endsWith(".mp4") ? (
@@ -160,6 +160,12 @@ const ArchiveUploader = ({ fieldChange, action, photos, onFilesRemoved }: Archiv
                         className="p-1 border-2 active:border-white active:bg-blue-300 hover:border-blue-300 rounded-lg w-full hover:underline hover:text-blue-500 cursor-pointer"
                         onClick={() => window.open(url, "_blank")}
                       >
+                        <img
+                          src="/public/assets/images/pdf-image.svg"
+                          alt="PDF Icon"
+                          height={100}
+                          width={100}
+                        />
                         {Array.isArray(photos) && photos.length > 0 ? photos[0].filename : ""}
                       </div>
                     ) : url.endsWith(".mp4") ? (

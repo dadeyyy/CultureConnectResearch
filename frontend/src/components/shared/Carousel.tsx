@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Lightbox from "yet-another-react-lightbox";
 
 interface CarouselProps {
   photos: {
@@ -7,8 +8,15 @@ interface CarouselProps {
   }[];
 }
 
+interface SlideImage {
+  src: string;
+}
+
 const Carousel: React.FC<CarouselProps> = ({ photos }) => {
+  const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const slides: SlideImage[] = photos.map((photo) => ({ src: photo.url }));
 
   const nextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % photos.length);
@@ -38,6 +46,7 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
             </div>
           ))}
         </div>
+        <Lightbox open={open} close={() => setOpen(false)} slides={slides} />
       </div>
     );
   }
@@ -56,6 +65,7 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
               src={photo.url}
               className="absolute block w-full h-full object-cover"
               alt={`Slide ${index + 1}`}
+              onClick={() => setOpen(true)}
             />
           </div>
         ))}
@@ -123,6 +133,7 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
           <span className="sr-only">Next</span>
         </span>
       </button>
+      <Lightbox open={open} close={() => setOpen(false)} slides={slides} />
     </div>
   );
 };

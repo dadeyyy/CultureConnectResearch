@@ -261,7 +261,7 @@ const Calendar = () => {
   return (
     <div className="calendar_details-container">
       <div className="w-full h-full flex lg:flex-row xs:flex-row">
-        <div className="w-[300px] py-12 pl-5 border-r-2 border-gray pr-3">
+        <div className="w-[300px] py-12 pl-5 border-r-2 border-gray pr-3 bg-red-50">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -305,7 +305,7 @@ const Calendar = () => {
               </Command>
             </PopoverContent>
           </Popover>
-          <div className="max-h-full overflow-auto ">
+          <div className="max-h-full overflow-auto border border-t-black border-red-50 ">
             <h2 className="font-bold text-xl mb-5 text-center">Events List</h2>
             <ul>
               {currentEvents.map((event) => (
@@ -601,7 +601,7 @@ const Calendar = () => {
             </div>
           </DialogContent>
         </Dialog>
-        <div className="w-full p-5 py-10">
+        <div className="w-full p-5 py-10 bg-blue-50">
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"

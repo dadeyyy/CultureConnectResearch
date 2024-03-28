@@ -109,8 +109,8 @@ const PostCard = ({ post }: PostCardProps) => {
   if (!post.user) return null;
 
   return (
-    <div className="post-card">
-      <div className="flex-between">
+    <div className="post-card ">
+      <div className="flex-between ">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.user.id}`}>
             <img

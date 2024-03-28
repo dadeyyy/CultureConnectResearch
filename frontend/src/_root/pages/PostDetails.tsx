@@ -108,7 +108,7 @@ const PostDetails = () => {
   const options = [{ label: "Report", value: "report" }];
 
   return (
-    <div className="flex-1 p-5">
+    <div className="flex-1 overflow-auto py-5">
       <div className="hidden md:flex max-w-5xl w-full">
         <Button onClick={() => navigate(-1)} variant="ghost" className="shad-button_ghost">
           <img
@@ -275,8 +275,6 @@ const PostDetails = () => {
       )}
 
       <div className="w-full max-w-5xl">
-        <hr className="border w-full border-dark-4/80 m-10" />
-
         <h3 className="body-bold md:h3-bold w-full m-10">More Related Posts</h3>
         {/* {isUserPostLoading || !relatedPosts ? <Loader /> : <GridPostList posts={relatedPosts} />} */}
       </div>

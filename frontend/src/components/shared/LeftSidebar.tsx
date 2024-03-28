@@ -3,7 +3,8 @@ import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
+import { Button } from "../ui/button";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const LeftSidebar = () => {
       imgURL: "/assets/icons/home.svg",
       route: "/home",
       label: "Home",
-    },    
+    },
     {
       imgURL: "/assets/icons/for-you.svg",
       route: "/for-you",
@@ -64,23 +65,16 @@ const LeftSidebar = () => {
     },
   ];
 
-  const handleOptionSelect = async (selectedValue: string) => {
-    setOpen(false);
-    setValue(selectedValue);
+  const handleLogout = async () => {
+    const response = await fetch("http://localhost:8000/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    const data = await response.json();
+    console.log(data);
+    localStorage.removeItem("currentUser");
 
-    if (selectedValue === "logout") {
-      const response = await fetch("http://localhost:8000/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await response.json();
-      console.log(data);
-      localStorage.removeItem("currentUser");
-
-      return navigate("/");
-    } else if (selectedValue === "profile") {
-      window.location.href = `/profile/${user.id}`;
-    }
+    return navigate("/");
   };
 
   return (
@@ -89,31 +83,7 @@ const LeftSidebar = () => {
         <Link to="/home" className="flex gap-3 items-center">
           <img src="/assets/images/logo-2.svg" alt="logo" width={170} height={36} />
         </Link>
-        <ul className="flex flex-col gap-2">
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.route;
-            const isCreate = link.label === "Create Post";
-
-            return (
-              <li key={link.route} className={`leftsidebar-link ${isActive ? "bg-off-white" : ""}`}>
-                <div
-                  className={isCreate ? `leftsidebar-create ${isActive ? "bg-off-white" : ""}` : ""}
-                >
-                  <NavLink
-                    to={link.route}
-                    className={`flex gap-4 items-center p-4 ${isCreate ? "text-lg" : ""}`}
-                  >
-                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-5 w-5" />}
-                    {link.label}
-                  </NavLink>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      <div className="flex flex-col-reverse">
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-3 items-center mt-5">
           <img
             src={
               isLoading
@@ -123,7 +93,12 @@ const LeftSidebar = () => {
             alt="profile picture"
             className="h-12 w-12 rounded-full bg-cover"
           />
-          <div className="flex flex-col">
+          <div
+            className="flex flex-col"
+            onClick={() => {
+              window.location.href = `/profile/${user.id}`;
+            }}
+          >
             {isLoading || !user.id ? (
               <p>Loading...</p>
             ) : (
@@ -135,36 +110,34 @@ const LeftSidebar = () => {
               </>
             )}
           </div>
-          <div className="flex flex-col">
-            <div className="grid grid-cols-2">
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <img
-                    src={"/assets/icons/three-dots.svg"}
-                    alt="profile picture"
-                    className="h-5 w-5 rounded-full col-end-7 hover:opacity-70 transition-opacity"
-                  />
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0 bg-light-2" side="top" align="end">
-                  <Command>
-                    <CommandGroup>
-                      {options.map((option) => (
-                        <CommandItem
-                          key={option.value}
-                          value={option.value}
-                          onSelect={handleOptionSelect}
-                          className="hover:bg-primary-1 cursor-pointer transition-colors"
-                        >
-                          {option.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
         </div>
+        <ul className="flex flex-col gap-1">
+          {sidebarLinks.map((link) => {
+            const isActive = pathname === link.route;
+            const isCreate = link.label === "Create Post";
+
+            return (
+              <li key={link.route} className={`leftsidebar-link ${isActive ? "bg-off-white" : ""}`}>
+                <div
+                  className={isCreate ? `leftsidebar-create ${isActive ? "bg-off-white" : ""}` : ""}
+                >
+                  <NavLink
+                    to={link.route}
+                    className={`flex gap-4 items-center p-4 ${isCreate ? "text-md" : ""}`}
+                  >
+                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-5 w-5" />}
+                    {link.label}
+                  </NavLink>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div className="flex flex-col-reverse">
+        <Button className="leftsidebar-link bg-off-white hover:bg-red-500" onClick={handleLogout}>
+          Logout
+        </Button>
       </div>
     </nav>
   );
