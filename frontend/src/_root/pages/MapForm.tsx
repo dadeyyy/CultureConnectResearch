@@ -61,32 +61,18 @@ const MapForm: React.FC = () => {
       });
 
       map.on("load", () => {
-        // Add markers to the map
         const markerList: mapboxgl.Marker[] = [];
         mapData.forEach((item) => {
-          const marker = new mapboxgl.Marker().setLngLat(item.location.coordinates).addTo(map);
-          markerList.push(marker);
-          // Add a click event listener to each marker
+          const el = document.createElement("div");
+          el.className = "marker";
+          el.style.backgroundImage = `url("../public/assets/icons/event-point.svg")`;
+          const marker = new mapboxgl.Marker(el).setLngLat(item.location.coordinates).addTo(map);
           marker.getElement().addEventListener("click", () => {
             setSelectedMarker(item);
-            // Set all markers to default color
-            markerList.forEach((m) => {
-              m.getElement().style.color = "";
-            });
-            // Change color of clicked marker
-            marker.getElement().style.color = "red";
           });
         });
         setMarkers(markerList);
       });
-
-      map.on("move", () => {
-        setLng(map.getCenter().lng.toFixed(4));
-        setLat(map.getCenter().lat.toFixed(4));
-        setZoom(map.getZoom().toFixed(2));
-      });
-
-      // Clean up the map when the component is unmounted
       return () => map.remove();
     }
   }, [mapData]);

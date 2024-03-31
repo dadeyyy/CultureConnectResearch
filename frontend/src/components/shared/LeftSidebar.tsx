@@ -1,17 +1,12 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user, isLoading, checkAuthUser } = useUserContext();
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,11 +16,6 @@ const LeftSidebar = () => {
     };
     fetchData();
   }, [checkAuthUser, user.id]);
-
-  const options = [
-    { label: "Profile", value: "profile" },
-    { label: "Logout", value: "logout" },
-  ];
 
   const sidebarLinks = [
     {
@@ -38,6 +28,13 @@ const LeftSidebar = () => {
       route: "/for-you",
       label: "For You",
     },
+    user.role === "ADMIN"
+      ? {
+          imgURL: "/assets/icons/reports.svg",
+          route: "/reports",
+          label: "Reports",
+        }
+      : null,
     {
       imgURL: "/assets/icons/explore.svg",
       route: "/explore",
@@ -58,12 +55,11 @@ const LeftSidebar = () => {
       route: "/live-streams",
       label: "Live Streams",
     },
-
     {
       route: "/create-post",
       label: "Create Post",
     },
-  ];
+  ].filter(Boolean);
 
   const handleLogout = async () => {
     const response = await fetch("http://localhost:8000/logout", {
@@ -78,7 +74,7 @@ const LeftSidebar = () => {
   };
 
   return (
-    <nav className="leftsidebar sticky">
+    <nav className="leftsidebar sticky border border-r-gray-300">
       <div className="flex flex-col gap-7">
         <Link to="/home" className="flex gap-3 items-center">
           <img src="/assets/images/logo-2.svg" alt="logo" width={170} height={36} />
@@ -113,6 +109,7 @@ const LeftSidebar = () => {
         </div>
         <ul className="flex flex-col gap-1">
           {sidebarLinks.map((link) => {
+            if (!link) return null;
             const isActive = pathname === link.route;
             const isCreate = link.label === "Create Post";
 
@@ -135,7 +132,10 @@ const LeftSidebar = () => {
         </ul>
       </div>
       <div className="flex flex-col-reverse">
-        <Button className="leftsidebar-link bg-off-white hover:bg-red-500" onClick={handleLogout}>
+        <Button
+          className="leftsidebar-link bg-off-white hover:bg-red-500 hover:text-white"
+          onClick={handleLogout}
+        >
           Logout
         </Button>
       </div>

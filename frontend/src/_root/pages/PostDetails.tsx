@@ -143,6 +143,10 @@ const PostDetails = () => {
                   <p className="base-medium lg:body-bold text-dark-1">
                     {post?.user.firstName} {post?.user.lastName}
                   </p>
+                  {user.role === `ADMIN` && (
+                    <span className="text-green-500">Admin from {user.province}</span>
+                  )}
+
                   <div className="flex-center gap-2 text-light-3">
                     <p className="subtle-semibold lg:small-regular ">
                       {multiFormatDateString(post?.createdAt)}
