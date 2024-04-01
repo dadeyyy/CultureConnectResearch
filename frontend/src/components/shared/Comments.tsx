@@ -175,7 +175,7 @@ const Comments = ({ postId, action }: CommentProps) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
-              <Button type="button" onClick={handleCommentSubmit}>
+              <Button type="button" className="bg-white" onClick={handleCommentSubmit}>
                 <img src="/assets/icons/send.svg" width={20} height={20} alt="send" />
               </Button>
             </>

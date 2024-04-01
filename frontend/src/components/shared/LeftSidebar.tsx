@@ -99,7 +99,7 @@ const LeftSidebar = () => {
               <p>Loading...</p>
             ) : (
               <>
-                <p className="body-bold">
+                <p className="font-bold text-regular">
                   {user.firstName} {user.lastName}
                 </p>
                 <p className="small-regular text-light-3">@{user.username}</p>
@@ -120,9 +120,9 @@ const LeftSidebar = () => {
                 >
                   <NavLink
                     to={link.route}
-                    className={`flex gap-4 items-center p-4 ${isCreate ? "text-md" : ""}`}
+                    className={`flex gap-4 items-center p-3 ${isCreate ? "text-sm" : ""}`}
                   >
-                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-5 w-5" />}
+                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-4 w-4" />}
                     {link.label}
                   </NavLink>
                 </div>

@@ -382,19 +382,6 @@
   height: 400px;
 }
 
-.sidebar {
-  background-color: rgb(35 55 75 / 90%);
-  color: #fff;
-  padding: 6px 12px;
-  font-family: monospace;
-  z-index: 1;
-  position: absolute;
-  top: 25;
-  left: 25;
-  margin: 12px;
-  border-radius: 4px;
-}
-
 .archive-container {
   @apply grid xl:grid-cols-5 lg:grid-cols-4 xs:grid-cols-2 sm:grid-cols-3 gap-5 bg-white p-5;
 }
@@ -425,4 +412,29 @@
   height: 50px;
   border-radius: 50%;
   cursor: pointer;
+}
+
+.sidebar {
+  background-color: rgb(35 55 75 / 90%);
+  color: #fff;
+  padding: 6px 12px;
+  font-family: monospace;
+  z-index: 1;
+  position: absolute;
+  top: 65px;
+  left: 25;
+  margin: 12px;
+  border-radius: 4px;
+}
+
+.sidebar-1 {
+  color: #fff;
+  font-family: monospace;
+  z-index: 1;
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  margin: 12px;
+  border-radius: 4px;
+  @apply grid grid-cols-3;
 }

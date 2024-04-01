@@ -14,7 +14,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="flex flex-1">
+    <div className="flex flex-1 bg-blue-100">
       <div className="home-container">
         <div className="home-posts">
           <h2 className="h3-bold md:h2-bold w-full text-center">Home Feed</h2>

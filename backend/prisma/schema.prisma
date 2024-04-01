@@ -78,6 +78,7 @@ model Archive {
   description String
   province String
   municipality String
+  location Json
   files Files[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
