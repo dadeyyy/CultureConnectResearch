@@ -425,6 +425,7 @@
   left: 25;
   margin: 12px;
   border-radius: 4px;
+  @apply top-8;
 }
 
 .sidebar-1 {
@@ -432,9 +433,7 @@
   font-family: monospace;
   z-index: 1;
   position: absolute;
-  top: 25px;
-  left: 25px;
   margin: 12px;
   border-radius: 4px;
-  @apply grid grid-cols-3;
+  @apply grid grid-cols-3 top-5 left-0;
 }
