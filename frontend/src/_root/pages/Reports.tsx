@@ -1,10 +1,88 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { multiFormatDateString } from "@/lib/utils";
+import { municipalities, provincesTest } from "@/lib/provinces";
+import { filterInappropriateWords } from "@/lib/CaptionFilter";
+import Carousel from "@/components/shared/Carousel";
+import PostStats from "@/components/shared/PostStats";
+import toast from "react-hot-toast";
+import Loader from "@/components/shared/Loader";
+import Box from "@mui/material/Box";
+import LinearProgress from "@mui/material/LinearProgress";
 
-const Reports = () => {
+interface ReportsProps {
+  post: PostProps; // Define the type of the post prop
+}
+
+interface PostProps {
+  id: number;
+  caption: string;
+  createdAt: string;
+  municipality: string;
+  photos: {
+    id: number;
+    url: string;
+    filename: string;
+    postId: number;
+  }[];
+  province: string;
+  updatedAt: string;
+  user: {
+    avatarUrl: string | null;
+    bio: string | null;
+    createdAt: string;
+    email: string;
+    firstName: string;
+    id: number;
+    lastName: string;
+    password: string;
+    role: string;
+    updatedAt: string;
+    username: string;
+  };
+  reportReasonCounts: { [reason: string]: number };
+}
+
+const Reports = ({ post }: ReportsProps) => {
   const { user } = useUserContext();
   const navigate = useNavigate();
+  const [reportedPosts, setReportedPosts] = useState<PostProps[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState(false);
+
+  useEffect(() => {
+    const fetchReportedPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:8000/post/reported/${user.province}`, {
+          credentials: "include",
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+
+        // Check if data is an array
+        if (Array.isArray(data)) {
+          setReportedPosts(data);
+        } else {
+          console.error("Data received from API is not an array:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching reported posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user.role === "ADMIN") {
+      fetchReportedPosts();
+    }
+  }, [user.role, user.province]);
 
   if (user.role === "USER") {
     return (
@@ -24,14 +102,115 @@ const Reports = () => {
     );
   }
 
+  async function handleDeletePost(postId: number) {
+    setProgress(true);
+    try {
+      const response = await fetch(`http://localhost:8000/post/${postId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        toast.success("Post deleted successfully");
+        navigate("/home");
+      } else {
+        const data = await response.json();
+        console.error("DELETE request failed:", data);
+        toast.error("Failed to delete post");
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete post");
+    } finally {
+      setProgress(false);
+    }
+  }
+
   return (
     <div className="bg-red-200 w-full overflow-auto">
       <div className="bg-red-300 w-full h-16 text-center p-3 sticky">
         <span className="text-xl font-bold">Reported Posts</span>
+        {progress && (
+          <div className="w-full">
+            <Box sx={{ width: "100%" }}>
+              <LinearProgress />
+            </Box>
+          </div>
+        )}
       </div>
-      <div className="grid grid-cols-2 h-full">
-        <div className="bg-blue-500 w-full h-full">ey</div>
-        <div className="bg-red-500 w-full h-full">ey</div>
+      <div className="flex h-full">
+        <div className="w-full flex flex-col items-center gap-5 h-full py-5 ">
+          {loading ? (
+            <Loader />
+          ) : (
+            reportedPosts.map((reportedPost) => (
+              <div key={reportedPost.id} className="w-full flex flex-row px-10 gap-10 items-center">
+                <div className="w-full bg-white rounded-lg p-5">
+                  {" "}
+                  <div className="flex-between">
+                    <div className="flex items-center gap-3">
+                      <Link to={`/profile/${reportedPost.user.id}`}>
+                        <img
+                          src={
+                            reportedPost?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"
+                          }
+                          alt="user"
+                          className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
+                        />
+                      </Link>
+
+                      <div className="flex flex-col">
+                        <div className="flex flex-row text-center gap-2">
+                          <p className="base-medium lg:body-bold text-dark-1">
+                            {reportedPost.user.firstName} {reportedPost.user.lastName}
+                          </p>
+                          {user.id === reportedPost?.user.id && user.role === `ADMIN` && (
+                            <Badge className="bg-green-300 font-light text-xs border border-gray-300">
+                              {user.province}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex gap-2 text-dark-3">
+                          <p className="subtle-regular lg:text-xs">
+                            {multiFormatDateString(reportedPost.createdAt)}
+                          </p>
+                          <p className="subtle-regular lg:text-xs">
+                            {"In "}
+                            {reportedPost?.municipality &&
+                              municipalities[reportedPost.province]?.find(
+                                (municipal) => municipal.value === reportedPost.municipality
+                              )?.label}
+                            {", "}
+                            {reportedPost?.province &&
+                              provincesTest.find(
+                                (province) => province.value === reportedPost.province
+                              )?.label}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <Link to={`/posts/${reportedPost.id}`}>
+                    <div className="small-medium lg:base-medium py-5">
+                      <p>{filterInappropriateWords(reportedPost.caption)}</p>
+                    </div>
+                  </Link>
+                  <Carousel photos={reportedPost?.photos || []} />
+                  <PostStats post={reportedPost} userId={user.id} />
+                  {/* <Comments postId={reportedPost.id} action="home" /> */}
+                </div>
+                <div className="w-fullh-full ">
+                  <Button
+                    className="bg-red-500 hover:scale-110 hover:bg-red-900 hover:text-white"
+                    onClick={() => handleDeletePost(reportedPost.id)}
+                  >
+                    Delete this post
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

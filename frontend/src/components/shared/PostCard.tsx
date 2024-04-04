@@ -2,28 +2,13 @@ import { Link } from "react-router-dom";
 import PostStats from "./PostStats";
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Button } from "../ui/button";
 import Carousel from "./Carousel";
 import { filterInappropriateWords } from "@/lib/CaptionFilter";
 import Comments from "./Comments";
-import toast from "react-hot-toast";
+
 import { municipalities, provincesTest } from "@/lib/provinces";
+import ReportForm from "../forms/ReportForm";
+import { Badge } from "../ui/badge";
 
 interface PostCardProps {
   post: {
@@ -51,66 +36,18 @@ interface PostCardProps {
       role: string;
       updatedAt: string;
       username: string;
+      province?: string;
     };
   };
   userId: number;
 }
-
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
-  const [openAlertDialog, setOpenAlertDialog] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("");
-  const [openNestedAlertDialog, setOpenNestedAlertDialog] = useState(false);
-
-  const handleOptionSelect = (selectedValue: string) => {
-    setSelectedOption(selectedValue);
-    setOpenAlertDialog(true);
-    setValue(selectedValue);
-  };
-
-  const handleCancel = () => {
-    setOpenAlertDialog(false);
-  };
-
-  const handleContinue = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/post/${post.id}/report`, {
-        credentials: "include",
-        method: "POST",
-      });
-
-      const data = await response.json();
-
-      if (data.error) {
-        toast.error(data.error);
-        return;
-      }
-      toast.success(data.message);
-      setOpenAlertDialog(false);
-      setOpenNestedAlertDialog(true);
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  };
-
-  const handleNestedContinue = () => {
-    setOpenNestedAlertDialog(false);
-    if (value === "report") {
-      window.location.href = "/home";
-    } else if (value === "share") {
-      window.location.href = "/home";
-    }
-  };
-  const options = [{ label: "Report", value: "report" }];
-
   if (!post.user) return null;
 
   return (
-    <div className="post-card ">
-      <div className="flex-between ">
+    <div className="post-card">
+      <div className="flex-between">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.user.id}`}>
             <img
@@ -121,15 +58,19 @@ const PostCard = ({ post }: PostCardProps) => {
           </Link>
 
           <div className="flex flex-col">
-            <p className="base-medium lg:body-bold text-dark-1">
-              {post.user.firstName} {post.user.lastName}
-            </p>
-            <div className="flex-center gap-2 text-dark-3">
-              <p className="subtle-semibold lg:small-regular ">
-                {multiFormatDateString(post.createdAt)}
+            <div className="flex flex-row text-center gap-2">
+              <p className="base-medium lg:body-bold text-dark-1">
+                {post.user.firstName} {post.user.lastName}
               </p>
-              •
-              <p className="subtle-semibold lg:small-regular">
+              {post?.user.role === `ADMIN` && (
+                <Badge className="bg-green-300 font-light text-xs border border-gray-300">
+                  {post?.user?.province}
+                </Badge>
+              )}
+            </div>
+            <div className="flex gap-2 text-dark-3">
+              <p className="subtle-regular lg:text-xs">{multiFormatDateString(post.createdAt)}</p>
+              <p className="subtle-regular lg:text-xs">
                 {"In "}
                 {post?.municipality &&
                   municipalities[post.province]?.find(
@@ -142,89 +83,7 @@ const PostCard = ({ post }: PostCardProps) => {
             </div>
           </div>
         </div>
-
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <img
-              src={"/assets/icons/three-dots.svg"}
-              alt="edit"
-              width={20}
-              height={20}
-              className={user.id === post?.user.id ? `hidden` : ""}
-            />
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] bg-light-2 p-0" side="top" align="end">
-            <Command>
-              <CommandGroup>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={handleOptionSelect}
-                    className={`hover:bg-primary-1 cursor-pointer transition-colors ${
-                      user.id === post?.user.id && option.value === "report" ? "hidden" : ""
-                    }`}
-                  >
-                    {option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-
-              <AlertDialog open={openAlertDialog}>
-                <AlertDialogContent className="bg-light-2">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Report Post.</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      <p>State your reason for reporting this post.</p>
-                      <div className="p-5">
-                        <RadioGroup defaultValue="flex mt-5">
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="radioFake" id="r1" />
-                            <Label htmlFor="r1">Contains fake news and misinformation.</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="radioIna" id="r2" />
-                            <Label htmlFor="r2">Inappropriate Content.</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="radioSpam" id="r3" />
-                            <Label htmlFor="r3">Spam</Label>
-                          </div>
-                        </RadioGroup>
-                      </div>
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
-                    <AlertDialogTrigger asChild>
-                      <Button onClick={handleContinue}>Submit</Button>
-                    </AlertDialogTrigger>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-
-                <AlertDialog open={openNestedAlertDialog}>
-                  <AlertDialogContent className="bg-light-2">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Report Submitted.</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Thank you for reporting this post.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogAction onClick={handleNestedContinue}>Continue</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </AlertDialog>
-            </Command>
-          </PopoverContent>
-        </Popover>
-        {/* <Link
-          to={`/update-post/${post.id}`}
-          className={`${user.id !== post.user.id && "hidden"}`}
-        >
-          <img src={"/assets/icons/edit.svg"} alt="edit" width={20} height={20} />
-        </Link> */}
+        <ReportForm userId={user.id} postId={post.id} postUserId={post.user.id} />
       </div>
 
       <Link to={`/posts/${post.id}`}>

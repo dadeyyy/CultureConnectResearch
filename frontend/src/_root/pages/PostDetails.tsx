@@ -23,8 +23,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
+import { Badge } from "@/components/ui/badge";
 import { municipalities, provincesTest } from "@/lib/provinces";
+import ReportForm from "@/components/forms/ReportForm";
 
 const PostDetails = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const PostDetails = () => {
     const fetchPost = async () => {
       try {
         if (!postData.length) {
-          await fetchPosts();
+          await fetchPosts(5, 0);
         }
 
         const postId = id ? parseInt(id, 10) : undefined;
@@ -140,19 +141,22 @@ const PostDetails = () => {
                 />
 
                 <div className="flex gap-1 flex-col">
-                  <p className="base-medium lg:body-bold text-dark-1">
-                    {post?.user.firstName} {post?.user.lastName}
-                  </p>
-                  {user.role === `ADMIN` && (
-                    <span className="text-green-500">Admin from {user.province}</span>
-                  )}
-
+                  <div className="flex flex-row text-center gap-2">
+                    <p className="base-medium lg:body-bold text-dark-1">
+                      {post?.user.firstName} {post?.user.lastName}
+                    </p>
+                    {user.id === post?.user.id && user.role === `ADMIN` && (
+                      <Badge className="bg-green-300 font-light text-xs border border-gray-300">
+                        {user.province}
+                      </Badge>
+                    )}
+                  </div>
                   <div className="flex-center gap-2 text-light-3">
-                    <p className="subtle-semibold lg:small-regular ">
+                    <p className="text-regular lg:text-sm ">
                       {multiFormatDateString(post?.createdAt)}
                     </p>
                     •
-                    <p className="subtle-semibold lg:small-regular">
+                    <p className="text-regular lg:text-sm">
                       {"In "}
                       {post?.municipality &&
                         municipalities[post.province]?.find(
@@ -182,83 +186,7 @@ const PostDetails = () => {
                   <img src={"/assets/icons/delete.svg"} alt="delete" width={24} height={24} />
                 </Button>
 
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <img
-                      src={"/assets/icons/three-dots.svg"}
-                      alt="edit"
-                      width={20}
-                      height={20}
-                      className={`${user.id === post?.user.id && "hidden"}`}
-                    />
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] bg-light-2 p-0" side="top" align="end">
-                    <Command>
-                      <CommandGroup>
-                        {options.map((option) => (
-                          <CommandItem
-                            key={option.value}
-                            value={option.value}
-                            onSelect={handleOptionSelect}
-                            className="hover:bg-primary-1 cursor-pointer transition-colors"
-                          >
-                            {option.label}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                      <AlertDialog open={openAlertDialog}>
-                        <AlertDialogContent className="bg-light-2">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Report post.</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              <p>State your reason for reporting this post.</p>
-                              <div className="p-5">
-                                <RadioGroup defaultValue="flex mt-5">
-                                  <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="radioFake" id="r1" />
-                                    <Label htmlFor="r1">
-                                      Contains fake news and misinformation.
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="radioIna" id="r2" />
-                                    <Label htmlFor="r2">Inappropriate Content.</Label>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="radioSpam" id="r3" />
-                                    <Label htmlFor="r3">Spam</Label>
-                                  </div>
-                                </RadioGroup>
-                              </div>
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
-                            <AlertDialogTrigger asChild>
-                              <Button onClick={handleContinue}>Submit</Button>
-                            </AlertDialogTrigger>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-
-                        <AlertDialog open={openNestedAlertDialog}>
-                          <AlertDialogContent className="bg-light-2">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Report Submitted.</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Thank you for reporting this post.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogAction onClick={handleNestedContinue}>
-                                Continue
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </AlertDialog>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <ReportForm userId={user.id} postId={post.id} postUserId={post.user.id} />
               </div>
             </div>
             <hr className="border w-full border-dark-4/80" />

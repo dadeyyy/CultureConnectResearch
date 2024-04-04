@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { user, isLoading, checkAuthUser } = useUserContext();
+  const { user, checkAuthUser } = useUserContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +56,11 @@ const LeftSidebar = () => {
       label: "Live Streams",
     },
     {
+      imgURL: `${user.imageUrl}`,
+      route: `/profile/${user.id}`,
+      label: "Profile",
+    },
+    {
       route: "/create-post",
       label: "Create Post",
     },
@@ -75,38 +80,10 @@ const LeftSidebar = () => {
 
   return (
     <nav className="leftsidebar sticky border border-r-gray-300">
-      <div className="flex flex-col gap-7">
-        <Link to="/home" className="flex gap-3 items-center">
-          <img src="/assets/images/logo-2.svg" alt="logo" width={170} height={36} />
-        </Link>
-        <div className="flex gap-3 items-center mt-5">
-          <img
-            src={
-              isLoading
-                ? "/assets/icons/profile-placeholder.svg"
-                : user.imageUrl || "/assets/icons/profile-placeholder.svg"
-            }
-            alt="profile picture"
-            className="h-12 w-12 rounded-full bg-cover"
-          />
-          <div
-            className="flex flex-col"
-            onClick={() => {
-              window.location.href = `/profile/${user.id}`;
-            }}
-          >
-            {isLoading || !user.id ? (
-              <p>Loading...</p>
-            ) : (
-              <>
-                <p className="font-bold text-regular">
-                  {user.firstName} {user.lastName}
-                </p>
-                <p className="small-regular text-light-3">@{user.username}</p>
-              </>
-            )}
-          </div>
-        </div>
+      <Link to="/home" className="flex gap-3 items-center my-5 mx-2 ">
+        <img src="/assets/images/logo-2.svg" alt="logo" width={170} height={36} />
+      </Link>
+      <div className="flex flex-col gap-7 h-full py-5">
         <ul className="flex flex-col gap-1">
           {sidebarLinks.map((link) => {
             if (!link) return null;

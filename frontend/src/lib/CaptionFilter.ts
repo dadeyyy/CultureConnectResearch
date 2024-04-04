@@ -342,6 +342,7 @@ export const filterInappropriateWords = (text: string): string => {
     "boto",
     "brocha",
     "burat",
+    "buset",
     "bwesit",
     "bwisit",
     "demonyo ka",
@@ -462,7 +463,7 @@ export const filterInappropriateWords = (text: string): string => {
   let filteredText = text;
   inappropriateWords.forEach((word) => {
     const replacedWord = replaceLookalikeCharacters(word);
-    const regex = new RegExp(`\\b${escapeRegExp(replacedWord)}\\b`, "gi"); // Correct placement of escapeRegExp
+    const regex = new RegExp(`\\b${escapeRegExp(replacedWord)}\\b`, "gi");
     filteredText = filteredText.replace(regex, "*".repeat(word.length));
   });
 

@@ -38,6 +38,44 @@ const Profile = () => {
   const { user } = useUserContext();
   const { pathname } = useLocation();
   const [currentUser, setCurrentUser] = useState<userProfile | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+
+  useEffect(() => {
+    const fetchFollowingCount = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/following-count/${id}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setFollowingCount(data.followingCount);
+        } else {
+          console.error("Failed to fetch following count");
+        }
+      } catch (error) {
+        console.error("Error fetching following count:", error);
+      }
+    };
+
+    const fetchFollowersCount = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/followers-count/${id}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setFollowersCount(data.followersCount);
+        } else {
+          console.error("Failed to fetch followers count");
+        }
+      } catch (error) {
+        console.error("Error fetching followers count:", error);
+      }
+    };
+
+    fetchFollowingCount();
+    fetchFollowersCount();
+  }, [id]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -61,7 +99,24 @@ const Profile = () => {
     fetchCurrentUser();
   }, [id]);
 
-  console.log("user: " + currentUser);
+  useEffect(() => {
+    const checkIfFollowing = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/is-following/${id}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setIsFollowing(data.isFollowing);
+        } else {
+          console.error("Failed to check if user is following");
+        }
+      } catch (error) {
+        console.error("Error checking if user is following:", error);
+      }
+    };
+
+    checkIfFollowing();
+  }, [id]);
 
   if (!currentUser)
     return (
@@ -70,14 +125,58 @@ const Profile = () => {
       </div>
     );
 
+  const handleFollow = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/follow", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ followerId: user.id, followingId: currentUser.id }),
+      });
+
+      if (response.ok) {
+        setIsFollowing(true);
+        setFollowersCount((prevCount) => prevCount + 1);
+      } else {
+        console.error("Failed to follow user:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/unfollow/${user.id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ currentUser: user.id }),
+      });
+
+      if (response.ok) {
+        setIsFollowing(false);
+        setFollowersCount((prevCount) => prevCount - 1);
+      } else {
+        console.error("Failed to unfollow user:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
+
+  console.log(currentUser);
+
   return (
     <div className="profile-container">
-      <div className="profile-inner_container">
-        <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7">
+      <div className="profile-inner_container bg-red-300">
+        <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7 p-5">
           <img
             src={currentUser.avatarUrl || "/assets/icons/profile-placeholder.svg"}
             alt="profile"
-            className="w-28 h-28 lg:h-36 lg:w-36 object-cover  rounded-full"
+            className="w-28 h-28 lg:h-40 lg:w-40 object-cover rounded-full"
           />
           <div className="flex flex-col flex-1 justify-between md:mt-2">
             <div className="flex flex-col w-full">
@@ -87,12 +186,12 @@ const Profile = () => {
               <p className="small-regular md:body-medium test-dark-3 text-center xl:text-left">
                 @{currentUser.username}
               </p>
-            </div>
-
-            <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
-              {/* <StatBlock value={currentUser.posts.length} label="Posts" /> */}
-              <StatBlock value={0} label="Followers" />
-              <StatBlock value={0} label="Following" />
+              <div className="flex gap-8 mt-2 items-center justify-center xl:justify-start flex-wrap z-20">
+                {/* <StatBlock value={currentUser.posts.length} label="Posts" /> */}
+                <StatBlock value={followingCount} label="Following" />
+                <StatBlock value={followersCount} label="Followers" />
+              </div>
+              <p>{currentUser.bio}</p>
             </div>
 
             <p className="small-medium md:base-medium text-center xl:text-left mt-7 max-w-screen-sm">
@@ -113,8 +212,12 @@ const Profile = () => {
               </Link>
             </div>
             <div className={`${user.id === currentUser.id && "hidden"}`}>
-              <Button type="button" className="shad-button_primary px-8">
-                Follow
+              <Button
+                type="button"
+                className="shad-button_primary px-8"
+                onClick={isFollowing ? handleUnfollow : handleFollow}
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
               </Button>
             </div>
           </div>

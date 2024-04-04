@@ -78,16 +78,20 @@ const CommentCard: React.FC<CommentCardProps> = ({
           alt="profile picture"
           className="h-8 w-8 rounded-full bg-cover"
         />
+
         <div className="flex-col flex">
-          <span className="font-bold w-48">
-            {commentUser?.firstName} {commentUser?.lastName}:{" "}
-          </span>
+          <div className="flex-col flex bg-gray-200 rounded-lg p-2">
+            <span className="font-bold text-base">
+              {commentUser?.firstName} {commentUser?.lastName}
+            </span>
+            <span className="text-sm text-start">{filterInappropriateWords(comment.content)}</span>
+          </div>
           <span className="text-gray-500 text-xs">
             {multiFormatDateString(comment.createdAt.toString())}
           </span>
         </div>
       </div>
-      <div className="text-regular text-start">{filterInappropriateWords(comment.content)}</div>
+
       {comment.userId === user.id && (
         <Popover
           open={openStates[index]}

@@ -37,6 +37,9 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
               className={`duration-700 ease-in-out absolute w-full h-full transform ${
                 index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
+              onClick={() => {
+                setOpen(true);
+              }}
             >
               <img
                 src={photo.url}
@@ -60,6 +63,9 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
             className={`duration-700 ease-in-out absolute w-full h-full transform ${
               index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
+            onClick={() => {
+              setOpen(true);
+            }}
           >
             <img
               src={photo.url}
