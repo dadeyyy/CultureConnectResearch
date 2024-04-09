@@ -10,7 +10,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'uploads',
-        allowedFormats: ['jpg', 'png'],
+        allowedFormats: ['jpg', 'png', 'mp4'],
     },
 });
 const upload = multer({ storage });
@@ -19,7 +19,8 @@ const archiveStorage = new CloudinaryStorage({
     params: {
         folder: 'archives',
         allowedFormats: ['jpg', 'png', 'jpeg', 'pdf', 'mp4'],
-        resource_type: 'auto'
+        resource_type: 'auto',
+        access_mode: 'public'
     },
 });
 const uploadArchive = multer({ storage: archiveStorage });

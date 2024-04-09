@@ -128,7 +128,7 @@ archiveRoute.put('/archive/:province/:archiveId', isAuthenticated, isProvinceAdm
                 filename: file.filename,
             }));
         }
-        await db.archive.update({
+        const updatedArchive = await db.archive.update({
             where: {
                 id: archiveId,
             },
@@ -166,8 +166,9 @@ archiveRoute.put('/archive/:province/:archiveId', isAuthenticated, isProvinceAdm
                     files: true,
                 },
             });
-            res.status(200).json(updatedFiles);
+            return res.status(200).json(updatedFiles);
         }
+        return res.status(200).json(updatedArchive);
     }
     catch (error) {
         console.error(error);

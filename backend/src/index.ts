@@ -11,6 +11,7 @@ import likeRoute from './router/likeRoute.js';
 import calendarRoute from './router/calendarRoute.js';
 import algoRoute from './router/algoRoute.js';
 import archiveRoute from './router/archive.js';
+import liveStreamRoute from './router/liveStream.js';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -66,6 +67,7 @@ app.use('/', likeRoute);
 app.use('/', calendarRoute);
 app.use('/', algoRoute);
 app.use('/', archiveRoute);
+app.use('/', liveStreamRoute)
 
 app.listen(PORT, () => {
   console.log(`LISTENING ON PORT ${PORT}`);

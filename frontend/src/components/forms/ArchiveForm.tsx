@@ -179,7 +179,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
         }
         const data = await response.json();
         console.log("Creation successful!", data);
-        navigate("/explore/${province}");
+        navigate(`/explore/${province}`);
       } catch (error) {
         console.error("Error during POST request:", error);
       }

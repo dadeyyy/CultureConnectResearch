@@ -11,7 +11,10 @@ import { archiveSchema, archiveTypeSchema } from '../utils/Schemas.js';
 import { cloudinary, upload, uploadArchive } from '../utils/cloudinary.js';
 import { Multer } from 'multer';
 
+
 const archiveRoute = express.Router();
+
+
 
 function generateRandomId() {
   return Math.floor(Math.random() * 90000) + 10000;
@@ -166,7 +169,7 @@ archiveRoute.put(
         }));
       }
 
-      await db.archive.update({
+      const updatedArchive = await db.archive.update({
         where: {
           id: archiveId,
         },
@@ -210,8 +213,10 @@ archiveRoute.put(
           },
         });
 
-        res.status(200).json(updatedFiles);
+        return res.status(200).json(updatedFiles);
       }
+
+      return res.status(200).json(updatedArchive);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error', error });
@@ -255,6 +260,8 @@ archiveRoute.delete(
     }
   }
 );
+
+
 
 // archiveRoute.delete('/archive/', async (req,res)=>{
 //   await db.archive.deleteMany();

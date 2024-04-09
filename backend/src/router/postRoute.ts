@@ -6,12 +6,7 @@ import {
 } from '../middleware/middleware.js';
 import { db } from '../utils/db.server.js';
 import { upload, cloudinary } from '../utils/cloudinary.js';
-import {
-  exploreSchema,
-  exploreTypeSchema,
-  postSchema,
-  postTypeSchema,
-} from '../utils/Schemas.js';
+import { postSchema, postTypeSchema } from '../utils/Schemas.js';
 
 const postRoute = express.Router();
 
@@ -25,8 +20,7 @@ postRoute.post(
     try {
       const data: postTypeSchema = req.body;
       const files: Express.Multer.File[] = req.files as Express.Multer.File[];
-      console.log(data);
-      console.log(files);
+
       const images = files?.map((file) => ({
         url: file.path,
         filename: file.filename,
@@ -50,60 +44,12 @@ postRoute.post(
         .status(201)
         .json({ message: 'Successfully created new post', data: newPost });
     } catch (error) {
-      console.log("TEST");
+      console.log('TEST');
       console.log(error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 );
-
-// postRoute.post('/explore', isAuthenticated, upload.array('image'), validate(exploreSchema) , async(req,res)=>{
-//   try {
-//     const data: exploreTypeSchema = req.body;
-//     const files: Express.Multer.File[] = req.files as Express.Multer.File[];
-//     console.log(data);
-//     console.log(files);
-//     const images = files?.map((file) => ({
-//       url: file.path,
-//       filename: file.filename,
-//     }));
-
-//     const newPost = await db.explore.create({
-//       data: {
-//         ...data,
-//         photos: {
-//           create: images,
-//         },
-//       },
-//       include: {
-//         photos: true
-//       }
-//     });
-
-//     res
-//       .status(201)
-//       .json({ message: 'Successfully created new archive!', data: newPost });
-//   } catch (error) {
-//     console.log("TEST");
-//     console.log(error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// })
-
-// postRoute.get('/explore',isAuthenticated, async(req,res) =>{
-//   try{
-//     const explore = await db.explore.findMany()
-
-//     if(explore){
-//       return res.status(200).json(explore)
-//     }
-
-//   }
-//   catch(error){
-//     console.log(error)
-//     return res.status(500).json(error)
-//   }
-// })
 
 // GET ALL THE POST
 postRoute.get('/post', isAuthenticated, async (req, res) => {
@@ -157,67 +103,82 @@ postRoute.put(
   upload.array('image'),
   validate(postSchema),
   async (req, res) => {
-    try {
+
+    try{
+
       const postId = parseInt(req.params.postId);
       const data: postTypeSchema = req.body;
-      const files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      const files = req.files as Express.Multer.File[];
 
-      // Check if post with the given ID exists
-      const post = await db.post.findUnique({
-        where: {
-          id: postId,
-        },
-        include: { photos: true },
-      });
-
-      // If not, return not found
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found!' });
-      }
-
-      // Create an array of new photos to add
-      const newPhotos = files?.map((file) => ({
+      const dataNoFiles = {
+        caption: data.caption,
+        province: data.province,
+        municipality: data.municipality,
+        userId: req.session.user?.id,
+      };
+      
+      let newFiles: { url: string; filename: string }[] = [];
+      if (files && files.length > 0) {
+        newFiles = files.map((file) => ({
         url: file.path,
         filename: file.filename,
       }));
+    }
 
-      // Update the post data
-      const updatedPost = await db.post.update({
+    const updatedPost = await db.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        ...dataNoFiles,
+        photos: {
+          create: newFiles,
+        },
+      },
+      include: {
+        photos: true,
+      },
+    });
+
+    if (data.deletedFiles) {
+      for (let filename of data.deletedFiles) {
+        await cloudinary.uploader.destroy(filename);
+      }
+      
+      const filesToDelete = await db.post.findUnique({
+        where: {
+          id: postId,
+        },
+        include: {
+          photos: true,
+        },
+      });
+      
+      const dataToDelete = data.deletedFiles.filter((file) =>
+      filesToDelete?.photos.some((filename) => file === filename.filename)
+      );
+      
+      const updatedFiles = await db.post.update({
         where: { id: postId },
         data: {
-          ...data,
-          userId: req.session.user?.id,
-          // Add new photos to the existing ones
           photos: {
-            create: newPhotos,
+            deleteMany: { filename: { in: dataToDelete } },
           },
         },
-        include: { photos: true, user: true },
+        include: {
+          photos: true,
+        },
       });
-
-      // If there are images to delete, remove them
-      if (req.body.deleteImages && req.body.deleteImages.length > 0) {
-        const imagesToDelete = req.body.deleteImages;
-
-        await db.post.update({
-          where: { id: postId },
-          data: {
-            photos: {
-              deleteMany: {
-                id: { in: imagesToDelete },
-              },
-            },
-          },
-        });
-      }
-
-      res
-        .status(200)
-        .json({ message: 'Successfully updated post', data: updatedPost });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      
+      return res.status(200).json(updatedFiles);
     }
+    
+    return res.status(200).json(updatedPost);
+  }
+  catch(error){
+    console.log(error);
+    return res.status(500).json(error)
+  }
   }
 );
 
