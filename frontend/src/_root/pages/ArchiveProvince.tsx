@@ -7,6 +7,7 @@ import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/
 import ArchiveForm from "@/components/forms/ArchiveForm";
 import Loader from "@/components/shared/Loader";
 import { useUserContext } from "@/context/AuthContext";
+import { useMediaQuery } from "@react-hook/media-query";
 
 interface ArchiveProps {
   description: string;
@@ -24,6 +25,7 @@ const ArchiveProvince = () => {
   const [loading, isLoading] = useState(true);
   const { user } = useUserContext();
   const navigate = useNavigate();
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const closeDrawer = () => {
     setIsDrawerOpen(false);
@@ -65,10 +67,14 @@ const ArchiveProvince = () => {
   return (
     <div className="w-full">
       <div className="bg-red-200 w-full p-4 flex justify-between">
-        <button className="button-back" onClick={() => navigate(-1)}>
-          Back
-        </button>
-        <h2 className="text-center font-bold text-2xl">{provinceLabel ?? province} Archives</h2>
+        {isMobile ? (
+          <></>
+        ) : (
+          <button className="button-back" onClick={() => navigate(-1)}>
+            Back
+          </button>
+        )}
+        <h2 className="text-center font-bold text-2xl p-2">{provinceLabel ?? province} Archives</h2>
         <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
           <DrawerTrigger asChild>
             {user.role === "ADMIN" && user.province === province ? (

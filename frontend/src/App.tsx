@@ -19,6 +19,7 @@ import Home from "./_root/pages/Home";
 import { Toaster } from "react-hot-toast";
 import ArchiveProvince from "./_root/pages/ArchiveProvince";
 import ArchiveDetails from "./components/shared/ArchiveDetails";
+import Reports from "./_root/pages/Reports";
 
 const App = () => {
   return (
@@ -38,6 +39,7 @@ const App = () => {
           <Route path="/explore" element={<Explore />} />
           <Route path="/map" element={<MapForm />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/live-streams" element={<LiveStream />} />
           <Route path="/for-you" element={<ForYou />} />
           <Route path="/create-post" element={<CreatePost />} />

@@ -1,22 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow, TableHead } from "@/components/ui/table";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import ReactPlayer from "react-player";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import Loader from "./Loader";
 import { useUserContext } from "@/context/AuthContext";
 import { Button } from "../ui/button";
 import ArchiveForm from "../forms/ArchiveForm";
-import { provincesTest } from "@/lib/provinces";
+import { multiFormatDateString } from "@/lib/utils";
+import { useMediaQuery } from "@react-hook/media-query";
+import { municipalities, provincesTest } from "@/lib/provinces";
 
 interface ArchiveData {
   id: number;
@@ -45,6 +40,8 @@ const ArchiveDetails: React.FC = () => {
   const { user } = useUserContext();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
+  const isMobile = useMediaQuery("(max-width: 640px)");
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState("");
 
   const closeDrawer = () => {
     setIsDrawerOpen(false);
@@ -65,7 +62,6 @@ const ArchiveDetails: React.FC = () => {
           throw new Error("Failed to fetch archive data");
         }
         const data = await response.json();
-        console.log(data.data);
         setArchiveData(data.data);
       } catch (error: any) {
         console.error(error);
@@ -82,9 +78,15 @@ const ArchiveDetails: React.FC = () => {
     return (
       <div className="w-full h-full">
         <div className="bg-red-200 w-full p-4 flex justify-between">
-          <button className="button-back" onClick={() => navigate(-1)}>
-            Back
-          </button>
+          {isMobile ? (
+            <button className="hidden button-back" onClick={() => navigate(-1)}>
+              Back
+            </button>
+          ) : (
+            <button className="button-back" onClick={() => navigate(-1)}>
+              Back
+            </button>
+          )}
           <h2 className="text-center font-bold text-2xl">Archives Details</h2>
           <div></div>
         </div>
@@ -132,10 +134,14 @@ const ArchiveDetails: React.FC = () => {
   return (
     <div className="w-full overflow-auto">
       <div className="bg-red-200 w-full p-4 flex justify-between">
-        <button className="button-back" onClick={() => navigate(-1)}>
-          Back
-        </button>
-        <h2 className="text-center font-bold text-2xl">Archives Details</h2>
+        {isMobile ? (
+          <></>
+        ) : (
+          <button className="button-back" onClick={() => navigate(-1)}>
+            Back
+          </button>
+        )}
+        <h2 className="text-center font-bold text-2xl p-2">Archives Details</h2>
         {user.role === "ADMIN" && user.province === province ? (
           <div className="px-3">
             <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
@@ -173,121 +179,154 @@ const ArchiveDetails: React.FC = () => {
         )}
       </div>
 
-      <div className="p-5">
-        <Table className="mb-2">
-          <TableBody>
-            <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold w-1/5 border-2">Archive Id:</TableCell>
-              <TableCell>{archiveData.id}</TableCell>
-            </TableRow>
-            <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold w-1/5 border-2">Title:</TableCell>
-              <TableCell>{archiveData.title}</TableCell>
-            </TableRow>
-            <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold border-2">Municipality:</TableCell>
-              <TableCell>{archiveData.municipality}</TableCell>
-            </TableRow>
-            <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold border-2">Description:</TableCell>
-              <TableCell>{archiveData.description}</TableCell>
-            </TableRow>
-            <TableRow className="border-2 hover:border-b-black">
-              <TableCell className="font-bold border-2">Date Created:</TableCell>
-              <TableCell>{archiveData.dateCreated}</TableCell>
-            </TableRow>
+      <div className="py-5 lg:px-10 sm:px-5">
+        {isMobile ? (
+          <Table className="mb-2">
+            <TableBody>
+              <TableRow className="border-2 hover:border-b-black">
+                <TableCell className="font-bold w-1/5 border-2">Archive Id:</TableCell>
+                <TableCell className="text-wrap w-full">{archiveData.id}</TableCell>
+              </TableRow>
+              <TableRow className="border-2 hover:border-b-black">
+                <TableCell className="font-bold w-1/5 border-2">Title:</TableCell>
+                <TableCell className="text-wrap w-full">{archiveData.title}</TableCell>
+              </TableRow>
+              <TableRow className="border-2 hover:border-b-black">
+                <TableCell className="font-bold border-2">Date Created:</TableCell>
+                <TableCell className="text-wrap w-full">
+                  {multiFormatDateString(archiveData.dateCreated)}
+                </TableCell>
+              </TableRow>
+              <TableRow className="border-2 hover:border-b-black">
+                <TableCell className="font-bold border-2">Municipality:</TableCell>
+                <TableCell className="text-wrap w-full">{archiveData.municipality}</TableCell>
+              </TableRow>
+              <TableRow className="border-2 hover:border-b-black">
+                <TableCell className="font-bold border-2">Description:</TableCell>
+                <TableCell className="text-wrap w-full">{archiveData.description}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        ) : (
+          <Table className="mb-2">
+            <TableBody className="border-2">
+              <TableRow className="border-2 bg-gray-200">
+                <TableHead className="font-bold w-1/12 text-center border-2">Id</TableHead>
+                <TableHead className="font-bold min-w-[100px] text-center border-2">
+                  Date Created
+                </TableHead>
+                <TableHead className="font-bold w-2/12 text-center border-2">Location</TableHead>
+                <TableHead className="font-bold w-full text-center border-2">
+                  Title & Description
+                </TableHead>
+              </TableRow>
+              <TableRow className="border-2">
+                <TableCell className="font-bold text-center border-2">{archiveData.id}</TableCell>
+                <TableCell className="font-bold text-center border-2">
+                  {multiFormatDateString(archiveData.dateCreated)}
+                </TableCell>
+                <TableCell className="font-bold text-center border-2">
+                  {archiveData.municipality &&
+                    municipalities[province ?? ""]?.find(
+                      (municipal) => municipal.value === archiveData.municipality
+                    )?.label}
+                  {archiveData.municipality && ", "}
+                  {province && provincesTest.find((prov) => prov.value === province)?.label}
+                </TableCell>
+                <TableCell className="font-bold flex flex-col text-balance border-2">
+                  <span className="font-bold text-base ">{archiveData.title}</span>
+                  <span className="text-sm font-normal text-justify">
+                    {archiveData.description}
+                  </span>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        )}
 
-            {archiveData.files.some((file) => file.url.endsWith(".pdf")) && (
-              <TableRow>
-                <TableCell className="font-bold">PDF:</TableCell>
-                <TableCell>
-                  {archiveData.files.map(
-                    (file, index) =>
-                      file.url.endsWith(".pdf") && (
-                        <div key={index}>
-                          <a
-                            href={file.url}
-                            download={file.url}
-                            className="flex items-center border-2 p-2 gap-2 w-96 rounded-xl border-white hover:border-red-200"
-                          >
-                            <img
-                              src="/public/assets/images/pdf-image.svg"
-                              alt="PDF Icon"
-                              height={100}
-                              width={100}
-                            />
-                            <div className="text-center flex-col flex">
-                              <span className="font-bold">{file.filename}</span>
-                              <span> - Click to download</span>
-                            </div>
-                          </a>
-                        </div>
-                      )
+        <div className="w-full m-auto p-2 text-center">
+          <span className="font-bold text-lg">Files:</span>
+        </div>
+        <div className="w-full grid xl:grid-cols-4 lg:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1">
+          {archiveData.files.map((file, index) => (
+            <div key={index}>
+              {file.url.endsWith(".pdf") && (
+                <a
+                  href={file.url}
+                  target="_blank"
+                  className="flex items-center border-2 p-2 gap-2 w-full rounded-xl border-white hover:border-red-200"
+                >
+                  <img
+                    src="/public/assets/images/pdf-image.svg"
+                    alt="PDF Icon"
+                    height={100}
+                    width={100}
+                  />
+                  <div className="text-center flex-col flex">
+                    <span className="font-normal"> - Click to view or open pdf</span>
+                  </div>
+                </a>
+              )}
+
+              {file.url.endsWith(".jpg") ||
+                (file.url.endsWith(".png") && (
+                  <div
+                    className="flex items-center border-2 p-2 gap-2 w-full rounded-xl border-white hover:border-red-200"
+                    onClick={() => handleOpenLightbox()}
+                  >
+                    <img
+                      src={file.url}
+                      alt="PDF Icon"
+                      height={100}
+                      width={100}
+                      className="aspect-square"
+                      onClick={() => handleOpenLightbox()}
+                    />
+                    <div className="text-center flex-col flex">
+                      <span className="font-normal"> - Click to view or open image</span>
+                    </div>
+                  </div>
+                ))}
+
+              {file.url.endsWith(".mp4") && (
+                <div>
+                  <div
+                    className="flex items-center border-2 p-2 gap-2 w-full rounded-xl border-white hover:border-red-200"
+                    onClick={() => setSelectedVideoUrl(file.url)}
+                  >
+                    <img
+                      src="/public/assets/images/videos-image.svg"
+                      alt="PDF Icon"
+                      height={100}
+                      width={100}
+                    />
+                    <div className="text-center flex-col flex">
+                      <span className="font-normal"> - Click to view or open video</span>
+                    </div>
+                  </div>
+
+                  {selectedVideoUrl && (
+                    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center">
+                      <div className="relative">
+                        <ReactPlayer url={file.url} controls width="100%" height="100%" />
+                        <button
+                          className="absolute top-2 right-2 text-white text-2xl cursor-pointer hover:blue-500"
+                          onClick={() => {
+                            setSelectedVideoUrl("");
+                          }}
+                        >
+                          <img src={"/assets/icons/close.svg"} />
+                        </button>
+                      </div>
+                    </div>
                   )}
-                </TableCell>
-              </TableRow>
-            )}
-
-            {archiveData.files.some(
-              (file) => file.url.endsWith(".jpg") || file.url.endsWith(".png")
-            ) && (
-              <TableRow>
-                <TableCell className="font-bold">Image(s):</TableCell>
-                <TableCell>
-                  <div className="w-full flex flex-wrap">
-                    <Carousel className="max-w-lg mx-auto">
-                      <CarouselContent>
-                        {/* Map each image to a separate CarouselItem */}
-                        {archiveData.files
-                          .filter((file) => file.url.endsWith(".jpg") || file.url.endsWith(".png"))
-                          .map((file, index) => (
-                            <CarouselItem key={index}>
-                              <Card className="min-w-full ">
-                                <CardContent className="flex items-center justify-center p-6 min-w-full">
-                                  <img
-                                    src={file.url}
-                                    onClick={() => handleOpenLightbox()}
-                                    width="300"
-                                    style={{
-                                      margin: "2px",
-                                      objectFit: "cover",
-                                    }}
-                                    alt=""
-                                  />
-                                </CardContent>
-                              </Card>
-                            </CarouselItem>
-                          ))}
-                      </CarouselContent>
-                      <CarouselPrevious />
-                      <CarouselNext />
-                    </Carousel>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-
-            {archiveData.files.some((file) => file.url.endsWith(".mp4")) && (
-              <TableRow>
-                <TableCell className="font-bold">Video(s):</TableCell>
-                <TableCell>
-                  <div className="w-full flex flex-wrap">
-                    {archiveData.files.map(
-                      (file, index) =>
-                        file.url.endsWith(".mp4") && (
-                          <div key={index}>
-                            <video controls src={file.url} className="w-full aspect-square" />
-                          </div>
-                        )
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-      {/* Render Lightbox component with slides */}
+
       <Lightbox
         open={open}
         close={() => setOpen(false)}

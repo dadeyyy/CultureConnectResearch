@@ -12,9 +12,9 @@ const postRoute = express.Router();
 
 //ADD POST
 postRoute.post(
-  '/post',
+  "/post",
   isAuthenticated,
-  upload.array('image'),
+  upload.array("image"),
   validate(postSchema),
   async (req, res) => {
     try {
@@ -40,13 +40,11 @@ postRoute.post(
         },
       });
 
-      res
-        .status(201)
-        .json({ message: 'Successfully created new post', data: newPost });
+      res.status(201).json({ message: "Successfully created new post", data: newPost });
     } catch (error) {
       console.log('TEST');
       console.log(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 );
@@ -54,22 +52,48 @@ postRoute.post(
 // GET ALL THE POST
 postRoute.get('/post', isAuthenticated, async (req, res) => {
   try {
+    const limit: number = parseInt(req.query.limit as string) || 1;
+    const offset: number = parseInt(req.query.offset as string) || 0;
+
     const allPost = await db.post.findMany({
       include: {
         photos: true,
         user: true,
         comments: true,
       },
+      take: limit,
+      skip: offset,
+      orderBy: {
+        createdAt: "desc",
+      },
     });
+
     res.status(200).json(allPost);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Cannot get the posts' });
+    res.status(500).json({ error: "Cannot get the posts" });
   }
 });
 
+// GET ALL THE POST
+// postRoute.get("/post", isAuthenticated, async (req, res) => {
+//   try {
+//     const allPost = await db.post.findMany({
+//       include: {
+//         photos: true,
+//         user: true,
+//         comments: true,
+//       },
+//     });
+//     res.status(200).json(allPost);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ error: "Cannot get the posts" });
+//   }
+// });
+
 // GET SPECIFIC POST
-postRoute.get('/post/:id', async (req, res) => {
+postRoute.get("/post/:id", async (req, res) => {
   try {
     //Get parameters ID
     const postId = parseInt(req.params.id);
@@ -90,17 +114,17 @@ postRoute.get('/post/:id', async (req, res) => {
     }
 
     //If not, return not found
-    return res.status(404).json({ error: 'Post not found!' });
+    return res.status(404).json({ error: "Post not found!" });
   } catch (error) {
     console.log(error);
   }
 });
 
 postRoute.put(
-  '/post/:postId',
+  "/post/:postId",
   isAuthenticated,
   isAuthor,
-  upload.array('image'),
+  upload.array("image"),
   validate(postSchema),
   async (req, res) => {
 
@@ -169,8 +193,27 @@ postRoute.put(
           photos: true,
         },
       });
-      
-      return res.status(200).json(updatedFiles);
+
+      // If there are images to delete, remove them
+      if (req.body.deleteImages && req.body.deleteImages.length > 0) {
+        const imagesToDelete = req.body.deleteImages;
+
+        await db.post.update({
+          where: { id: postId },
+          data: {
+            photos: {
+              deleteMany: {
+                id: { in: imagesToDelete },
+              },
+            },
+          },
+        });
+      }
+
+      res.status(200).json({ message: "Successfully updated post", data: updatedPost });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
     
     return res.status(200).json(updatedPost);
@@ -182,45 +225,39 @@ postRoute.put(
   }
 );
 
-postRoute.delete(
-  '/post/:postId',
-  isAuthenticated,
-  isAuthor,
-  async (req, res) => {
-    try {
-      const postId = parseInt(req.params.postId);
+postRoute.delete("/post/:postId", isAuthenticated, async (req, res) => {
+  try {
+    const postId = parseInt(req.params.postId);
 
-      //Find post to delete
-      const post = await db.post.findUnique({
+    //Find post to delete
+    const post = await db.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (post) {
+      const deletedPost = await db.post.delete({
         where: {
-          id: postId,
+          id: +postId,
         },
+        include: { photos: true },
       });
 
-      if (post) {
-        const deletedPost = await db.post.delete({
-          where: {
-            id: +postId,
-          },
-          include: { photos: true },
-        });
-
-        return res
-          .status(200)
-          .json({ message: `Successfully deleted post! #${deletedPost.id}` });
-      }
-
-      return res.status(404).json({ error: "Can't find post!" });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error, message: 'Internal Server Error!' });
+      return res.status(200).json({ message: `Successfully deleted post! #${deletedPost.id}` });
     }
-  }
-);
 
-postRoute.post('/post/:postId/report', async (req, res) => {
+    return res.status(404).json({ error: "Can't find post!" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error, message: "Internal Server Error!" });
+  }
+});
+
+postRoute.post("/post/:postId/report", async (req, res) => {
   const postId = req.params.postId;
   const currentUser = req.session.user?.id;
+  const { reason } = req.body;
 
   try {
     // Find post
@@ -236,7 +273,7 @@ postRoute.post('/post/:postId/report', async (req, res) => {
     // Determine if the post is the current user's post, if not, proceed to report
     if (!post || post.user.id === currentUser) {
       return res.status(403).json({
-        error: 'You cannot report your own post or the post does not exist',
+        error: "You cannot report your own post or the post does not exist",
       });
     }
 
@@ -249,9 +286,7 @@ postRoute.post('/post/:postId/report', async (req, res) => {
     });
 
     if (existingReport) {
-      return res
-        .status(400)
-        .json({ error: 'You have already reported this post' });
+      return res.status(400).json({ error: "You have already reported this post" });
     }
 
     // Create a report record
@@ -259,6 +294,7 @@ postRoute.post('/post/:postId/report', async (req, res) => {
       data: {
         postId: +postId as number,
         userId: currentUser as number,
+        reportReason: reason,
       },
     });
 
@@ -287,15 +323,38 @@ postRoute.post('/post/:postId/report', async (req, res) => {
         },
       });
 
-      return res.json({ deletedReportedPost, message: 'Post was deleted' });
+      return res.json({ deletedReportedPost, message: "Post was deleted" });
     }
 
-    return res
-      .status(200)
-      .json({ message: 'Post reported successfully', updatedPost });
+    return res.status(200).json({ message: "Post reported successfully", updatedPost });
   } catch (error) {
-    console.log('Error');
-    return res.status(500).json({ error: 'Internal server error' });
+    console.log("Error: " + error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
+  try {
+    const province = req.params.province;
+
+    const reportedPosts = await db.post.findMany({
+      where: {
+        reports: {
+          some: {
+            AND: [{ post: { province } }],
+          },
+        },
+      },
+      include: {
+        reports: true,
+        user: true,
+      },
+    });
+
+    res.status(200).json(reportedPosts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Cannot get the reported posts" });
   }
 });
 

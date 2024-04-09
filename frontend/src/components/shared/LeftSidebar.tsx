@@ -1,16 +1,12 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import toast from 'react-hot-toast';
+import { Button } from "../ui/button";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { user, isLoading, checkAuthUser } = useUserContext();
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const { user, checkAuthUser } = useUserContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,22 +17,24 @@ const LeftSidebar = () => {
     fetchData();
   }, [checkAuthUser, user.id]);
 
-  const options = [
-    { label: "Profile", value: "profile" },
-    { label: "Logout", value: "logout" },
-  ];
-
   const sidebarLinks = [
     {
       imgURL: "/assets/icons/home.svg",
       route: "/home",
       label: "Home",
-    },    
+    },
     {
       imgURL: "/assets/icons/for-you.svg",
       route: "/for-you",
       label: "For You",
     },
+    user.role === "ADMIN"
+      ? {
+          imgURL: "/assets/icons/reports.svg",
+          route: "/reports",
+          label: "Reports",
+        }
+      : null,
     {
       imgURL: "/assets/icons/explore.svg",
       route: "/explore",
@@ -57,40 +55,38 @@ const LeftSidebar = () => {
       route: "/live-streams",
       label: "Live Streams",
     },
-
+    {
+      imgURL: `${user.imageUrl}`,
+      route: `/profile/${user.id}`,
+      label: "Profile",
+    },
     {
       route: "/create-post",
       label: "Create Post",
     },
-  ];
+  ].filter(Boolean);
 
-  const handleOptionSelect = async (selectedValue: string) => {
-    setOpen(false);
-    setValue(selectedValue);
+  const handleLogout = async () => {
+    const response = await fetch("http://localhost:8000/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    const data = await response.json();
+    console.log(data);
+    localStorage.removeItem("currentUser");
 
-    if (selectedValue === "logout") {
-      const response = await fetch("http://localhost:8000/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await response.json();
-      console.log(data);
-      localStorage.removeItem("currentUser");
-
-      return navigate("/");
-    } else if (selectedValue === "profile") {
-      window.location.href = `/profile/${user.id}`;
-    }
+    return navigate("/");
   };
 
   return (
-    <nav className="leftsidebar sticky">
-      <div className="flex flex-col gap-7">
-        <Link to="/home" className="flex gap-3 items-center">
-          <img src="/assets/images/logo-2.svg" alt="logo" width={170} height={36} />
-        </Link>
-        <ul className="flex flex-col gap-2">
+    <nav className="leftsidebar sticky border border-r-gray-300">
+      <Link to="/home" className="flex gap-3 items-center my-5 mx-2 ">
+        <img src="/assets/images/logo-2.svg" alt="logo" width={170} height={36} />
+      </Link>
+      <div className="flex flex-col gap-7 h-full py-5">
+        <ul className="flex flex-col gap-1">
           {sidebarLinks.map((link) => {
+            if (!link) return null;
             const isActive = pathname === link.route;
             const isCreate = link.label === "Create Post";
 
@@ -101,9 +97,9 @@ const LeftSidebar = () => {
                 >
                   <NavLink
                     to={link.route}
-                    className={`flex gap-4 items-center p-4 ${isCreate ? "text-lg" : ""}`}
+                    className={`flex gap-4 items-center p-3 ${isCreate ? "text-sm" : ""}`}
                   >
-                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-5 w-5" />}
+                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-4 w-4" />}
                     {link.label}
                   </NavLink>
                 </div>
@@ -113,58 +109,12 @@ const LeftSidebar = () => {
         </ul>
       </div>
       <div className="flex flex-col-reverse">
-        <div className="flex gap-3 items-center">
-          <img
-            src={
-              isLoading
-                ? "/assets/icons/profile-placeholder.svg"
-                : user.imageUrl || "/assets/icons/profile-placeholder.svg"
-            }
-            alt="profile picture"
-            className="h-12 w-12 rounded-full bg-cover"
-          />
-          <div className="flex flex-col">
-            {isLoading || !user.id ? (
-              <p>Loading...</p>
-            ) : (
-              <>
-                <p className="body-bold">
-                  {user.firstName} {user.lastName}
-                </p>
-                <p className="small-regular text-light-3">@{user.username}</p>
-              </>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <div className="grid grid-cols-2">
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <img
-                    src={"/assets/icons/three-dots.svg"}
-                    alt="profile picture"
-                    className="h-5 w-5 rounded-full col-end-7 hover:opacity-70 transition-opacity"
-                  />
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0 bg-light-2" side="top" align="end">
-                  <Command>
-                    <CommandGroup>
-                      {options.map((option) => (
-                        <CommandItem
-                          key={option.value}
-                          value={option.value}
-                          onSelect={handleOptionSelect}
-                          className="hover:bg-primary-1 cursor-pointer transition-colors"
-                        >
-                          {option.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-        </div>
+        <Button
+          className="leftsidebar-link bg-off-white hover:bg-red-500 hover:text-white"
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
       </div>
     </nav>
   );

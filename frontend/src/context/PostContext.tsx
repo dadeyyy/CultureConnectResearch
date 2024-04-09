@@ -33,7 +33,7 @@ interface IPostContext {
   postData: IPost[];
   isPostLoading: boolean;
   error: string;
-  fetchPosts: () => void;
+  fetchPosts: (limit: number, offset: number) => void;
 }
 
 const PostContext = createContext<IPostContext | undefined>(undefined);
@@ -47,22 +47,25 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
   const [isPostLoading, setIsPostLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchPosts = useCallback(async () => {
+  const fetchPosts = async (limit: number, offset: number): Promise<void> => {
     try {
-      const response = await fetch("http://localhost:8000/post", { credentials: "include" });
+      const response = await fetch(`http://localhost:8000/post?limit=${limit}&offset=${offset}`, {
+        credentials: "include",
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      setPostData(data);
+      setPostData((prevData) => [...prevData, ...data]);
       setIsPostLoading(false);
     } catch (error) {
       console.error("Error fetching posts:", error);
       setError("Something went wrong while fetching posts. Please try again later.");
       setIsPostLoading(false);
+      throw error;
     }
-  }, []);
+  };
 
   const value: IPostContext = {
     postData,

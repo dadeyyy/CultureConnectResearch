@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface PostStatsProps {
   post: {
@@ -34,12 +34,32 @@ interface PostStatsProps {
 
 const PostStats = ({ post, userId }: PostStatsProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
+  const [showComments, setShowComments] = useState(false);
 
   useEffect(() => {
-    // Check if the post is liked by the user and get like count
+    const fetchCommentCount = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/post/${post.id}/comments`, {
+          credentials: "include",
+        });
+        const data = await response.json();
+        if (data) {
+          setCommentCount(data.comments.length);
+        }
+      } catch (error) {
+        console.error("Error fetching comment count:", error);
+      }
+    };
+
+    fetchCommentCount();
+  }, [post.id]);
+
+  useEffect(() => {
     const checkLikeStatus = async () => {
       try {
         const response = await fetch(`http://localhost:8000/post/${post.id}/like-status`, {
@@ -73,11 +93,10 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       if (!response.ok) {
         console.error("Error liking post. Server responded with:", response);
         return;
-      } else console.log("Liked Successfully");
+      }
 
       const data = await response.json();
       setLikeCount(data.count);
-      console.log("like count", data.count);
       setIsLiked((prevIsLiked) => !prevIsLiked);
     } catch (error) {
       console.error("Error liking post:", error);
@@ -99,6 +118,23 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
         />
         <p className="small-medium lg:base-medium">{likeCount}</p>
       </div>
+      <a
+        onClick={() => {
+          navigate(`/posts/${post.id}`);
+        }}
+        className={`hover:cursor-pointer focus:outline-none  ${showComments ? "hidden" : ""}`}
+      >
+        <div className="flex flex-row gap-1">
+          <img
+            src={"/assets/icons/comment.svg"}
+            alt="comment"
+            width={25}
+            height={25}
+            className="cursor-pointer"
+          />
+          <p className="small-medium lg:base-medium">{commentCount}</p>
+        </div>
+      </a>
     </div>
   );
 };

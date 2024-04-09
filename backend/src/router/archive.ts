@@ -1,15 +1,17 @@
-import express from 'express';
-import { db } from '../utils/db.server.js';
-import {
-  isAuthenticated,
-  isAdmin,
-  isProvinceAdmin,
-  validate,
-} from '../middleware/middleware.js';
-import { archiveSchema, archiveTypeSchema } from '../utils/Schemas.js';
+import express from "express";
+import { db } from "../utils/db.server.js";
+import { isAuthenticated, isAdmin, isProvinceAdmin, validate } from "../middleware/middleware.js";
+import { archiveSchema, archiveTypeSchema } from "../utils/Schemas.js";
 
-import { cloudinary, upload, uploadArchive } from '../utils/cloudinary.js';
-import { Multer } from 'multer';
+import { cloudinary, upload, uploadArchive } from "../utils/cloudinary.js";
+import { Multer } from "multer";
+
+import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
+
+const mapboxToken =
+  "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
+
+const geocoder = Geocoding({ accessToken: mapboxToken as string });
 
 
 const archiveRoute = express.Router();
@@ -20,52 +22,53 @@ function generateRandomId() {
   return Math.floor(Math.random() * 90000) + 10000;
 }
 
+type GeoJsonPoint = {
+  type: "Point";
+  coordinates: number[];
+};
+
 //Get specific archive
-archiveRoute.get(
-  '/archive/:province/:archiveId',
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const archiveId = parseInt(req.params.archiveId);
-      const province = req.params.province;
+archiveRoute.get("/archive/:province/:archiveId", isAuthenticated, async (req, res) => {
+  try {
+    const archiveId = parseInt(req.params.archiveId);
+    const province = req.params.province;
 
-      const archive = await db.archive.findUnique({
-        where: {
-          id: archiveId,
-          province: province,
-        },
-        include: {
-          files: true,
-        },
-      });
+    const archive = await db.archive.findUnique({
+      where: {
+        id: archiveId,
+        province: province,
+      },
+      include: {
+        files: true,
+      },
+    });
 
-      if (!archive) {
-        return res.status(404).json({ message: 'Archive not found' });
-      }
-
-      const extractedData = {
-        id: archive.id,
-        title: archive.title,
-        description: archive.description,
-        province: archive.province,
-        municipality: archive.municipality,
-        dateCreated: archive.createdAt,
-        files: archive.files.map((file) => ({
-          url: file.url,
-          filename: file.filename,
-        })),
-      };
-
-      res.status(200).json({ data: extractedData });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal Server Error', error });
+    if (!archive) {
+      return res.status(404).json({ message: "Archive not found" });
     }
+
+    const extractedData = {
+      id: archive.id,
+      title: archive.title,
+      description: archive.description,
+      province: archive.province,
+      municipality: archive.municipality,
+      dateCreated: archive.createdAt,
+      files: archive.files.map((file) => ({
+        url: file.url,
+        filename: file.filename,
+      })),
+    };
+
+    res.status(200).json({ data: extractedData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error", error });
   }
-);
+});
 
 //Viewing of archives;
-archiveRoute.get('/archive/:province', isAuthenticated, async (req, res) => {
+archiveRoute.get("/archive/:province", isAuthenticated, async (req, res) => {
   try {
     const data = req.params.province;
     const provinceArchives = await db.archive.findMany({
@@ -92,19 +95,19 @@ archiveRoute.get('/archive/:province', isAuthenticated, async (req, res) => {
       return res.status(200).json({ data: extractedData });
     }
 
-    return res.status(404).json({ message: 'No archives found!' });
+    return res.status(404).json({ message: "No archives found!" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error', error });
+    res.status(500).json({ message: "Internal Server Error", error });
   }
 });
 
 //Creation of archives
 archiveRoute.post(
-  '/archive/:province',
+  "/archive/:province",
   isAuthenticated,
   isProvinceAdmin,
-  uploadArchive.array('archive'),
+  uploadArchive.array("archive"),
   validate(archiveSchema),
   async (req, res) => {
     try {
@@ -115,10 +118,20 @@ archiveRoute.post(
         filename: file.filename,
       }));
 
+      const geoData = await geocoder
+        .forwardGeocode({
+          query: `${data.municipality}, ${req.session.user?.province ?? ""}`,
+          limit: 1,
+        })
+        .send();
+
+      const location: GeoJsonPoint = geoData.body.features[0].geometry;
+
       const newArchive = await db.archive.create({
         data: {
           ...data,
-          province: req.session.user?.province ?? '',
+          province: req.session.user?.province ?? "",
+          location: location,
           userId: req.session.user?.id,
           files: {
             create: archiveFile,
@@ -131,22 +144,22 @@ archiveRoute.post(
       });
 
       res.status(201).json({
-        message: 'Successfully created new archive',
+        message: "Successfully created new archive",
         data: newArchive,
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: 'Cannot create new archive', error });
+      res.status(500).json({ message: "Cannot create new archive", error });
     }
   }
 );
 
 // Edit archive
 archiveRoute.put(
-  '/archive/:province/:archiveId',
+  "/archive/:province/:archiveId",
   isAuthenticated,
   isProvinceAdmin,
-  uploadArchive.array('archive'),
+  uploadArchive.array("archive"),
   validate(archiveSchema),
   async (req, res) => {
     try {
@@ -219,14 +232,14 @@ archiveRoute.put(
       return res.status(200).json(updatedArchive);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Internal Server Error', error });
+      res.status(500).json({ message: "Internal Server Error", error });
     }
   }
 );
 
 // Delete archive
 archiveRoute.delete(
-  '/archive/:province/:archiveId',
+  "/archive/:province/:archiveId",
   isAuthenticated,
   isProvinceAdmin,
   async (req, res) => {
@@ -243,7 +256,7 @@ archiveRoute.delete(
       });
 
       if (!archive) {
-        return res.status(404).json({ message: 'Archive not found' });
+        return res.status(404).json({ message: "Archive not found" });
       }
 
       // Delete the archive
@@ -253,15 +266,25 @@ archiveRoute.delete(
         },
       });
 
-      res.status(200).json({ message: 'Archive deleted successfully' });
+      res.status(200).json({ message: "Archive deleted successfully" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Internal Server Error', error });
+      res.status(500).json({ message: "Internal Server Error", error });
     }
   }
 );
 
+archiveRoute.get("/archives", isAuthenticated, async (req, res) => {
+  const archives = await db.archive.findMany({});
 
+  // const locations = calendars.map((calendar) => calendar.location);
+
+  if (archives) {
+    return res.status(200).json(archives);
+  }
+
+  return res.status(404).json({ error: "No locations found!" });
+});
 
 // archiveRoute.delete('/archive/', async (req,res)=>{
 //   await db.archive.deleteMany();

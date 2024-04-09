@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 interface CommentProps {
   postId: number;
-  action: 'home' | 'detail';
+  action: "home" | "detail";
 }
 
 interface Comment {
@@ -37,32 +37,27 @@ interface UserProfile {
 
 const Comments = ({ postId, action }: CommentProps) => {
   const { user, isLoading } = useUserContext();
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
   const [showComments, setShowComments] = useState(false);
-  const [openStates, setOpenStates] = useState<boolean[]>(
-    Array(comments.length).fill(false)
-  );
-  const [value, setValue] = useState('');
+  const [openStates, setOpenStates] = useState<boolean[]>(Array(comments.length).fill(false));
+  const [value, setValue] = useState("");
   const [commentUser, setCommentUser] = useState<UserProfile | null>(null);
   const navigate = useNavigate();
 
-  const options = [{ label: 'Delete', value: 'delete' }];
+  const options = [{ label: "Delete", value: "delete" }];
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/post/${postId}/comments`,
-          {
-            credentials: 'include',
-          }
-        );
+        const response = await fetch(`http://localhost:8000/post/${postId}/comments`, {
+          credentials: "include",
+        });
         const data = await response.json();
         setComments(data.comments);
         setOpenStates(Array(data.comments.length).fill(false)); // Initialize open states for each comment
       } catch (error) {
-        console.error('Error fetching comments:', error);
+        console.error("Error fetching comments:", error);
       }
     };
 
@@ -71,22 +66,19 @@ const Comments = ({ postId, action }: CommentProps) => {
 
   const handleOptionSelect = async (selectedValue: string, index: number) => {
     setOpenStates((prevOpenStates) =>
-      prevOpenStates.map((prevState, i) =>
-        i === index ? !prevState : prevState
-      )
+      prevOpenStates.map((prevState, i) => (i === index ? !prevState : prevState))
     );
     setValue(selectedValue);
 
-    if (selectedValue === 'edit') {
+    if (selectedValue === "edit") {
       // EDIT
-    } else if (selectedValue === 'delete') {
-
+    } else if (selectedValue === "delete") {
       try {
         const response = await fetch(
           `http://localhost:8000/post/${postId}/comment/${comments[index].id}`,
           {
-            credentials: 'include',
-            method: 'DELETE',
+            credentials: "include",
+            method: "DELETE",
           }
         );
 
@@ -96,7 +88,7 @@ const Comments = ({ postId, action }: CommentProps) => {
           toast.success(`${data.message}`);
           return;
         } else {
-          toast.error('Failed to delete comment');
+          toast.error("Failed to delete comment");
         }
       } catch (error) {
         toast.error(`${error}`);
@@ -106,34 +98,28 @@ const Comments = ({ postId, action }: CommentProps) => {
 
   const handleCommentSubmit = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/post/${postId}/comment`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            content: newComment,
-          }),
-          credentials: 'include',
-        }
-      );
+      const response = await fetch(`http://localhost:8000/post/${postId}/comment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: newComment,
+        }),
+        credentials: "include",
+      });
 
       if (!response.ok) {
-        console.error(
-          'Error submitting comment. Server responded with:',
-          response
-        );
+        console.error("Error submitting comment. Server responded with:", response);
         return;
       }
 
       const data = await response.json();
       setComments([...comments, data.comment]);
       setOpenStates([...openStates, false]);
-      setNewComment('');
+      setNewComment("");
     } catch (error) {
-      console.error('Error submitting comment:', error);
+      console.error("Error submitting comment:", error);
     }
   };
 
@@ -141,72 +127,72 @@ const Comments = ({ postId, action }: CommentProps) => {
     navigate(`/posts/${postId}`);
   };
 
-  const numberOfCommentsToShow = action === 'detail' ? comments.length : 1;
+  const numberOfCommentsToShow = action === "detail" ? comments.length : 1;
   const displayedComments = comments.slice(0, numberOfCommentsToShow);
 
   return (
-    <div className={`post-comments border my-5 border-light-4`}>
-      <h2
-        className={`${
-          action === 'home' ? 'hidden p-0' : ''
-        } font-bold ml-5 text-lg`}
-      >
+    <div
+      className={`post-comments border border-white ${
+        action === "detail" ? "lg:border-l-light-4 h-full" : "border-t-light-4"
+      }`}
+    >
+      <h2 className={`${action === "home" ? "hidden p-0" : ""} font-bold ml-5 text-lg`}>
         Comments
       </h2>
-      {action === 'home' && comments.length > 0 && (
-        <Button
-          type="button"
+      {action === "home" && comments.length > 0 && (
+        <a
           onClick={toggleComments}
-          className={`mt-2 text-sm font-semibold text-gray-500 hover:text-gray-800 focus:outline-none ${
-            showComments ? 'hidden' : ''
+          className={`mt-2 text-sm font-semibold text-gray-500 hover:text-gray-800 hover:cursor-pointer focus:outline-none ${
+            showComments ? "hidden" : ""
           }`}
         >
           Show Comments
-        </Button>
+        </a>
       )}
 
       <div
-        className={`mt-2 overflow-y-auto  ${
-          action === 'detail' ? 'pt-5 lg:h-96' : ''
+        className={`mt-2 flex flex-col-reverse max-h-[500px]  overflow-y-auto  ${
+          action === "detail" ? "py-5 h-full" : ""
         }`}
       >
-        {displayedComments.map((comment, index) => (
-          <CommentCard
-            key={comment.id}
-            comment={comment}
-            index={index}
-            openStates={openStates}
-            setOpenStates={setOpenStates}
-            handleOptionSelect={handleOptionSelect}
-          />
-        ))}
+        <div>
+          {displayedComments.map((comment, index) => (
+            <CommentCard
+              key={comment.id}
+              comment={comment}
+              index={index}
+              openStates={openStates}
+              setOpenStates={setOpenStates}
+              handleOptionSelect={handleOptionSelect}
+            />
+          ))}
+        </div>
       </div>
-      <div className="flex gap-3 items-center w-full">
+      <div className="flex gap-3 items-center w-full ">
         <img
           src={
             isLoading
-              ? '/assets/icons/profile-placeholder.svg'
-              : user.imageUrl || '/assets/icons/profile-placeholder.svg'
+              ? "/assets/icons/profile-placeholder.svg"
+              : user.imageUrl || "/assets/icons/profile-placeholder.svg"
           }
           alt="profile picture"
           className="h-12 w-12 rounded-full bg-cover"
         />
-        <div className="flex w-full">
+        <div className="flex w-full py-2 ">
           <>
             <Input
               type="text"
               placeholder="Add a comment"
-              className="w-full border-b-2 border-slate-950"
+              className="w-full border border-white border-b-2 bg-gray-100 border-b-slate-950"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
             />
-            <Button type="button" onClick={handleCommentSubmit}>
-              <img
-                src="/assets/icons/send.svg"
-                width={20}
-                height={20}
-                alt="send"
-              />
+            <Button
+              type="button"
+              className="bg-white hover:bg-white hover:scale-125 transition ease-in-out delay-150"
+              onClick={handleCommentSubmit}
+            >
+              <img src="/assets/icons/send.svg" width={20} height={20} alt="send" />
             </Button>
           </>
         </div>

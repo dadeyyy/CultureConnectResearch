@@ -261,7 +261,7 @@ const Calendar = () => {
   return (
     <div className="calendar_details-container">
       <div className="w-full h-full flex lg:flex-row xs:flex-row">
-        <div className="w-[300px] py-12 pl-5 border-r-2 border-gray pr-3">
+        <div className="w-[300px] py-12 pl-5 border-r-2 border-gray pr-3 bg-red-50">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -305,7 +305,7 @@ const Calendar = () => {
               </Command>
             </PopoverContent>
           </Popover>
-          <div className="max-h-full overflow-auto ">
+          <div className="max-h-full overflow-auto border border-t-black border-red-50 ">
             <h2 className="font-bold text-xl mb-5 text-center">Events List</h2>
             <ul>
               {currentEvents.map((event) => (
@@ -420,9 +420,9 @@ const Calendar = () => {
         </Dialog>
 
         <Dialog open={openModalDetails} onOpenChange={setOpenModalDetails}>
-          <DialogContent className="sm:max-w-[1024px] h-3/4 bg-white border-4 border border-slate-500 ">
+          <DialogContent className="sm:max-w-[1024px] h-3/4 bg-white border-2 border-slate-500 ">
             <DialogHeader>
-              <DialogTitle className="text-2xl mx-10">Event Details</DialogTitle>
+              <DialogTitle className="text-2xl text-center">Event Details</DialogTitle>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-3 ">
               <div className="flex flex-col gap-5">
@@ -449,129 +449,6 @@ const Calendar = () => {
                   </Label>
                 </div>
                 <div className="flex flex-col gap-1">
-                  {/* <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        className={`bg-blue-200 ${
-                          user.role === 'ADMIN' ? '' : 'hidden'
-                        }`}
-                      >
-                        Edit
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px] bg-white">
-                      <Form {...form}>
-                        <form
-                          onSubmit={form.handleSubmit(onEdit)}
-                          className="space-y-6"
-                        >
-                          <DialogHeader>
-                            <DialogTitle>Update event</DialogTitle>
-                            <DialogDescription>
-                              Enter event details below:
-                            </DialogDescription>
-                          </DialogHeader>
-                          <FormField
-                            control={form.control}
-                            name="province"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-col">
-                                <FormLabel>Province</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="text"
-                                    readOnly
-                                    value={selectedProvince?.toString()}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="municipality"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Municipality</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="text"
-                                    placeholder="Enter Municipality"
-                                    className="col-span-3"
-                                    value={form.getValues('municipality') || calendarDetails?.municipality || '' }
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="title"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Title</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="text"
-                                    placeholder="Enter Title"
-                                    className="col-span-3"
-                                    value={form.getValues('title') || calendarDetails?.title || '' }
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="details"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Details</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="text"
-                                    placeholder="Enter Details"
-                                    className="col-span-3"
-                                    value={form.getValues('details') || calendarDetails?.details || '' }
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="date"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Date</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="text"
-                                    readOnly
-                                    value={calendarDetails?.date}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <DialogFooter>
-                            <Button type="submit">Save changes</Button>
-                          </DialogFooter>
-                        </form>
-                      </Form>
-                    </DialogContent>
-                  </Dialog> */}
                   <Button
                     className={`bg-red-500 ${user.role === "ADMIN" ? "" : "hidden"}`}
                     onClick={handleDeleteClick}
@@ -601,12 +478,18 @@ const Calendar = () => {
             </div>
           </DialogContent>
         </Dialog>
-        <div className="w-full p-5 py-10">
+        <div className="w-full p-5 py-10 bg-blue-50">
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
-            selectable={user.role === "USER" ? false : true}
-            editable={user.role === "USER" ? false : true}
+            selectable={
+              user.role === "ADMIN" &&
+              user.province?.toLowerCase() === selectedProvince.toLowerCase()
+            }
+            editable={
+              user.role === "ADMIN" &&
+              user.province?.toLowerCase() === selectedProvince.toLowerCase()
+            }
             locales={allLocales}
             locale="en"
             events={INITIAL_EVENTS}

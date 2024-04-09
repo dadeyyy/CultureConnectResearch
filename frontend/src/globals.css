@@ -97,10 +97,11 @@
     width: 3px;
     height: 3px;
     border-radius: 2px;
+    background-color: skyblue;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: #09090a;
+    background-color: rgb(2, 116, 161);
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -142,9 +143,13 @@
     @apply h-12 bg-light-4 border-none placeholder:text-light-4 focus-visible:ring-0 focus-visible:ring-offset-0 ring-offset-0 !important;
   }
 
+  /* Report */
+  .report-container {
+    @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-7 px-5 md:px-8 lg:p-10 custom-scrollbar;
+  }
   /* Home */
   .home-container {
-    @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar;
+    @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-10 custom-scrollbar;
   }
 
   .home-posts {
@@ -152,7 +157,7 @@
   }
 
   .home-creators {
-    @apply hidden xl:flex flex-col w-72 2xl:w-465 px-6 py-10 gap-10  overflow-scroll custom-scrollbar;
+    @apply hidden xl:flex flex-col w-72 2xl:w-465 px-6 py-5 gap-10  overflow-scroll custom-scrollbar;
   }
 
   /* Post Details */
@@ -161,15 +166,15 @@
   }
 
   .post_details-card {
-    @apply bg-light-2 w-full max-w-5xl rounded-[30px] flex-col flex xl:grid xl:grid-cols-2 border border-light-4 xl:rounded-l-[24px];
+    @apply lg:bg-light-2 w-full max-w-5xl lg:w-full rounded-[30px] flex-col flex xl:grid xl:grid-cols-2 border lg:border-light-4 xl:rounded-l-[24px];
   }
 
   .post_details-img {
-    @apply h-80 lg:h-[480px] xl:w-[48%] rounded-t-[30px] xl:rounded-l-[24px] xl:rounded-tr-none object-cover p-5 bg-light-1;
+    @apply h-80 lg:h-[480px] xl:w-[48%] rounded-t-[30px] xl:rounded-l-[24px] xl:rounded-tr-none object-cover p-5 lg:bg-light-1;
   }
 
   .post_details-info {
-    @apply bg-light-2 flex flex-col gap-5 lg:gap-7 flex-1 items-start p-2 rounded-[30px];
+    @apply lg:bg-light-2 flex flex-col gap-5 lg:gap-7 flex-1 items-start p-2 rounded-[30px];
   }
 
   .post_details-delete_btn {
@@ -178,7 +183,7 @@
 
   /* Profile */
   .profile-container {
-    @apply flex flex-col items-center flex-1 gap-10 overflow-scroll py-10 px-5 md:p-14 custom-scrollbar;
+    @apply flex flex-col items-center flex-1 gap-10 overflow-scroll py-10 px-5 md:p-14 custom-scrollbar bg-red-200;
   }
 
   .profile-inner_container {
@@ -227,7 +232,7 @@
 
   /* Left sidebar */
   .leftsidebar {
-    @apply hidden md:flex px-6 py-5 flex-col justify-between min-w-[270px] bg-light-2;
+    @apply hidden md:flex px-5 py-2 flex-col justify-between min-w-[250px] bg-light-2;
   }
 
   .leftsidebar-create {
@@ -240,11 +245,11 @@
 
   /* Post Card */
   .post-card {
-    @apply bg-light-2 rounded-3xl border border-light-4 p-5 lg:p-7 w-full max-w-screen-sm;
+    @apply bg-white rounded-xl border border-dark-4 p-5 lg:p-7 w-full max-w-screen-sm;
   }
 
   .post-comments {
-    @apply bg-light-2 rounded-3xl p-5 lg:p-7 w-full max-w-screen-sm;
+    @apply lg:py-5 w-full;
   }
 
   .post-card_img {
@@ -382,21 +387,8 @@
   height: 400px;
 }
 
-.sidebar {
-  background-color: rgb(35 55 75 / 90%);
-  color: #fff;
-  padding: 6px 12px;
-  font-family: monospace;
-  z-index: 1;
-  position: absolute;
-  top: 25;
-  left: 25;
-  margin: 12px;
-  border-radius: 4px;
-}
-
 .archive-container {
-  @apply grid lg:grid-cols-4 xs:grid-cols-2 sm:grid-cols-3 gap-5 bg-white p-5;
+  @apply grid xl:grid-cols-5 lg:grid-cols-4 xs:grid-cols-2 sm:grid-cols-3 gap-5 bg-white p-5;
 }
 
 .archive-province-container {
@@ -416,5 +408,37 @@
 }
 
 .button-back {
-  @apply border-2 border-red-200 hover:border-black ease-in-out duration-300 rounded-lg p-2;
+  @apply border-2  border-red-200 hover:border-black ease-in-out duration-300 rounded-lg p-2;
+}
+
+.marker {
+  background-size: cover;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.sidebar {
+  background-color: rgb(35 55 75 / 90%);
+  color: #fff;
+  padding: 6px 12px;
+  font-family: monospace;
+  z-index: 1;
+  position: absolute;
+  top: 65px;
+  left: 25;
+  margin: 12px;
+  border-radius: 4px;
+  @apply top-8;
+}
+
+.sidebar-1 {
+  color: #fff;
+  font-family: monospace;
+  z-index: 1;
+  position: absolute;
+  margin: 12px;
+  border-radius: 4px;
+  @apply grid grid-cols-3 top-5 left-0;
 }

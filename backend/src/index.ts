@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
@@ -12,8 +13,24 @@ import calendarRoute from './router/calendarRoute.js';
 import algoRoute from './router/algoRoute.js';
 import archiveRoute from './router/archive.js';
 import liveStreamRoute from './router/liveStream.js';
+=======
+import * as dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import session from "express-session";
+import morgan from "morgan";
+import authRouter from "./router/authRoute.js";
+import postRoute from "./router/postRoute.js";
+import userRoute from "./router/userRoute.js";
+import commentRoute from "./router/commentRoute.js";
+import likeRoute from "./router/likeRoute.js";
+import calendarRoute from "./router/calendarRoute.js";
+import algoRoute from "./router/algoRoute.js";
+import archiveRoute from "./router/archive.js";
+import followRouter from "./router/followRoute.js";
+>>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
 
@@ -24,7 +41,7 @@ if (!process.env.PORT) {
   process.exit(1);
 }
 
-declare module 'express-session' {
+declare module "express-session" {
   interface SessionData {
     user: {
       id: number;
@@ -38,7 +55,7 @@ declare module 'express-session' {
 app.use(express.json());
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Specify the origin of your frontend
+    origin: "http://localhost:5173", // Specify the origin of your frontend
     credentials: true, // Enable credentials (including cookies)
   })
 );
@@ -51,14 +68,15 @@ app.use(
     cookie: {
       maxAge: 3600000, // 1 hour
       secure: false, // Set to true if using HTTPS
-      sameSite: 'lax',
+      sameSite: "lax",
     },
   })
 );
 
-app.use(morgan('tiny'));
+app.use(morgan("tiny"));
 
 //Routers
+<<<<<<< HEAD
 app.use('/', authRouter);
 app.use('/', postRoute);
 app.use('/', userRoute);
@@ -68,6 +86,17 @@ app.use('/', calendarRoute);
 app.use('/', algoRoute);
 app.use('/', archiveRoute);
 app.use('/', liveStreamRoute)
+=======
+app.use("/", authRouter);
+app.use("/", postRoute);
+app.use("/", userRoute);
+app.use("/", commentRoute);
+app.use("/", likeRoute);
+app.use("/", calendarRoute);
+app.use("/", algoRoute);
+app.use("/", archiveRoute);
+app.use("/", followRouter);
+>>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
 
 app.listen(PORT, () => {
   console.log(`LISTENING ON PORT ${PORT}`);
