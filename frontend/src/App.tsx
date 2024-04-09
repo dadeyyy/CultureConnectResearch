@@ -5,7 +5,7 @@ import LoginForm from "./_auth/forms/LoginForm";
 import RegisterForm from "./_auth/forms/RegisterForm";
 import RootLayout from "./_root/RootLayout";
 import { LandingPage } from "./_root/pages";
-import Explore from "./_root/pages/Explore";
+import Archives from "./_root/pages/Archives";
 import MapForm from "./_root/pages/MapForm";
 import LiveStream from "./_root/pages/LiveStream";
 import ForYou from "./_root/pages/ForYou";
@@ -20,6 +20,7 @@ import { Toaster } from "react-hot-toast";
 import ArchiveProvince from "./_root/pages/ArchiveProvince";
 import ArchiveDetails from "./components/shared/ArchiveDetails";
 import Reports from "./_root/pages/Reports";
+import Explore from "./_root/pages/Explore";
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
         <Route element={<RootLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/archives" element={<Archives />} />
           <Route path="/map" element={<MapForm />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/reports" element={<Reports />} />
@@ -47,8 +49,8 @@ const App = () => {
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
-          <Route path="/explore/:province" element={<ArchiveProvince />} />
-          <Route path="/explore/:province/archive/:id" element={<ArchiveDetails />} />
+          <Route path="/archives/:province" element={<ArchiveProvince />} />
+          <Route path="/archives/:province/:id" element={<ArchiveDetails />} />
         </Route>
       </Routes>
 

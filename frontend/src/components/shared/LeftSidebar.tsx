@@ -23,10 +23,16 @@ const LeftSidebar = () => {
       route: "/home",
       label: "Home",
     },
+    // {
+    //   imgURL: "/assets/icons/for-you.svg",
+    //   route: "/for-you",
+    //   label: "For You",
+    // },
+
     {
-      imgURL: "/assets/icons/for-you.svg",
-      route: "/for-you",
-      label: "For You",
+      imgURL: "/assets/icons/explore.svg",
+      route: "/Explore",
+      label: "Explore",
     },
     user.role === "ADMIN"
       ? {
@@ -36,9 +42,9 @@ const LeftSidebar = () => {
         }
       : null,
     {
-      imgURL: "/assets/icons/explore.svg",
-      route: "/explore",
-      label: "Explore",
+      imgURL: "/assets/icons/archive-icon.svg",
+      route: "/archives",
+      label: "Archives",
     },
     {
       imgURL: "/assets/icons/map.svg",
@@ -66,6 +72,7 @@ const LeftSidebar = () => {
     },
   ].filter(Boolean);
 
+  console.log(user.imageUrl);
   const handleLogout = async () => {
     const response = await fetch("http://localhost:8000/logout", {
       method: "POST",
@@ -97,9 +104,19 @@ const LeftSidebar = () => {
                 >
                   <NavLink
                     to={link.route}
-                    className={`flex gap-4 items-center p-3 ${isCreate ? "text-sm" : ""}`}
+                    className={`flex gap-4 items-center ${
+                      link.label === "Profile" ? "p-2" : "p-3"
+                    } ${isCreate ? "text-sm" : ""}`}
                   >
-                    {!isCreate && <img src={link.imgURL} alt={link.label} className="h-4 w-4" />}
+                    {!isCreate && (
+                      <img
+                        src={link.imgURL}
+                        alt={link.label}
+                        className={`h-5 w-5 ${
+                          link.label === "Profile" ? "h-7 w-7 rounded-full" : ""
+                        }`}
+                      />
+                    )}
                     {link.label}
                   </NavLink>
                 </div>

@@ -65,3 +65,32 @@ export const multiFormatDateString = (timestamp: string = ""): string => {
       return "Just now";
   }
 };
+
+export type IPost = {
+  id: number;
+  caption: string;
+  createdAt: string;
+  municipality: string;
+  photos: {
+    id: number;
+    url: string;
+    filename: string;
+    postId: number;
+  }[];
+  province: string;
+  updatedAt: string;
+  user: {
+    avatarUrl: string | null;
+    bio: string | null;
+    createdAt: string;
+    email: string;
+    firstName: string;
+    id: number;
+    lastName: string;
+    password: string;
+    role: string;
+    updatedAt: string;
+    username: string;
+  };
+  userId: number;
+};

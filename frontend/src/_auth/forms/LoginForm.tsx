@@ -42,7 +42,7 @@ const LoginForm = () => {
           lastName: user.lastName,
           username: user.username,
           email: user.email,
-          imageUrl: "",
+          imageUrl: user.imageUrl,
           bio: "Bio means life",
           role: user.role,
           province: user.province,

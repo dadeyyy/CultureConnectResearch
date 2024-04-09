@@ -9,6 +9,15 @@ import Loader from "@/components/shared/Loader";
 import { useUserContext } from "@/context/AuthContext";
 import { useMediaQuery } from "@react-hook/media-query";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
 interface ArchiveProps {
   description: string;
   files: string[];
@@ -107,18 +116,110 @@ const ArchiveProvince = () => {
           <Loader />
         </div>
       ) : (
-        <div className="archive-province-container">
-          {archives.map((archive) => (
-            <ArchiveComponent
-              key={archive.id}
-              description={archive.description}
-              files={archive.files}
-              id={archive.id}
-              municipality={archive.municipality}
-              title={archive.title}
-              province={province}
-            />
-          ))}
+        <div className="bg-red w-full">
+          <Breadcrumb className="px-5 py-2">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink>
+                  <BreadcrumbLink href="/archives">Archives</BreadcrumbLink>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink>
+                  <BreadcrumbLink href={`/archives/${province}`}>{province}</BreadcrumbLink>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Category</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className=" w-full grid grid-cols-2 gap-10 px-5">
+            <div className="h-[500px] flex flex-col p-5">
+              <span className="border border-transparent border-b-gray-400 text-2xl">
+                Archive Categories
+              </span>
+              <hr className="border-2 w-1/3 border-blue-400 rounded-" />
+              <div className="p-2">
+                <ul className="text-lg">
+                  <li className="flex flex-row">
+                    <img src={"/assets/icons/chevron-right.svg"} width={25} />
+                    <span>Historical Documents (7)</span>
+                  </li>
+                  <li className="flex flex-row">
+                    <img src={"/assets/icons/chevron-right.svg"} width={25} />
+                    <span>Pictures of artifacts, monuments, and buildings (2)</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="h-[500px]  flex flex-col p-5">
+              <span className="border border-transparent border-b-gray-400 text-2xl">
+                Recently Added
+              </span>
+              <hr className="border-2 w-1/3 border-blue-400 rounded-" />
+              <div className="p-2">
+                <ul>
+                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
+                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
+                    <span className="text-base">
+                      <p>
+                        What Disasters Can Teach Us About Good System Design and problematic child
+                      </p>
+                    </span>
+                  </li>
+                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
+                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
+                    <span className="text-base">
+                      <p>
+                        What Disasters Can Teach Us About Good System Design and problematic child
+                      </p>
+                    </span>
+                  </li>
+                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
+                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
+                    <span className="text-base">
+                      <p>
+                        What Disasters Can Teach Us About Good System Design and problematic child
+                      </p>
+                    </span>
+                  </li>
+                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
+                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
+                    <span className="text-base">
+                      <p>
+                        What Disasters Can Teach Us About Good System Design and problematic child
+                      </p>
+                    </span>
+                  </li>
+                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
+                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
+                    <span className="text-base">
+                      <p>
+                        What Disasters Can Teach Us About Good System Design and problematic child
+                      </p>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* <div className="archive-province-container">
+            {archives.map((archive) => (
+              <ArchiveComponent
+                key={archive.id}
+                description={archive.description}
+                files={archive.files}
+                id={archive.id}
+                municipality={archive.municipality}
+                title={archive.title}
+                province={province}
+              />
+            ))}
+          </div> */}
         </div>
       )}
     </div>

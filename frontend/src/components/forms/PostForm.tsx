@@ -157,7 +157,7 @@ const PostForm = ({ action }: PostFormProps) => {
       formData.append("caption", values.caption);
       formData.append("province", values.province);
       formData.append("municipality", values.municipality);
-      formData.append("image", values.image )
+      // formData.append("image", values.image )
       if (values.image) {
         values.image.forEach((file) => {
           formData.append(`image`, file);

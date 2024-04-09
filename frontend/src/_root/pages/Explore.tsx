@@ -1,66 +1,20 @@
-import React, { useState } from "react";
-import { provincesWithImage } from "@/lib/provinces";
-import ProvinceCard from "@/components/shared/ProvinceCard";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-const formSchema = z.object({
-  title: z.string().min(0, {
-    message: "You cannot create a post without a caption.",
-  }),
-  description: z.string({
-    required_error: "Please select a province.",
-  }),
-  province: z.string({
-    required_error: "Please select a province.",
-  }),
-  municipality: z.string({
-    required_error: "Please select a municipal.",
-  }),
-  image: z.custom<File[]>(),
-});
-
-interface ExploreProps {
-  title: string;
-  description: string;
-  province: string;
-  municipality: string;
-  photos?: string;
-}
-
 const Explore = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      province: "",
-      municipality: "",
-    },
-  });
-
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Your form submission logic here
-  };
-
-  const handleProvinceChange = (provinceValue: string) => {
-    setSelectedProvince(provinceValue);
-  };
-
   return (
-    <div className="w-full flex flex-col">
-      <div className="p-5">
-        <h2 className="font-bold lg:text-2xl xs:text-xl">Provinces of the Philippines Archives</h2>
+    <div className="flex flex-1 overflow-y-scroll custom-scrollbar">
+      <div className="home-container bg-red-200">
+        <div className="w-full flex flex-col items-center relative">
+          <div className="explore-header h-20"></div>
+        </div>
       </div>
-      {/* <div className="p-5 overflow-y-scroll flex flex-wrap justify-start gap-5"> */}
-      <div className="archive-container overflow-auto ">
-        {provincesWithImage.map((province, index) => (
-          <ProvinceCard key={index} province={province} />
-        ))}
+      <div className="home-creators">
+        <span className="text-sm">
+          <span className="hover:underline cursor-pointer m-1">Terms of Service</span>
+          <span className="hover:underline cursor-pointer m-1">Privacy Policy</span>
+          <span className="hover:underline cursor-pointer m-1"> About</span>
+          <div>
+            <span className="m-1">© 2024 CultureConnect.</span>
+          </div>
+        </span>
       </div>
     </div>
   );

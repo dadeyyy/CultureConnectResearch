@@ -28,6 +28,10 @@ userRoute.get("/user/:userId", async (req, res) => {
                     lastName: user.lastName,
                     username: user.username,
                     email: user.email,
+                    role: user.role,
+                    province: user.province,
+                    imageUrl: user.avatarUrl,
+                    bio: user.bio,
                 },
             });
         }

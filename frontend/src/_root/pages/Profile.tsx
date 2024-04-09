@@ -13,7 +13,7 @@ interface StabBlockProps {
 }
 
 interface userProfile {
-  avatarUrl: string | null;
+  imageUrl: string | null;
   bio: string | null;
   createdAt: string;
   email: string;
@@ -82,7 +82,7 @@ const Profile = () => {
       try {
         const response = await fetch(`http://localhost:8000/user/${id}`);
         const data = await response.json();
-
+        console.log(data);
         if (response.ok) {
           setCurrentUser((prevUser) => ({
             ...prevUser,
@@ -148,7 +148,7 @@ const Profile = () => {
 
   const handleUnfollow = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/unfollow/${user.id}`, {
+      const response = await fetch(`http://localhost:8000/unfollow/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -167,14 +167,12 @@ const Profile = () => {
     }
   };
 
-  console.log(currentUser);
-
   return (
     <div className="profile-container">
       <div className="profile-inner_container bg-red-300">
         <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7 p-5">
           <img
-            src={currentUser.avatarUrl || "/assets/icons/profile-placeholder.svg"}
+            src={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
             alt="profile"
             className="w-28 h-28 lg:h-40 lg:w-40 object-cover rounded-full"
           />

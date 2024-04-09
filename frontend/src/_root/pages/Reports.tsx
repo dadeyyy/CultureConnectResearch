@@ -14,7 +14,7 @@ import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 
 interface ReportsProps {
-  post: PostProps; // Define the type of the post prop
+  post: PostProps;
 }
 
 interface PostProps {
@@ -46,7 +46,7 @@ interface PostProps {
   reportReasonCounts: { [reason: string]: number };
 }
 
-const Reports = ({ post }: ReportsProps) => {
+const Reports = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
   const [reportedPosts, setReportedPosts] = useState<PostProps[]>([]);
