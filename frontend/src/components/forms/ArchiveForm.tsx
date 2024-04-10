@@ -40,6 +40,7 @@ interface ArchiveFormProps {
       url: string;
       filename: string;
     }[];
+    category: string;
   };
 }
 
@@ -53,6 +54,7 @@ const formSchema = z.object({
   municipality: z.string({
     required_error: "Please select a municipal.",
   }),
+  category: z.string({ required_error: "category is required" }),
   archive: z.custom<File[]>(),
   deletedFiles: z.array(z.string()).optional(),
 });
@@ -67,6 +69,7 @@ type Archive = {
     url: string;
     filename: string;
   }[];
+  category: string;
   province: string;
   updatedAt: string;
 };
@@ -93,6 +96,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
       title: archiveData?.title || "", // Provide default value for title
       description: archiveData?.description || "", // Provide default value for description
       municipality: archiveData?.municipality || "", // Provide default value for municipality
+      category: archiveData?.category || "",
     },
   });
 
@@ -115,6 +119,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
         formData.append("province", provinceData);
       }
       formData.append("municipality", values.municipality);
+      formData.append("category", values.category);
 
       if (values.archive) {
         values.archive.forEach((file) => {
@@ -298,6 +303,29 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                           />
                         </div>
                       )}
+                    </div>
+                    <div className="flex flex-col space-y-1.5">
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Category</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a verified email to display" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="document">Historical Document</SelectItem>
+                                <SelectItem value="artifacts">Artifacts</SelectItem>
+                                <SelectItem value="monuments">Monuments and buildings</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
                 </CardContent>

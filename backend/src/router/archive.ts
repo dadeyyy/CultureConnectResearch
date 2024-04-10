@@ -55,6 +55,7 @@ archiveRoute.get("/archive/:province/:archiveId", isAuthenticated, async (req, r
         url: file.url,
         filename: file.filename,
       })),
+      category: archive.category,
     };
 
     res.status(200).json({ data: extractedData });
@@ -279,6 +280,52 @@ archiveRoute.get("/archives", isAuthenticated, async (req, res) => {
   }
 
   return res.status(404).json({ error: "No locations found!" });
+});
+
+//document-archives
+archiveRoute.get("/archives/:category", isAuthenticated, async (req, res) => {
+  const category = req.params.category;
+  const archives = await db.archive.findMany({
+    where: {
+      category: category,
+    },
+  });
+
+  if (archives) {
+    return res.status(200).json(archives);
+  }
+
+  return res.status(404).json({ error: "No locations found!" });
+});
+
+//document-count
+archiveRoute.get("/archive-count/:province", async (req, res) => {
+  try {
+    const province = req.params.province;
+    const documentCount = await db.archive.count({
+      where: {
+        category: "document",
+        province: province,
+      },
+    });
+    const artifactCount = await db.archive.count({
+      where: {
+        category: "artifact",
+        province: province,
+      },
+    });
+    const monumentCount = await db.archive.count({
+      where: {
+        category: "monument",
+        province: province,
+      },
+    });
+
+    res.status(200).json({ documentCount, artifactCount, monumentCount });
+  } catch (error) {
+    console.error("Error fetching document count:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // archiveRoute.delete('/archive/', async (req,res)=>{

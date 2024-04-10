@@ -51,6 +51,7 @@ export const archiveSchema = z.object({
   title: z.string({ required_error: "title is required" }),
   description: z.string({ required_error: "description is required" }),
   municipality: z.string({ required_error: "municipality is required" }),
+  category: z.string({ required_error: "category is required" }),
   deletedFiles: z.array(z.string()).optional(),
 });
 

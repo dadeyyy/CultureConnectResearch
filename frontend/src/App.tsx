@@ -21,6 +21,7 @@ import ArchiveProvince from "./_root/pages/ArchiveProvince";
 import ArchiveDetails from "./components/shared/ArchiveDetails";
 import Reports from "./_root/pages/Reports";
 import Explore from "./_root/pages/Explore";
+import ArchiveCategory from "./_root/pages/ArchiveCategory";
 
 const App = () => {
   return (
@@ -50,6 +51,7 @@ const App = () => {
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
           <Route path="/archives/:province" element={<ArchiveProvince />} />
+          <Route path="/archives/:province/:category" element={<ArchiveCategory />} />
           <Route path="/archives/:province/:id" element={<ArchiveDetails />} />
         </Route>
       </Routes>
