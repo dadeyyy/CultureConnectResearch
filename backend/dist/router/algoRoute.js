@@ -1,9 +1,9 @@
-import express from 'express';
-import { db } from '../utils/db.server.js';
-import { isAuthenticated } from '../middleware/middleware.js';
-import { mostLikedProvince } from '../utils/mostLikedProvince.js';
+import express from "express";
+import { db } from "../utils/db.server.js";
+import { isAuthenticated } from "../middleware/middleware.js";
+import { mostLikedProvince } from "../utils/mostLikedProvince.js";
 const algoRoute = express.Router();
-algoRoute.get('/algorithm', isAuthenticated, async (req, res) => {
+algoRoute.get("/algorithm", isAuthenticated, async (req, res) => {
     try {
         const currentUser = req.session.user?.id;
         // Find user
@@ -16,19 +16,19 @@ algoRoute.get('/algorithm', isAuthenticated, async (req, res) => {
             },
         });
         if (!userLikes) {
-            // If user data is not found, send a 404 Not Found response
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: "User not found" });
         }
         // Get all postId
         const userLikesId = userLikes.likes.map((userLike) => userLike.postId);
-        if (userLikesId.length === 0) {
-            // If the user has no liked posts, send a 204 No Content response
-            return res.status(204).json({ message: 'No liked posts found for the user' });
+        // Filter out null values from userLikesId
+        const filteredUserLikesId = userLikesId.filter((id) => id !== null);
+        if (filteredUserLikesId.length === 0) {
+            return res.status(204).json({ message: "No liked posts found for the user" });
         }
         const userPostProvinces = await db.post.findMany({
             where: {
                 id: {
-                    in: userLikesId,
+                    in: filteredUserLikesId,
                 },
             },
         });
@@ -40,28 +40,28 @@ algoRoute.get('/algorithm', isAuthenticated, async (req, res) => {
                     in: mostLikedProvinces.mostOccurringElements,
                 },
                 id: {
-                    notIn: userLikesId,
+                    notIn: filteredUserLikesId,
                 },
                 userId: {
-                    not: currentUser
-                }
+                    not: currentUser,
+                },
             },
             orderBy: {
                 likes: {
-                    _count: 'desc',
+                    _count: "desc",
                 },
             },
             take: 10,
             include: {
                 user: true,
-                photos: true
-            }
+                photos: true,
+            },
         });
         res.status(200).json(suggestedPosts);
     }
     catch (error) {
-        console.error('Error in algorithm route:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error("Error in algorithm route:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 export default algoRoute;

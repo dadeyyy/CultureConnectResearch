@@ -34,9 +34,10 @@ model User {
   comments    Comment[]
   reports     Report[]
   archives Archive[]
-  interest String[]
   followers    Followers[] @relation("UserFollowers")
   following    Followers[] @relation("UserFollowing")
+  sharedPosts SharedPost[]
+  interest String[]
 }
 
 
@@ -75,7 +76,23 @@ model Post {
   likes       Like[]
   comments    Comment[]
   reports     Report[]
+  sharedPost  SharedPost?
 }
+
+
+
+model SharedPost {
+  id          Int      @id @default(autoincrement())
+  caption     String
+  postId      Int      @unique
+  userId      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  post        Post     @relation(fields: [postId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
+
 
 model Archive {
   id Int @id @default(autoincrement())
@@ -85,6 +102,7 @@ model Archive {
   municipality String
   location Json
   files Files[]
+  category String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId Int?
@@ -137,11 +155,12 @@ model ExplorePhotos {
 
 model Like {
   id        Int      @id @default(autoincrement())
-  postId    Int
+  postId    Int?
+  sharedId  Int?
   userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -162,7 +181,9 @@ model Calendar {
   municipality String @default("Balanga")
   details   String
   location Json
-  date DateTime 
+  startDate DateTime
+  endDate   DateTime?
+  repeat    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   provinceId String
