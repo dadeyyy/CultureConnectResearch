@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 
 interface ArchiveProps {
+category: string;
   description: string;
   files: string[];
   id: number;
@@ -23,7 +24,7 @@ interface ArchiveProps {
 }
 
 const ArchiveCategory = () => {
-  const { province } = useParams<{ province: string }>();
+  const { province } = useParams<{ province: string}>();
   const [archives, setArchives] = useState<ArchiveProps[]>([]);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
   const [loading, isLoading] = useState(true);
@@ -114,8 +115,7 @@ const ArchiveCategory = () => {
             {archives.map((archive) => (
               <ArchiveComponent
                 key={archive.id}
-                description={archive.description}
-                files={archive.files}
+                category={archive.category}
                 id={archive.id}
                 municipality={archive.municipality}
                 title={archive.title}

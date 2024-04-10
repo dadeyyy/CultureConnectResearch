@@ -34,11 +34,13 @@ model User {
   comments    Comment[]
   reports     Report[]
   archives Archive[]
-  
   followers    Followers[] @relation("UserFollowers")
   following    Followers[] @relation("UserFollowing")
   sharedPosts SharedPost[]
+  interest String[]
 }
+
+
 
  model Followers {
    id           Int      @id @default(autoincrement())
@@ -76,6 +78,8 @@ model Post {
   reports     Report[]
   sharedPost  SharedPost?
 }
+
+
 
 model SharedPost {
   id          Int      @id @default(autoincrement())

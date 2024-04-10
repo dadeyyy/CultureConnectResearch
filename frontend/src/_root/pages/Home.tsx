@@ -47,7 +47,7 @@ const Home = () => {
   useEffect(() => {
     setPostData([]);
     setIsPostLoading(true);
-    fetchPosts(10, 0);
+    fetchPosts(3, 0);
   }, [selectedSection]);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const Home = () => {
       (entries) => {
         if (entries[0].isIntersecting && !isPostLoading && !error) {
           setIsLoadingMore(true);
-          fetchPosts(10, postData.length); // Fetch more posts when scrolling to the end
+          fetchPosts(3, postData.length); // Fetch more posts when scrolling to the end
         }
       },
       { threshold: 1 }

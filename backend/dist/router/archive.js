@@ -64,6 +64,7 @@ archiveRoute.get("/archive/:province", isAuthenticated, async (req, res) => {
                 id: item.id,
                 title: item.title,
                 description: item.description,
+                category: item.category,
                 province: item.province,
                 municipality: item.municipality,
                 files: item.files.map((file) => ({

@@ -52,7 +52,7 @@ const App = () => {
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
           <Route path="/archives/:province" element={<ArchiveProvince />} />
           <Route path="/archives/:province/:category" element={<ArchiveCategory />} />
-          <Route path="/archives/:province/:id" element={<ArchiveDetails />} />
+          <Route path="/archives/:province/:category/:id" element={<ArchiveDetails />} />
         </Route>
       </Routes>
 

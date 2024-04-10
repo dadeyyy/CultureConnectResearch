@@ -27,6 +27,16 @@ import FormControl from "@mui/material/FormControl";
 import { DateSelectArg, EventApi, EventClickArg, EventInput } from "@fullcalendar/core/index.js";
 import rrulePlugin from "@fullcalendar/rrule";
 import CalendarForm from "@/components/forms/CalendarForm";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
@@ -185,7 +195,7 @@ const Calendar = () => {
 
   return (
     <div className="calendar_details-container">
-      <div className="w-full h-full flex lg:flex-row xs:flex-row">
+      <div className="w-full h-full flex lg:flex-row xs:flex-row ">
         <div className="w-[300px] pb-12 pt-8 pl-5 border-r-2 border-gray pr-3 bg-red-50">
           <FormControl fullWidth>
             <InputLabel id="label">Province</InputLabel>
@@ -227,12 +237,12 @@ const Calendar = () => {
             </ul>
           </div>
         </div>
-        <Dialog open={openModalDetails} onOpenChange={setOpenModalDetails}>
-          <DialogContent className="sm:max-w-[1024px] h-3/4 bg-white border-2 border-slate-500 ">
-            <DialogHeader>
-              <DialogTitle className="text-2xl text-center">Event Details</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-3 ">
+        <Sheet open={openModalDetails} onOpenChange={setOpenModalDetails}>
+          <SheetContent className="sm:max-w-[720px] bg-white opacity-90 overflow-y-auto custom-scrollbar">
+            <SheetHeader>
+              <SheetTitle className="text-2xl text-center">Event Details</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-3 ">
               <div className="flex flex-col gap-5">
                 <div className="flex">
                   <Label className="mr-5 font-extrabold text-lg">Event Title: </Label>
@@ -240,14 +250,20 @@ const Calendar = () => {
                 </div>
                 <div className="flex">
                   <Label className="mr-5 font-extrabold text-lg">Event Details: </Label>
-                  <Label className="text-lg font-regular max-h-56 overflow-auto">
+                  <Label className="text-lg font-regular  ">
                     {calendarDetails?.details}
+                  </Label>
+                </div>
+                <div className="flex">
+                  <Label className="mr-5 font-extrabold text-lg">Event repeat: </Label>
+                  <Label className="text-lg font-regular max-h-56 overflow-auto">
+                    {calendarDetails?.repeat}
                   </Label>
                 </div>
                 <div className="flex">
                   <Label className="mr-5 font-extrabold text-lg">Event Date: </Label>
                   <Label className="text-lg font-regular">
-                    {calendarDetails?.endDate != "1970-01-01"
+                    {calendarDetails?.endDate === null
                       ? formatDateToWord(calendarDetails?.startDate)
                       : `${formatDateToWord(calendarDetails?.startDate)} to ${formatDateToWord(
                           calendarDetails?.endDate
@@ -269,16 +285,16 @@ const Calendar = () => {
                   </Button> */}
                 </div>
               </div>
-              <div className="flex flex-col pl-3">
+              <div className="flex flex-col pl-3 h-full">
                 <Label className="mr-5 font-bold text-lg">Map: </Label>
                 <ReactMapGl
                   mapLib={import("mapbox-gl")}
                   initialViewState={{
                     longitude: calendarDetails?.location.coordinates[0],
                     latitude: calendarDetails?.location.coordinates[1],
-                    zoom: 12,
+                    zoom: 13,
                   }}
-                  style={{ width: 450, height: 400 }}
+                  style={{ width: "100%", height: 550 }}
                   mapStyle="mapbox://styles/mapbox/streets-v9"
                 >
                   <Marker
@@ -288,8 +304,8 @@ const Calendar = () => {
                 </ReactMapGl>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </SheetContent>
+        </Sheet>
         <div className="w-full p-5 py-10 bg-blue-200">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
