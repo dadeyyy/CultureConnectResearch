@@ -7,7 +7,7 @@ interface Props {
 
 const ProvinceCard: React.FC<Props> = ({ province }) => {
   return (
-    <Link to={`/explore/${province.value}`}>
+    <Link to={`/archives/${province.value}`}>
       <div className="w-full h-full border rounded-lg opacity-50 relative hover:opacity-100 hover:scale-110 transition duration-300 ease-in-out">
         <img
           src={province.image}

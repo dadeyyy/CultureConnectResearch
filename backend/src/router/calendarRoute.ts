@@ -27,7 +27,7 @@ calendarRoute.get("/province/:provinceId", async (req, res) => {
       include: {
         calendars: {
           orderBy: {
-            date: "asc", // Sorting by date in ascending order
+            startDate: "asc", // Sorting by date in ascending order
           },
         },
       },
@@ -53,8 +53,10 @@ calendarRoute.post(
     try {
       const data: calendarTypeSchema = req.body;
       const { municipality, provinceId } = data;
-      const { date } = data;
-      const parsedDate = new Date(date);
+      const { startDate } = data;
+      const { endDate } = data;
+      const { repeat } = data;
+      const parsedStartDate = new Date(startDate);
 
       const geoData = await geocoder
         .forwardGeocode({
@@ -70,7 +72,9 @@ calendarRoute.post(
           ...data,
           provinceId: data.provinceId,
           location: location,
-          date: parsedDate,
+          startDate: parsedStartDate,
+          repeat: repeat,
+          endDate: endDate || null,
         },
       });
 

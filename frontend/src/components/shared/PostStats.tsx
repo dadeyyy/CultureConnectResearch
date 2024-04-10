@@ -84,6 +84,8 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
   }, [post.id, userId]);
 
   const handleLikePost = async () => {
+    setIsLiked((prevIsLiked) => !prevIsLiked);
+    setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
     try {
       const response = await fetch(`http://localhost:8000/post/${post.id}/like`, {
         method: "POST",
@@ -97,7 +99,6 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
       const data = await response.json();
       setLikeCount(data.count);
-      setIsLiked((prevIsLiked) => !prevIsLiked);
     } catch (error) {
       console.error("Error liking post:", error);
     }
@@ -135,6 +136,16 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
           <p className="small-medium lg:base-medium">{commentCount}</p>
         </div>
       </a>
+      <div className="flex flex-row gap-1 items-center cursor-pointer">
+        <img
+          src={"/assets/icons/share.svg"}
+          alt="comment"
+          width={25}
+          height={25}
+          className="cursor-pointer"
+        />
+        <p className="small-medium lg:base-medium text-center">Share</p>
+      </div>
     </div>
   );
 };

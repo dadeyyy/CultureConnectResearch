@@ -273,6 +273,7 @@ postRoute.post("/post/:postId/report", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 });
+//get reports via province e
 postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
     try {
         const province = req.params.province;
@@ -294,6 +295,46 @@ postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
     catch (error) {
         console.log(error);
         res.status(500).json({ error: "Cannot get the reported posts" });
+    }
+});
+//following posts
+postRoute.get("/following/posts", isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        // Fetch the IDs of users whom the current user follows
+        const followingIds = await db.followers.findMany({
+            where: {
+                followerId: userId,
+            },
+            select: {
+                followingId: true,
+            },
+        });
+        console.log(followingIds);
+        const followingUserIds = followingIds.map((entry) => entry.followingId);
+        console.log(followingUserIds);
+        // Fetch posts from users whom the current user follows
+        const followingPosts = await db.post.findMany({
+            where: {
+                userId: {
+                    in: followingUserIds,
+                },
+            },
+            include: {
+                photos: true,
+                user: true,
+                comments: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+        console.log(followingPosts);
+        res.status(200).json(followingPosts);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Failed to fetch following posts" });
     }
 });
 export default postRoute;

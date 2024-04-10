@@ -143,21 +143,33 @@
     @apply h-12 bg-light-4 border-none placeholder:text-light-4 focus-visible:ring-0 focus-visible:ring-offset-0 ring-offset-0 !important;
   }
 
+  .explore-header {
+    @apply border-2 w-full bg-white divide-x sticky top-0 z-50 cursor-pointer;
+  }
+
   /* Report */
   .report-container {
     @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-7 px-5 md:px-8 lg:p-10 custom-scrollbar;
   }
   /* Home */
   .home-container {
-    @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-10 custom-scrollbar;
+    @apply flex flex-col flex-1 items-center gap-10;
   }
 
+  .home-header {
+    @apply border-2 border-y-gray-500 grid grid-cols-2 w-full bg-white lg:grid xs:hidden divide-x divide-gray-500 sticky top-0 z-50 cursor-pointer;
+  }
+
+  /* .home-container {
+    @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-10 custom-scrollbar;
+  } */
+
   .home-posts {
-    @apply max-w-screen-sm flex flex-col items-center w-full gap-6 md:gap-9;
+    @apply max-w-[600px] flex flex-col items-center w-full gap-6 py-2 md:gap-9;
   }
 
   .home-creators {
-    @apply hidden xl:flex flex-col w-72 2xl:w-465 px-6 py-5 gap-10  overflow-scroll custom-scrollbar;
+    @apply hidden xl:flex flex-col w-96 2xl:w-[500px] px-6 py-5 gap-10 sticky top-0 border-2 border-x-gray-500;
   }
 
   /* Post Details */
@@ -240,12 +252,12 @@
   }
 
   .leftsidebar-link {
-    @apply rounded-full base-medium hover:bg-off-white transition;
+    @apply rounded-xl base-medium hover:bg-off-white transition;
   }
 
   /* Post Card */
   .post-card {
-    @apply bg-white rounded-xl border border-dark-4 p-5 lg:p-7 w-full max-w-screen-sm;
+    @apply bg-white rounded-xl border  p-5 lg:p-7 w-full;
   }
 
   .post-comments {
@@ -392,7 +404,7 @@
 }
 
 .archive-province-container {
-  @apply flex flex-wrap gap-5 bg-white pt-5 px-9 xs:justify-center lg:justify-normal;
+  @apply flex flex-col gap-5 bg-white pt-5 px-9 xs:justify-center lg:justify-normal;
 }
 
 .add-archive-cancel {

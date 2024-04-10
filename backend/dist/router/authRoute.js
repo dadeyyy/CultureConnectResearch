@@ -40,6 +40,8 @@ authRouter.post("/signin", validate(signInSchema), async (req, res) => {
                             email: user.email,
                             role: user.role,
                             province: user.province,
+                            imageUrl: user.avatarUrl,
+                            bio: user.bio,
                         },
                     });
                 });

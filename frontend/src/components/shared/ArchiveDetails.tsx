@@ -20,6 +20,7 @@ interface ArchiveData {
   municipality: string;
   files: File[];
   dateCreated: string;
+  category: string;
 }
 
 interface File {

@@ -30,7 +30,7 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
     // If there is only one photo, don't render the carousel buttons
     return (
       <div className="relative w-full" data-carousel="slide">
-        <div className="relative aspect-w-1 aspect-h-1 h-56 overflow-hidden rounded-lg md:h-96">
+        <div className="relative aspect-square h-full overflow-hidden rounded-lg w-full">
           {photos.map((photo, index) => (
             <div
               key={index}
@@ -56,7 +56,7 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
 
   return (
     <div id="default-carousel" className="relative w-full" data-carousel="slide">
-      <div className="relative h-56 overflow-hidden rounded-lg md:h-96">
+      <div className="relative aspect-square overflow-hidden rounded-lg">
         {photos.map((photo, index) => (
           <div
             key={index}

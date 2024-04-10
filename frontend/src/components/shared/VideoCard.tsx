@@ -19,38 +19,23 @@ import {
 
 const VideoCard = () => {
   return (
-    <div>
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Create project</CardTitle>
-          <CardDescription>Deploy your new project in one-click.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="Name of your project" />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="framework">Framework</Label>
-                <Select>
-                  <SelectTrigger id="framework">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="next">Next.js</SelectItem>
-                    <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                    <SelectItem value="astro">Astro</SelectItem>
-                    <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+<div className="flex justify-center items-center cursor-pointer ">
+  <div className="w-full min-w-64 max-w-xs">
+    <div className="bg-white border rounded-lg shadow-md">
+      <img
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOAh9PP2K3lPsFrrDP9ZmxOLtKZMKJAAHLn1rjRH4iew&s"
+        className="w-full h-full aspect-video object-cover"
+        alt="Dog"
+      />
+      <div className="py-2 px-4 flex flex-col">
+        <span className="text-lg font-bold">I recreated the gagamboy</span>
+        <span>MrBeast</span>
+        <span className="text-xs">110 views 4 hours ago</span>
+      </div>
     </div>
+  </div>
+</div>
+
   );
 };
 
