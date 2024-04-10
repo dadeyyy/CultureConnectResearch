@@ -34,10 +34,12 @@ model User {
   comments    Comment[]
   reports     Report[]
   archives Archive[]
-  
+  interest String[]
   followers    Followers[] @relation("UserFollowers")
   following    Followers[] @relation("UserFollowing")
 }
+
+
 
  model Followers {
    id           Int      @id @default(autoincrement())
@@ -160,7 +162,7 @@ model Calendar {
   municipality String @default("Balanga")
   details   String
   location Json
-  date DateTime
+  date DateTime 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   provinceId String

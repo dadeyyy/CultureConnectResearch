@@ -11,15 +11,19 @@ import likeRoute from "./router/likeRoute.js";
 import calendarRoute from "./router/calendarRoute.js";
 import algoRoute from "./router/algoRoute.js";
 import archiveRoute from "./router/archive.js";
-import followRouter from "./router/followRoute.js";
+import liveStreamRoute from './router/liveStream.js';
+import { createServer } from 'node:http';
+import socket from "./socket.js";
 if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
 const PORT = parseInt(process.env.PORT, 10);
 const app = express();
+const server = createServer(app);
 if (!process.env.PORT) {
     process.exit(1);
 }
+socket(server);
 app.use(express.json());
 app.use(cors({
     origin: "http://localhost:5173", // Specify the origin of your frontend
@@ -37,16 +41,16 @@ app.use(session({
 }));
 app.use(morgan("tiny"));
 //Routers
-app.use("/", authRouter);
-app.use("/", postRoute);
-app.use("/", userRoute);
-app.use("/", commentRoute);
-app.use("/", likeRoute);
-app.use("/", calendarRoute);
-app.use("/", algoRoute);
-app.use("/", archiveRoute);
-app.use("/", followRouter);
-app.listen(PORT, () => {
+app.use('/', authRouter);
+app.use('/', postRoute);
+app.use('/', userRoute);
+app.use('/', commentRoute);
+app.use('/', likeRoute);
+app.use('/', calendarRoute);
+app.use('/', algoRoute);
+app.use('/', archiveRoute);
+app.use('/', liveStreamRoute);
+server.listen(PORT, () => {
     console.log(`LISTENING ON PORT ${PORT}`);
 });
 //# sourceMappingURL=index.js.map

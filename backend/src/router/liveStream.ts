@@ -2,50 +2,53 @@ import express from 'express';
 import axios from 'axios';
 
 const liveStreamRoute = express.Router();
+const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+
+type cloudflareResponse = {
+  result: {
+    uid: string;
+    rtmps: {
+      url: string;
+      streamKey: string;
+    };
+    created: string;
+    modified: string;
+    meta: {
+      name: string;
+    };
+    status: string | null;
+    recording: {
+      mode: string;
+      requireSignedURLs: boolean;
+      allowedOrigins: string[] | null;
+    };
+  };
+};
 
 liveStreamRoute.post('/createLivestream', async (req, res) => {
   try {
     const data = req.body;
-    const response = await axios.post(
-      'https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/stream/live_inputs',
+    const response = await axios.post<cloudflareResponse>(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/live_inputs`,
       {
         meta: { name: data.name },
         recording: { mode: 'automatic' },
       },
       {
         headers: {
-            Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`
-        }
+          Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
+        },
       }
     );
+    const url = response.data.result.rtmps.url;
+    const streamKey = response.data.result.rtmps.streamKey;
 
-    const url = response.rtmps.url;
-    const streamKey = response.rtmps.streamKey;
+    if (response.data) {
+        return res.status(200).json({url,streamKey})
+    } 
+
+    return res.status(404).json({error: "No data!"})
     
-
-    
-
-    //SAMPLE RESPONSE DATA:
-    // {
-    //     "uid": "f256e6ea9341d51eea64c9454659e576",
-    //     "rtmps": {
-    //       "url": "rtmps://live.cloudflare.com:443/live/",
-    //       "streamKey": "MTQ0MTcjM3MjI1NDE3ODIyNTI1MjYyMjE4NTI2ODI1NDcxMzUyMzcf256e6ea9351d51eea64c9454659e576"
-    //     },
-    //     "created": "2021-09-23T05:05:53.451415Z",
-    //     "modified": "2021-09-23T05:05:53.451415Z",
-    //     "meta": {
-    //       "name": "test stream"
-    //     },
-    //     "status": null,
-    //     "recording": {
-    //       "mode": "automatic",
-    //       "requireSignedURLs": false,
-    //       "allowedOrigins": null
-    //     }
-    //   }
-    
-
   } catch (err) {
     console.log(err);
     res.status(500).json(err);

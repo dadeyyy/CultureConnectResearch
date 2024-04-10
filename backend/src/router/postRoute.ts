@@ -211,10 +211,7 @@ postRoute.put(
       }
 
       res.status(200).json({ message: "Successfully updated post", data: updatedPost });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
+    } 
     
     return res.status(200).json(updatedPost);
   }

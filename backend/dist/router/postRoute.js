@@ -1,16 +1,8 @@
-<<<<<<< HEAD
 import express from 'express';
 import { isAuthenticated, isAuthor, validate, } from '../middleware/middleware.js';
 import { db } from '../utils/db.server.js';
 import { upload, cloudinary } from '../utils/cloudinary.js';
 import { postSchema } from '../utils/Schemas.js';
-=======
-import express from "express";
-import { isAuthenticated, isAuthor, validate } from "../middleware/middleware.js";
-import { db } from "../utils/db.server.js";
-import { upload } from "../utils/cloudinary.js";
-import { postSchema } from "../utils/Schemas.js";
->>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
 const postRoute = express.Router();
 //ADD POST
 postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSchema), async (req, res) => {
@@ -42,54 +34,8 @@ postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSch
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-<<<<<<< HEAD
 // GET ALL THE POST
 postRoute.get('/post', isAuthenticated, async (req, res) => {
-=======
-// postRoute.post('/explore', isAuthenticated, upload.array('image'), validate(exploreSchema) , async(req,res)=>{
-//   try {
-//     const data: exploreTypeSchema = req.body;
-//     const files: Express.Multer.File[] = req.files as Express.Multer.File[];
-//     console.log(data);
-//     console.log(files);
-//     const images = files?.map((file) => ({
-//       url: file.path,
-//       filename: file.filename,
-//     }));
-//     const newPost = await db.explore.create({
-//       data: {
-//         ...data,
-//         photos: {
-//           create: images,
-//         },
-//       },
-//       include: {
-//         photos: true
-//       }
-//     });
-//     res
-//       .status(201)
-//       .json({ message: 'Successfully created new archive!', data: newPost });
-//   } catch (error) {
-//     console.log("TEST");
-//     console.log(error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// })
-// postRoute.get('/explore',isAuthenticated, async(req,res) =>{
-//   try{
-//     const explore = await db.explore.findMany()
-//     if(explore){
-//       return res.status(200).json(explore)
-//     }
-//   }
-//   catch(error){
-//     console.log(error)
-//     return res.status(500).json(error)
-//   }
-// })
-postRoute.get("/post", isAuthenticated, async (req, res) => {
->>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
     try {
         const limit = parseInt(req.query.limit) || 1;
         const offset = parseInt(req.query.offset) || 0;
@@ -175,23 +121,6 @@ postRoute.put("/post/:postId", isAuthenticated, isAuthor, upload.array("image"),
             where: {
                 id: postId,
             },
-<<<<<<< HEAD
-=======
-            include: { photos: true },
-        });
-        // If not, return not found
-        if (!post) {
-            return res.status(404).json({ error: "Post not found!" });
-        }
-        // Create an array of new photos to add
-        const newPhotos = files?.map((file) => ({
-            url: file.path,
-            filename: file.filename,
-        }));
-        // Update the post data
-        const updatedPost = await db.post.update({
-            where: { id: postId },
->>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
             data: {
                 ...dataNoFiles,
                 photos: {
@@ -226,21 +155,27 @@ postRoute.put("/post/:postId", isAuthenticated, isAuthor, upload.array("image"),
                     photos: true,
                 },
             });
-            return res.status(200).json(updatedFiles);
+            // If there are images to delete, remove them
+            if (req.body.deleteImages && req.body.deleteImages.length > 0) {
+                const imagesToDelete = req.body.deleteImages;
+                await db.post.update({
+                    where: { id: postId },
+                    data: {
+                        photos: {
+                            deleteMany: {
+                                id: { in: imagesToDelete },
+                            },
+                        },
+                    },
+                });
+            }
+            res.status(200).json({ message: "Successfully updated post", data: updatedPost });
         }
-<<<<<<< HEAD
         return res.status(200).json(updatedPost);
     }
     catch (error) {
         console.log(error);
         return res.status(500).json(error);
-=======
-        res.status(200).json({ message: "Successfully updated post", data: updatedPost });
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal Server Error" });
->>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
     }
 });
 postRoute.delete("/post/:postId", isAuthenticated, async (req, res) => {

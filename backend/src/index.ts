@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-import * as dotenv from 'dotenv';
-import express from 'express';
-import cors from 'cors';
-import session from 'express-session';
-import morgan from 'morgan';
-import authRouter from './router/authRoute.js';
-import postRoute from './router/postRoute.js';
-import userRoute from './router/userRoute.js';
-import commentRoute from './router/commentRoute.js';
-import likeRoute from './router/likeRoute.js';
-import calendarRoute from './router/calendarRoute.js';
-import algoRoute from './router/algoRoute.js';
-import archiveRoute from './router/archive.js';
-import liveStreamRoute from './router/liveStream.js';
-=======
 import * as dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -28,7 +12,10 @@ import calendarRoute from "./router/calendarRoute.js";
 import algoRoute from "./router/algoRoute.js";
 import archiveRoute from "./router/archive.js";
 import followRouter from "./router/followRoute.js";
->>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
+import liveStreamRoute from './router/liveStream.js';
+import {createServer} from 'node:http'
+import socket from "./socket.js";
+
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
@@ -36,10 +23,16 @@ if (process.env.NODE_ENV !== "production") {
 
 const PORT: number = parseInt(process.env.PORT as string, 10);
 const app = express();
+const server = createServer(app)
 
 if (!process.env.PORT) {
   process.exit(1);
 }
+
+
+
+socket(server)
+
 
 declare module "express-session" {
   interface SessionData {
@@ -76,7 +69,6 @@ app.use(
 app.use(morgan("tiny"));
 
 //Routers
-<<<<<<< HEAD
 app.use('/', authRouter);
 app.use('/', postRoute);
 app.use('/', userRoute);
@@ -86,18 +78,9 @@ app.use('/', calendarRoute);
 app.use('/', algoRoute);
 app.use('/', archiveRoute);
 app.use('/', liveStreamRoute)
-=======
-app.use("/", authRouter);
-app.use("/", postRoute);
-app.use("/", userRoute);
-app.use("/", commentRoute);
-app.use("/", likeRoute);
-app.use("/", calendarRoute);
-app.use("/", algoRoute);
-app.use("/", archiveRoute);
-app.use("/", followRouter);
->>>>>>> ccadcc55c102c5dc25aca7fd288b2044d0f3c2bc
 
-app.listen(PORT, () => {
+
+
+server.listen(PORT, () => {
   console.log(`LISTENING ON PORT ${PORT}`);
 });
