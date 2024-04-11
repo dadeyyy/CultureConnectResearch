@@ -54,7 +54,7 @@ const PostDetails = () => {
       console.log("FAILED", data);
     }
   }
-
+console.log(post)
   return (
     <div className="flex-1 overflow-auto py-5">
       <div className="hidden md:flex max-w-5xl w-full">
@@ -80,7 +80,7 @@ const PostDetails = () => {
         <div className="post_details-card mx-auto p-2 ">
           <div className="post_details-info">
             <div className="flex-between w-full">
-              <Link to={`/profile/${post.user.id}`} className="flex items-center gap-3">
+              <Link to={`/profile/${post.userId}`} className="flex items-center gap-3">
                 <img
                   src={post.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
                   alt="user"

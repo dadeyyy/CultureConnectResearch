@@ -88,9 +88,13 @@ followRouter.get("/followers-count/:userId", async (req, res) => {
 
 followRouter.get("/people-you-may-know", async (req, res) => {
   try{
-    
+    const people = await db.user.findMany({
+      take: 5,
+  })
+    res.status(200).json({people})
   }catch(error){
-
+    console.error("error ", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 })
 

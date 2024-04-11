@@ -5,6 +5,17 @@ import { useUserContext } from "@/context/AuthContext";
 import { IPost } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostSkeleton from "@/components/shared/PostSkeleton";
+import { Link } from "react-router-dom";
+
+type peopleProps = {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  province?: string;
+  avatarUrl: string;
+}[];
 
 const Home = () => {
   const { user, isLoading } = useUserContext();
@@ -14,7 +25,11 @@ const Home = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [load, setLoad] = useState(true);
   const observerTarget = useRef<HTMLDivElement>(null);
-  const [selectedSection, setSelectedSection] = useState<"For You" | "Following">("For You");
+  const [selectedSection, setSelectedSection] = useState<
+    "For You" | "Following"
+  >("For You");
+  const [people, setPeople] = useState<peopleProps>([]);
+  const [peopleLoad, setPeopleLoad] = useState(false);
 
   const fetchPosts = async (limit: number, offset: number) => {
     try {
@@ -37,7 +52,9 @@ const Home = () => {
       setLoad(false);
     } catch (error) {
       console.error("Error fetching posts:", error);
-      setError("Something went wrong while fetching posts. Please try again later.");
+      setError(
+        "Something went wrong while fetching posts. Please try again later."
+      );
       setIsPostLoading(false);
       setLoad(false);
     }
@@ -71,6 +88,36 @@ const Home = () => {
       }
     };
   }, [isPostLoading, error, postData.length]); // Add dependencies to useEffect
+
+  useEffect(() => {
+    const fetchPeople = async () => {
+      setPeopleLoad(true);
+      try {
+        const response = await fetch(
+          "http://localhost:8000/people-you-may-know",
+          {
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
+        setPeople(data.people);
+        setPeopleLoad(false);
+      } catch (error) {
+        console.log(error);
+        setPeopleLoad(false);
+      }
+    };
+
+    fetchPeople();
+  }, []);
+
+  console.log(peopleLoad);
 
   return (
     <div className="flex flex-1 overflow-y-scroll custom-scrollbar">
@@ -108,7 +155,9 @@ const Home = () => {
                 {postData.map((post, index) => (
                   <li key={post.id} className="flex justify-center w-full">
                     <PostCard post={post} userId={user.id} />
-                    {index === postData.length - 1 && <div ref={observerTarget}></div>}
+                    {index === postData.length - 1 && (
+                      <div ref={observerTarget}></div>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -123,7 +172,7 @@ const Home = () => {
         </div>
       </div>
       <div className="home-creators">
-        <div className="flex gap-3 items-center mt-5 hover:cursor-pointer">
+        <div className="flex gap-1 items-center mt-5 hover:cursor-pointer">
           <img
             src={
               isLoading
@@ -152,41 +201,54 @@ const Home = () => {
           </div>
         </div>
         <h3 className="font-bold text-base">People you may know</h3>
-        <div className="flex items-center space-x-4">
-          <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px] bg-gray-400" />
-            <Skeleton className="h-4 w-[200px] bg-gray-400" />
-          </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px] bg-gray-400" />
-            <Skeleton className="h-4 w-[200px] bg-gray-400" />
-          </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px] bg-gray-400" />
-            <Skeleton className="h-4 w-[200px] bg-gray-400" />
-          </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px] bg-gray-400" />
-            <Skeleton className="h-4 w-[200px] bg-gray-400" />
-          </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px] bg-gray-400" />
-            <Skeleton className="h-4 w-[200px] bg-gray-400" />
-          </div>
-        </div>
+        {peopleLoad === true ? (
+          <>
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px] bg-gray-400" />
+                <Skeleton className="h-4 w-[200px] bg-gray-400" />
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px] bg-gray-400" />
+                <Skeleton className="h-4 w-[200px] bg-gray-400" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+          <div className="flex flex-col gap-2">
+            {people.map((person) => (
+              <Link to={`/profile/${person.id}`}>
+                <div
+                  key={person.id}
+                  className="flex items-center space-x-4 cursor-pointer"
+                >
+                  <img
+                    src={
+                      isLoading
+                        ? "/assets/icons/profile-placeholder.svg"
+                        : person.avatarUrl ||
+                          "/assets/icons/profile-placeholder.svg"
+                    }
+                    alt="profile picture"
+                    className="h-12 w-12 rounded-full bg-cover"
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-lg font-bold">
+                      {person.firstName} {person.lastName}{" "}
+                    </span>
+                    <span>@{person.username}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

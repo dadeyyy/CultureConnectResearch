@@ -169,7 +169,7 @@
   }
 
   .home-creators {
-    @apply hidden xl:flex flex-col w-96 2xl:w-[500px] px-6 py-5 gap-10 sticky top-0 border-2 border-x-gray-500;
+    @apply hidden xl:flex flex-col w-96 2xl:w-[500px] px-6 py-5 gap-5 sticky top-0 border-2 border-x-gray-500;
   }
 
   /* Post Details */
