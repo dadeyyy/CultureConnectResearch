@@ -36,7 +36,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
@@ -195,8 +195,8 @@ const Calendar = () => {
 
   return (
     <div className="calendar_details-container">
-      <div className="w-full h-full flex lg:flex-row xs:flex-row ">
-        <div className="w-[300px] pb-12 pt-8 pl-5 border-r-2 border-gray pr-3 bg-red-50">
+      <div className="w-full h-full flex lg:flex-row xs:flex-col ">
+        <div className="lg:w-[300px] xs:w-full lg:pb-12 xs:pb-8 lg:pt-8 xs:pt-2 pl-5 border-r-2 border-gray pr-3 bg-red-50 xs:overflow-auto">
           <FormControl fullWidth>
             <InputLabel id="label">Province</InputLabel>
             <Select
@@ -213,7 +213,12 @@ const Calendar = () => {
           </FormControl>
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="xs:hidden lg:flex w-full my-5">Add Event</Button>
+              {user.role === "ADMIN" &&
+              user.province.toLowerCase() === selectedProvince.toLowerCase() ? (
+                <Button className="xs:hidden lg:flex w-full my-5">Add Event</Button>
+              ) : (
+                <></>
+              )}
             </DialogTrigger>
             <DialogContent className="w-full bg-white ">
               <DialogHeader>
@@ -226,19 +231,23 @@ const Calendar = () => {
             </DialogContent>
           </Dialog>
 
-          <div className="max-h-full overflow-auto border border-t-black border-red-50 ">
+          <div className="lg:max-h-full xs:max-h-96 overflow-auto border border-t-black border-red-50 ">
             <h2 className="font-bold text-xl mb-5 text-center">Events List</h2>
             <ul>
-              {currentEvents.map((event) => (
-                <li key={event.id}>
-                  <strong>• {formatDateToWord(event.startDate)}</strong> - {event.title}
-                </li>
-              ))}
+              {currentEvents.length > 0 ? (
+                currentEvents.map((event) => (
+                  <li key={event.id}>
+                    <strong>• {formatDateToWord(event.startDate)}</strong> - {event.title}
+                  </li>
+                ))
+              ) : (
+                <p className="text-center">No events available</p>
+              )}
             </ul>
           </div>
         </div>
         <Sheet open={openModalDetails} onOpenChange={setOpenModalDetails}>
-          <SheetContent className="sm:max-w-[720px] bg-white opacity-90 overflow-y-auto custom-scrollbar">
+          <SheetContent className="lg:max-w-[720px] xs:w-full bg-white opacity-90 overflow-y-auto custom-scrollbar">
             <SheetHeader>
               <SheetTitle className="text-2xl text-center">Event Details</SheetTitle>
             </SheetHeader>
@@ -250,9 +259,7 @@ const Calendar = () => {
                 </div>
                 <div className="flex">
                   <Label className="mr-5 font-extrabold text-lg">Event Details: </Label>
-                  <Label className="text-lg font-regular  ">
-                    {calendarDetails?.details}
-                  </Label>
+                  <Label className="text-lg font-regular  ">{calendarDetails?.details}</Label>
                 </div>
                 <div className="flex">
                   <Label className="mr-5 font-extrabold text-lg">Event repeat: </Label>
@@ -292,7 +299,7 @@ const Calendar = () => {
                   initialViewState={{
                     longitude: calendarDetails?.location.coordinates[0],
                     latitude: calendarDetails?.location.coordinates[1],
-                    zoom: 13,
+                    zoom: 10,
                   }}
                   style={{ width: "100%", height: 550 }}
                   mapStyle="mapbox://styles/mapbox/streets-v9"
@@ -306,7 +313,7 @@ const Calendar = () => {
             </div>
           </SheetContent>
         </Sheet>
-        <div className="w-full p-5 py-10 bg-blue-200">
+        <div className="w-full p-5 py-10 bg-blue-200 xs:h-2/3 lg:h-full overflow-auto">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
             initialView="dayGridMonth"

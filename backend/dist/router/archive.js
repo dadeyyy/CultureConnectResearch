@@ -225,13 +225,16 @@ archiveRoute.get("/archives", isAuthenticated, async (req, res) => {
     return res.status(404).json({ error: "No locations found!" });
 });
 //document-archives
-archiveRoute.get("/archives/:category", isAuthenticated, async (req, res) => {
+archiveRoute.get("/archives/:province/:category", isAuthenticated, async (req, res) => {
+    const province = req.params.province;
     const category = req.params.category;
     const archives = await db.archive.findMany({
         where: {
             category: category,
+            province: province,
         },
     });
+    console.log(archives);
     if (archives) {
         return res.status(200).json(archives);
     }
@@ -266,8 +269,40 @@ archiveRoute.get("/archive-count/:province", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-// archiveRoute.delete('/archive/', async (req,res)=>{
-//   await db.archive.deleteMany();
-// })
+//recent
+archiveRoute.get("/recent/:province", isAuthenticated, async (req, res) => {
+    try {
+        const data = req.params.province;
+        const provinceArchives = await db.archive.findMany({
+            where: {
+                province: data,
+            },
+            include: {
+                files: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            take: 5,
+        });
+        if (provinceArchives) {
+            const extractedData = provinceArchives.map((item) => ({
+                id: item.id,
+                title: item.title,
+                description: item.description,
+                category: item.category,
+                province: item.province,
+                municipality: item.municipality,
+                createdAt: item.createdAt,
+            }));
+            return res.status(200).json({ data: extractedData });
+        }
+        return res.status(404).json({ message: "No archives found!" });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal Server Error", error });
+    }
+});
 export default archiveRoute;
 //# sourceMappingURL=archive.js.map

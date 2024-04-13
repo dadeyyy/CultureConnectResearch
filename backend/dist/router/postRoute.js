@@ -1,8 +1,8 @@
-import express from 'express';
-import { isAuthenticated, isAuthor, validate, } from '../middleware/middleware.js';
-import { db } from '../utils/db.server.js';
-import { upload, cloudinary } from '../utils/cloudinary.js';
-import { postSchema } from '../utils/Schemas.js';
+import express from "express";
+import { isAuthenticated, isAuthor, validate } from "../middleware/middleware.js";
+import { db } from "../utils/db.server.js";
+import { upload, cloudinary } from "../utils/cloudinary.js";
+import { postSchema } from "../utils/Schemas.js";
 const postRoute = express.Router();
 //ADD POST
 postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSchema), async (req, res) => {
@@ -29,13 +29,13 @@ postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSch
         res.status(201).json({ message: "Successfully created new post", data: newPost });
     }
     catch (error) {
-        console.log('TEST');
+        console.log("TEST");
         console.log(error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
 // GET ALL THE POST
-postRoute.get('/post', isAuthenticated, async (req, res) => {
+postRoute.get("/post", isAuthenticated, async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 1;
         const offset = parseInt(req.query.offset) || 0;
@@ -77,26 +77,28 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
 // GET SPECIFIC POST
 postRoute.get("/post/:id", async (req, res) => {
     try {
-        //Get parameters ID
+        // Get parameter ID
         const postId = parseInt(req.params.id);
-        //Find post in the database
+        // Find post in the database
         const post = await db.post.findUnique({
             where: {
                 id: postId,
             },
             include: {
                 photos: true,
+                user: { select: { id: true, username: true, firstName: true, lastName: true } }, // Corrected include syntax
             },
         });
-        //If post is found, return post
+        // If post is found, return post
         if (post) {
             return res.status(200).json(post);
         }
-        //If not, return not found
+        // If not, return not found
         return res.status(404).json({ error: "Post not found!" });
     }
     catch (error) {
         console.log(error);
+        return res.status(500).json({ error: "Internal server error" });
     }
 });
 postRoute.put("/post/:postId", isAuthenticated, isAuthor, upload.array("image"), validate(postSchema), async (req, res) => {

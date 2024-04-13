@@ -143,76 +143,80 @@ const MapForm: React.FC = () => {
 
   return (
     <div className="top-0 bottom-0 w-full p-5 xs:p-0 relative">
-      <div className="sidebar-1 gap-2 xs:gap-1 p-1 xs:m-1 xs:flex xs:top-2 xs:justify-center xs:px-10 lg:px-4">
-        <Button
-          className={`h-6 ${parameter === "locations" && "bg-blue-700"}`}
-          onClick={() => {
-            setParameter("locations");
-            setSelectedMarker(null);
-          }}
-        >
-          Events
-        </Button>
-        <Button
-          className={`h-6 ${parameter === "heritages" && "bg-blue-700"}`}
-          onClick={() => {
-            setParameter("heritages");
-            setSelectedMarker(null);
-          }}
-        >
-          Heritages
-        </Button>
-        <Button
-          className={`h-6 ${parameter === "archives" && "bg-blue-700"}`}
-          onClick={() => {
-            setParameter("archives");
-            setSelectedMarker(null);
-          }}
-        >
-          Archives
-        </Button>
+      <div className="lg:w-1/2 xs:w-full absolute gap-2 flex items-center z-10  flex-col p-5">
+        <div className="grid grid-cols-3 gap-2 w-full">
+          <Button
+            className={`h-full ${parameter === "locations" && "bg-blue-900 text-white"}`}
+            onClick={() => {
+              setParameter("locations");
+              setSelectedMarker(null);
+            }}
+          >
+            Events
+          </Button>
+          <Button
+            className={`h-full ${parameter === "heritages" && "bg-blue-900 text-white"}`}
+            onClick={() => {
+              setParameter("heritages");
+              setSelectedMarker(null);
+            }}
+          >
+            Heritages
+          </Button>
+          <Button
+            className={`h-full ${parameter === "archives" && "bg-blue-900 text-white"}`}
+            onClick={() => {
+              setParameter("archives");
+              setSelectedMarker(null);
+            }}
+          >
+            Archives
+          </Button>
+        </div>
+        <div className="text-[10px] lg:block bg-neutral-200 px-3 py-1 lg:text-base xs:text-sm font-semibold rounded-xl border-gray-500 border">
+          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+        </div>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button className="bg-red-200 border border-gray-300 hover:bg-blue-800">
+              Add a heritage
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="bg-blue-200 min-w-[450px]">
+            <SheetHeader>
+              <SheetTitle>Add a heritage</SheetTitle>
+              <SheetDescription>
+                Add a cultural heritage based on the location you are administering.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+                <Input id="name" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="username" className="text-right">
+                  Province
+                </Label>
+                <Input id="username" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="username" className="text-right">
+                  Municipality
+                </Label>
+                <Input id="username" className="col-span-3" />
+              </div>
+            </div>
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button type="submit">Add heritage</Button>
+              </SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
       </div>
-      <div className="sidebar text-[10px] lg:block xs:hidden">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-      </div>
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button className="bg-red-200 absolute top-5 z-10 right-5">Add a heritage</Button>
-        </SheetTrigger>
-        <SheetContent className="bg-blue-200 min-w-[450px]">
-          <SheetHeader>
-            <SheetTitle>Add a heritage</SheetTitle>
-            <SheetDescription>
-              Add a cultural heritage based on the location you are administering.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input id="name" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Province
-              </Label>
-              <Input id="username" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Municipality
-              </Label>
-              <Input id="username" className="col-span-3" />
-            </div>
-          </div>
-          <SheetFooter>
-            <SheetClose asChild>
-              <Button type="submit">Add heritage</Button>
-            </SheetClose>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
 
       <div ref={mapContainer} className="h-full rounded-lg" />
       {selectedMarker && (

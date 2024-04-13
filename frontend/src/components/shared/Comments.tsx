@@ -131,11 +131,7 @@ const Comments = ({ postId, action }: CommentProps) => {
   const displayedComments = comments.slice(0, numberOfCommentsToShow);
 
   return (
-    <div
-      className={`post-comments border border-white ${
-        action === "detail" ? "lg:border-l-light-4 h-full" : "border-t-light-4"
-      }`}
-    >
+    <div className={`post-comments px-2 border border-white border-t-light-4`}>
       <h2 className={`${action === "home" ? "hidden p-0" : ""} font-bold ml-5 text-lg`}>
         Comments
       </h2>
