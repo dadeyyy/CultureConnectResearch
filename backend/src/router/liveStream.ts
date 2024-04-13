@@ -2,23 +2,24 @@ import express from 'express';
 import axios from 'axios';
 
 import fetch from 'node-fetch';
-import { LiveInput, cloudflareResponse, pastLiveStreamApiResponse, pastLiveStreamTypes } from '../utils/liveStreamTypes.js';
+import {
+  LiveInput,
+  cloudflareResponse,
+  pastLiveStreamApiResponse,
+  liveStreamData,
+} from '../utils/liveStreamTypes.js';
 const liveStreamRoute = express.Router();
-const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 
-type liveStreamData = {
-  name: string;
-  description: string;
-};
-
+//Creating live input
 liveStreamRoute.post('/createLivestream', async (req, res) => {
   try {
     const { name, description }: liveStreamData = req.body;
+
     //Call to the cloudflare create live input api
     const response = await axios.post<cloudflareResponse>(
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/live_inputs`,
+      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs`,
       {
-        meta: { name: name, description: description },
+        meta: { name, description },
         recording: { mode: 'automatic' },
       },
       {
@@ -28,8 +29,10 @@ liveStreamRoute.post('/createLivestream', async (req, res) => {
       }
     );
 
-    if (response.data.success) {
-      const responseData = response.data.result;
+    const { data } = response;
+
+    if (data.success) {
+      const responseData = data.result;
       //sample responseData:
       // "result": {
       //   "created": "2014-01-02T02:20:00Z",
@@ -73,21 +76,17 @@ liveStreamRoute.post('/createLivestream', async (req, res) => {
       return res.status(200).json(responseData);
     }
 
-    if (!response.data.success) {
-      const errors = response.data.errors;
-      if (errors.length > 0) {
-        const creatingLiveStreamError = errors.map((data) => ({ data }));
-        return res.json(creatingLiveStreamError);
-      }
-
-      return res.status(400).json({ error: 'Failed to create livestream' });
+    const errors = data.errors;
+    if (errors.length > 0) {
+      const { message, code } = errors[0];
+      return res.status(code).json({ message });
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    return res.status(500).json({message: "Failed to create liveStream"});
   }
 });
 
+//GET ongoing livestream
 liveStreamRoute.get('/getLiveStreams', async (req, res) => {
   try {
     const response = await axios.get(
@@ -125,14 +124,12 @@ liveStreamRoute.get('/getLiveStreams', async (req, res) => {
       //If there is no available livestream
       return res.status(404).json({ message: 'No livestream available' });
     }
-
-    return res.status(400).json({ error: 'Data not found!' });
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
     res.status(500).json({ error });
   }
 });
 
+//Saved livestream videos
 liveStreamRoute.get('/pastLiveStreams', async (req, res) => {
   try {
     // Check if CLOUDFLARE_EMAIL environment variable is set
@@ -153,14 +150,46 @@ liveStreamRoute.get('/pastLiveStreams', async (req, res) => {
 
     const data = await response.json() as pastLiveStreamApiResponse;
 
-    if(data.success){
+    if (data.success) {
       return res.json(data.result);
     }
 
-    return res.status(400).json(data.errors)
-    
+    return res.status(400).json(data.errors);
   } catch (err) {
-    console.log(`ERROR ${err}`);
+    res.status(500).json({error: err})
+  }
+});
+
+//Get specific livestream
+liveStreamRoute.get('/liveStream/:id', async (req, res) => {
+  try {
+    const liveStreamId = req.params.id;
+    console.log(liveStreamId);
+
+    if (!process.env.CLOUDFLARE_EMAIL) {
+      throw new Error('CLOUDFLARE_EMAIL environment variable is not set');
+    }
+
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs/${liveStreamId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Email': process.env.CLOUDFLARE_EMAIL,
+          Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
+        },
+      }
+    );
+
+    const liveStream = (await response.json()) as cloudflareResponse;
+
+    if (liveStream.success) {
+      return res.json(liveStream);
+    }
+
+    return res.json({ error: liveStream.errors[0].message });
+  } catch (err) {
+    return res.status(500).json({error: err})
   }
 });
 

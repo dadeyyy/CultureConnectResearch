@@ -9,6 +9,12 @@ export type LiveInput = {
 }
 
 
+export type liveStreamData = {
+  name: string;
+  description: string;
+};
+
+
 export type cloudflareResponse = {
         errors: any[]; // Array of errors, assuming they can be of any type
         messages: any[]; // Array of messages, assuming they can be of any type
