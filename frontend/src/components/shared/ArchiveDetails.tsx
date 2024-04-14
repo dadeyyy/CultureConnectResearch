@@ -158,12 +158,7 @@ const ArchiveDetails: React.FC = () => {
                       Edit this archive from {provinceLabel ?? province}
                     </DrawerTitle>
                   </div>
-                  <ArchiveForm
-                    closeDrawer={closeDrawer}
-                    provinceData={province}
-                    action="Update"
-                    archiveData={archiveData}
-                  />
+                  <ArchiveForm provinceData={province} action="Update" archiveData={archiveData} />
                 </div>
               </DrawerContent>
             </Drawer>

@@ -29,6 +29,7 @@ const PostDetails = () => {
         }
 
         const postData = await response.json();
+        console.log(postData);
 
         setPost(postData);
       } catch (error) {
@@ -55,6 +56,8 @@ const PostDetails = () => {
     }
   }
 
+  console.log(post);
+
   return (
     <div className="flex-1 overflow-auto py-5">
       <div className="hidden md:flex max-w-5xl w-full">
@@ -80,7 +83,7 @@ const PostDetails = () => {
         <div className="post_details-card mx-auto p-2 ">
           <div className="post_details-info">
             <div className="flex-between w-full">
-              <Link to={`/profile/${post.user.id}`} className="flex items-center gap-3">
+              <Link to={`/profile/${post.userId}`} className="flex items-center gap-3">
                 <img
                   src={post.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
                   alt="user"
@@ -92,7 +95,7 @@ const PostDetails = () => {
                     <p className="base-medium lg:body-bold text-dark-1">
                       {post.user.firstName} {post.user.lastName}
                     </p>
-                    {user.id === post.user.id && user.role === `ADMIN` && (
+                    {user.id === post.userId && user.role === `ADMIN` && (
                       <Badge className="bg-green-300 font-light text-xs border border-gray-300">
                         {user.province}
                       </Badge>
@@ -120,7 +123,7 @@ const PostDetails = () => {
               <div className="flex-center gap-1">
                 <Link
                   to={`/update-post/${post.id}`}
-                  className={`${user.id !== post.user.id && "hidden"}`}
+                  className={`${user.id !== post.userId && "hidden"}`}
                 >
                   <img src={"/assets/icons/edit.svg"} alt="edit" width={24} height={24} />
                 </Link>
@@ -128,12 +131,12 @@ const PostDetails = () => {
                 <Button
                   onClick={handleDeletePost}
                   variant="ghost"
-                  className={`ost_details-delete_btn ${user.id !== post.user.id && "hidden"}`}
+                  className={`ost_details-delete_btn ${user.id !== post.userId && "hidden"}`}
                 >
                   <img src={"/assets/icons/delete.svg"} alt="delete" width={24} height={24} />
                 </Button>
 
-                <ReportForm userId={user.id} postId={post.id} postUserId={post.user.id} />
+                <ReportForm userId={user.id} postId={post.id} postUserId={post.userId} />
               </div>
             </div>
             <hr className="border w-full border-dark-4/80" />

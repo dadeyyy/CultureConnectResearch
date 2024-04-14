@@ -1,12 +1,18 @@
-import { provincesTest } from "@/lib/provinces";
+import { provincesTest, provincesWithImage } from "@/lib/provinces";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import ArchiveForm from "@/components/forms/ArchiveForm";
 import Loader from "@/components/shared/Loader";
 import { useUserContext } from "@/context/AuthContext";
-import { useMediaQuery } from "@react-hook/media-query";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,24 +20,25 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { multiFormatDateString } from "@/lib/utils";
 
-interface ArchiveProps {
-  description: string;
-  files: string[];
+interface ArchiveData {
   id: number;
-  municipality: string;
   title: string;
+  description: string;
+  category: string;
+  province: string;
+  municipality: string;
+  createdAt: string;
 }
 
 const ArchiveProvince = () => {
   const { province } = useParams<{ province: string }>();
-  const [archives, setArchives] = useState<ArchiveProps[]>([]);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [archives, setArchives] = useState<ArchiveData[]>([]);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
   const [loading, isLoading] = useState(true);
   const { user } = useUserContext();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width: 640px)");
   const [counts, setCounts] = useState<{
     documentCount: number;
     artifactCount: number;
@@ -41,11 +48,6 @@ const ArchiveProvince = () => {
     artifactCount: 0,
     monumentCount: 0,
   });
-
-  const closeDrawer = () => {
-    setIsDrawerOpen(false);
-  };
-
   useEffect(() => {
     const fetchArchives = async () => {
       try {
@@ -80,7 +82,7 @@ const ArchiveProvince = () => {
   useEffect(() => {
     const fetchArchives = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/archive/${province}`, {
+        const response = await fetch(`http://localhost:8000/recent/${province}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -120,42 +122,44 @@ const ArchiveProvince = () => {
     navigate(`/archives/${province}/monument`);
   };
 
+  const provinceImage = provincesWithImage.find((item) => item.value === province)?.image;
+
   return (
     <div className="w-full">
-      <div className="bg-red-200 w-full p-4 flex justify-between">
-        {isMobile ? (
-          <></>
-        ) : (
-          <button className="button-back" onClick={() => navigate(-1)}>
-            Back
-          </button>
-        )}
-        <h2 className="text-center font-bold text-2xl p-2">{provinceLabel ?? province} Archives</h2>
-        <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-          <DrawerTrigger asChild>
-            {user.role === "ADMIN" && user.province === province ? (
-              <Button
-                variant="outline"
-                className="add-archive"
-                onClick={() => setIsDrawerOpen(true)}
-              >
-                Add Archive
-              </Button>
-            ) : (
-              <div className="bg-red-200"></div>
-            )}
-          </DrawerTrigger>
-          <DrawerContent className="min-h-[720px] max-h-[800px] bg-white">
-            <div className="w-full flex px-4 flex-col">
-              <div className="flex justify-between">
-                <DrawerTitle className="font-bold text-lg">
-                  Add an archive in {provinceLabel}
-                </DrawerTitle>
+      <div className="archive-header items-center">
+        <img
+          src={provinceImage}
+          alt="image province"
+          className="object-cover opacity-50 inset-0 w-full h-full"
+        />
+        <div className="absolute flex flex-col p-5 items-center">
+          <h2 className="text-center font-bold text-5xl p-2">
+            {provinceLabel ?? province} Archives
+          </h2>
+          <Sheet>
+            <SheetTrigger asChild>
+              {user.role === "ADMIN" && user.province === province ? (
+                <Button variant="outline" className="add-archive">
+                  Add Archive
+                </Button>
+              ) : (
+                <div className="bg-red-200"></div>
+              )}
+            </SheetTrigger>
+            <SheetContent className="min-h-[720px] max-h-[800px] bg-white" side={"bottom"}>
+              <div className="w-full flex px-4 flex-col">
+                <div className="flex justify-between">
+                  <SheetHeader>
+                    <SheetTitle className="font-bold text-lg">
+                      Add an archive in {provinceLabel}
+                    </SheetTitle>
+                  </SheetHeader>
+                </div>
+                <ArchiveForm provinceData={province} action="Create" />
               </div>
-              <ArchiveForm closeDrawer={closeDrawer} provinceData={province} action="Create" />
-            </div>
-          </DrawerContent>
-        </Drawer>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       {loading ? (
@@ -163,7 +167,7 @@ const ArchiveProvince = () => {
           <Loader />
         </div>
       ) : (
-        <div className="bg-red w-full">
+        <div className="bg-red w-full h-2/3 overflow-auto">
           <Breadcrumb className="px-5 py-2">
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -211,53 +215,35 @@ const ArchiveProvince = () => {
                 </ul>
               </div>
             </div>
-            <div className="h-[500px]  flex flex-col p-5">
+            <div className="h-full flex flex-col p-5">
               <span className="border border-transparent border-b-gray-400 text-2xl">
                 Recently Added
               </span>
-              <hr className="border-2 w-1/3 border-blue-400 rounded-" />
               <div className="p-2">
                 <ul>
-                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
-                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
-                    <span className="text-base">
-                      <p>
-                        What Disasters Can Teach Us About Good System Design and problematic child
-                      </p>
-                    </span>
-                  </li>
-                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
-                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
-                    <span className="text-base">
-                      <p>
-                        What Disasters Can Teach Us About Good System Design and problematic child
-                      </p>
-                    </span>
-                  </li>
-                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
-                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
-                    <span className="text-base">
-                      <p>
-                        What Disasters Can Teach Us About Good System Design and problematic child
-                      </p>
-                    </span>
-                  </li>
-                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
-                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
-                    <span className="text-base">
-                      <p>
-                        What Disasters Can Teach Us About Good System Design and problematic child
-                      </p>
-                    </span>
-                  </li>
-                  <li className="flex flex-row border border-transparent border-y-gray-400 gap-2 p-2">
-                    <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
-                    <span className="text-base">
-                      <p>
-                        What Disasters Can Teach Us About Good System Design and problematic child
-                      </p>
-                    </span>
-                  </li>
+                  <hr className="border-2 w-1/3 border-blue-400 rounded-" />
+                  {archives.length > 0 ? (
+                    archives.map((archive) => (
+                      <li
+                        className="flex flex-row border border-transparent border-y-gray-400 gap-4 p-2 hover:text-blue-500 cursor-pointer"
+                        onClick={() => {
+                          navigate(`/archives/pampanga/document/${archive.id}`);
+                        }}
+                      >
+                        <img src={"/assets/icons/archive-icon-2.svg"} width={25} />
+                        <span className="text-base">
+                          <p className="font-bold">{archive.title}</p>
+                          <p className="text-sm">
+                            Created {multiFormatDateString(archive.createdAt)} -{" "}
+                            {archive.municipality}
+                          </p>
+                          <p className="text-xs">Category: {archive.category}</p>
+                        </span>
+                      </li>
+                    ))
+                  ) : (
+                    <p>No archives found.</p>
+                  )}
                 </ul>
               </div>
             </div>

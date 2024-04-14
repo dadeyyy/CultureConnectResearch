@@ -1,12 +1,8 @@
-import express from 'express';
-import {
-  isAuthenticated,
-  isAuthor,
-  validate,
-} from '../middleware/middleware.js';
-import { db } from '../utils/db.server.js';
-import { upload, cloudinary } from '../utils/cloudinary.js';
-import { postSchema, postTypeSchema } from '../utils/Schemas.js';
+import express from "express";
+import { isAuthenticated, isAuthor, validate } from "../middleware/middleware.js";
+import { db } from "../utils/db.server.js";
+import { upload, cloudinary } from "../utils/cloudinary.js";
+import { postSchema, postTypeSchema } from "../utils/Schemas.js";
 
 const postRoute = express.Router();
 
@@ -42,7 +38,7 @@ postRoute.post(
 
       res.status(201).json({ message: "Successfully created new post", data: newPost });
     } catch (error) {
-      console.log('TEST');
+      console.log("TEST");
       console.log(error);
       res.status(500).json({ error: "Internal Server Error" });
     }
@@ -50,7 +46,7 @@ postRoute.post(
 );
 
 // GET ALL THE POST
-postRoute.get('/post', isAuthenticated, async (req, res) => {
+postRoute.get("/post", isAuthenticated, async (req, res) => {
   try {
     const limit: number = parseInt(req.query.limit as string) || 1;
     const offset: number = parseInt(req.query.offset as string) || 0;
@@ -95,28 +91,30 @@ postRoute.get('/post', isAuthenticated, async (req, res) => {
 // GET SPECIFIC POST
 postRoute.get("/post/:id", async (req, res) => {
   try {
-    //Get parameters ID
+    // Get parameter ID
     const postId = parseInt(req.params.id);
 
-    //Find post in the database
+    // Find post in the database
     const post = await db.post.findUnique({
       where: {
         id: postId,
       },
       include: {
         photos: true,
+        user: { select: { id: true, username: true, firstName: true, lastName: true } }, // Corrected include syntax
       },
     });
 
-    //If post is found, return post
+    // If post is found, return post
     if (post) {
       return res.status(200).json(post);
     }
 
-    //If not, return not found
+    // If not, return not found
     return res.status(404).json({ error: "Post not found!" });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -127,9 +125,7 @@ postRoute.put(
   upload.array("image"),
   validate(postSchema),
   async (req, res) => {
-
-    try{
-
+    try {
       const postId = parseInt(req.params.postId);
       const data: postTypeSchema = req.body;
       const files = req.files as Express.Multer.File[];
@@ -140,53 +136,23 @@ postRoute.put(
         municipality: data.municipality,
         userId: req.session.user?.id,
       };
-      
+
       let newFiles: { url: string; filename: string }[] = [];
       if (files && files.length > 0) {
         newFiles = files.map((file) => ({
-        url: file.path,
-        filename: file.filename,
-      }));
-    }
-
-    const updatedPost = await db.post.update({
-      where: {
-        id: postId,
-      },
-      data: {
-        ...dataNoFiles,
-        photos: {
-          create: newFiles,
-        },
-      },
-      include: {
-        photos: true,
-      },
-    });
-
-    if (data.deletedFiles) {
-      for (let filename of data.deletedFiles) {
-        await cloudinary.uploader.destroy(filename);
+          url: file.path,
+          filename: file.filename,
+        }));
       }
-      
-      const filesToDelete = await db.post.findUnique({
+
+      const updatedPost = await db.post.update({
         where: {
           id: postId,
         },
-        include: {
-          photos: true,
-        },
-      });
-      
-      const dataToDelete = data.deletedFiles.filter((file) =>
-      filesToDelete?.photos.some((filename) => file === filename.filename)
-      );
-      
-      const updatedFiles = await db.post.update({
-        where: { id: postId },
         data: {
+          ...dataNoFiles,
           photos: {
-            deleteMany: { filename: { in: dataToDelete } },
+            create: newFiles,
           },
         },
         include: {
@@ -194,31 +160,60 @@ postRoute.put(
         },
       });
 
-      // If there are images to delete, remove them
-      if (req.body.deleteImages && req.body.deleteImages.length > 0) {
-        const imagesToDelete = req.body.deleteImages;
+      if (data.deletedFiles) {
+        for (let filename of data.deletedFiles) {
+          await cloudinary.uploader.destroy(filename);
+        }
 
-        await db.post.update({
+        const filesToDelete = await db.post.findUnique({
+          where: {
+            id: postId,
+          },
+          include: {
+            photos: true,
+          },
+        });
+
+        const dataToDelete = data.deletedFiles.filter((file) =>
+          filesToDelete?.photos.some((filename) => file === filename.filename)
+        );
+
+        const updatedFiles = await db.post.update({
           where: { id: postId },
           data: {
             photos: {
-              deleteMany: {
-                id: { in: imagesToDelete },
-              },
+              deleteMany: { filename: { in: dataToDelete } },
             },
           },
+          include: {
+            photos: true,
+          },
         });
+
+        // If there are images to delete, remove them
+        if (req.body.deleteImages && req.body.deleteImages.length > 0) {
+          const imagesToDelete = req.body.deleteImages;
+
+          await db.post.update({
+            where: { id: postId },
+            data: {
+              photos: {
+                deleteMany: {
+                  id: { in: imagesToDelete },
+                },
+              },
+            },
+          });
+        }
+
+        res.status(200).json({ message: "Successfully updated post", data: updatedPost });
       }
 
-      res.status(200).json({ message: "Successfully updated post", data: updatedPost });
-    } 
-    
-    return res.status(200).json(updatedPost);
-  }
-  catch(error){
-    console.log(error);
-    return res.status(500).json(error)
-  }
+      return res.status(200).json(updatedPost);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
   }
 );
 
@@ -346,6 +341,7 @@ postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
       include: {
         reports: true,
         user: true,
+        photos: true,
       },
     });
 

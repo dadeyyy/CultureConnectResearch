@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { provincesTest, municipalities } from "@/lib/provinces";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Textarea } from "../ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +27,6 @@ import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 
 interface ArchiveFormProps {
-  closeDrawer: () => void;
   provinceData: string | undefined;
   action: "Create" | "Update";
   archiveData?: {
@@ -74,12 +73,7 @@ type Archive = {
   updatedAt: string;
 };
 
-const ArchiveForm: React.FC<ArchiveFormProps> = ({
-  closeDrawer,
-  provinceData,
-  action,
-  archiveData,
-}) => {
+const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archiveData }) => {
   const [province, setProvince] = useState(provinceData);
   const [archive, setArchive] = useState<Archive | null>(null);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
@@ -314,7 +308,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select a verified email to display" />
+                                  <SelectValue placeholder="Please select a category" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -360,9 +354,6 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
           </div>
           <div className="flex-row-reverse flex mt-2">
             <Button className="w-1/6 add-archive-submit ">Submit</Button>
-            <Button className="w-1/6 add-archive-cancel" onClick={closeDrawer}>
-              Cancel
-            </Button>
           </div>
         </div>
       </form>

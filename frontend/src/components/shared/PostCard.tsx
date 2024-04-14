@@ -48,41 +48,42 @@ const PostCard = ({ post }: PostCardProps) => {
   return (
     <div className="post-card">
       <div className="flex-between">
-        <div className="flex items-center gap-3">
-          <Link to={`/profile/${post.user.id}`}>
+        <Link to={`/profile/${post.user.id}`}>
+          <div className="flex items-center gap-3">
             <img
               src={post?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
               alt="user"
               className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
             />
-          </Link>
 
-          <div className="flex flex-col">
-            <div className="flex flex-row text-center gap-2">
-              <p className="base-medium lg:body-bold text-dark-1">
-                {post.user.firstName} {post.user.lastName}
-              </p>
-              {post?.user.role === `ADMIN` && (
-                <Badge className="bg-green-300 font-light text-xs border border-gray-300">
-                  {post?.user?.province}
-                </Badge>
-              )}
-            </div>
-            <div className="flex gap-2 text-dark-3">
-              <p className="subtle-regular lg:text-xs">{multiFormatDateString(post.createdAt)}</p>
-              <p className="subtle-regular lg:text-xs">
-                {"In "}
-                {post?.municipality &&
-                  municipalities[post.province]?.find(
-                    (municipal) => municipal.value === post.municipality
-                  )?.label}
-                {", "}
-                {post?.province &&
-                  provincesTest.find((province) => province.value === post.province)?.label}
-              </p>
+            <div className="flex flex-col">
+              <div className="flex flex-row text-center gap-2">
+                <p className="base-medium lg:body-bold text-dark-1">
+                  {post.user.firstName} {post.user.lastName}
+                </p>
+                {post?.user.role === `ADMIN` && (
+                  <Badge className="bg-green-300 font-light text-xs border border-gray-300">
+                    {post?.user?.province}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2 text-dark-3">
+                <p className="subtle-regular xs:text-xs">{multiFormatDateString(post.createdAt)}</p>
+                <p className="subtle-regular xs:text-xs">
+                  {"In "}
+                  {post?.municipality &&
+                    municipalities[post.province]?.find(
+                      (municipal) => municipal.value === post.municipality
+                    )?.label}
+                  {", "}
+                  {post?.province &&
+                    provincesTest.find((province) => province.value === post.province)?.label}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
+
         <ReportForm userId={user.id} postId={post.id} postUserId={post.user.id} />
       </div>
 

@@ -17,19 +17,10 @@ module.exports = {
       padding: "2rem",
       screens: {
         sm: "640px",
-        // => @media (min-width: 640px) { ... }
-
         md: "768px",
-        // => @media (min-width: 768px) { ... }
-
         lg: "1024px",
-        // => @media (min-width: 1024px) { ... }
-
         xl: "1280px",
-        // => @media (min-width: 1280px) { ... }
-
         "2xl": "1536px",
-        // => @media (min-width: 1536px) { ... }
       },
     },
     extend: {
@@ -39,7 +30,6 @@ module.exports = {
         primary: "#6495ed",
         "secondary-500": "#FFB620",
         "off-white": "#D0DFFF",
-        // red: "#FF5A5A",
         "dark-1": "#000000",
         "dark-2": "#09090A",
         "dark-3": "#101012",
@@ -48,6 +38,39 @@ module.exports = {
         "light-2": "#EFEFEF",
         "light-3": "#7878A3",
         "light-4": "#5C5C7B",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
       screens: {
         xs: "240px",

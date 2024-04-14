@@ -2,6 +2,13 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { Moon, Sun } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
