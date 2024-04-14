@@ -63,7 +63,13 @@ import { Button } from '@/components/ui/button';
 // ];
 
 type streamState = {
-  name: string;
+  created: string;
+  deleteRecordingAfterDays: number;
+  meta: {
+    name: string;
+    description: string;
+  };
+  modified: string;
   uid: string;
 }[];
 
@@ -87,16 +93,11 @@ const LiveStream = () => {
         }
 
         const data1 = await liveStreamResponse.json();
-        console.log(data1);
         setAvailableLivestreams(data1);
-
-
-        
       } catch (error: unknown) {
-        if(error instanceof Error) {
-          setError(error)
-        }
-        else {
+        if (error instanceof Error) {
+          setError(error);
+        } else {
           setError(new Error('An unknown error occurred.'));
         }
       }
@@ -117,8 +118,7 @@ const LiveStream = () => {
         <div className="w-full h-full flex justify-center">
           <Carousel className="w-4/5 m-auto">
             <CarouselContent className="h-full m-auto my-2">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <CarouselItem key={index}>
+            {availableLivestreams.map((data, index) => (                <CarouselItem key={index}>
                   <div className="">
                     <Card
                       className="cursor-pointer"
@@ -126,47 +126,49 @@ const LiveStream = () => {
                         navigate(`/live-streams/1`);
                       }}
                     >
-                      <CardContent className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3">
-                        {availableLivestreams.map((data, index) => {
-                          return (
-                            <iframe
-                              key={index}
-                              src={`https://customer-zo8okz8uxe6umby3.cloudflarestream.com/${data.uid}/iframe`}
-                              title="Example Stream video"
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            ></iframe>
-                          );
-                        })}
+                      
+                        <CardContent
+                          className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3"
+                        >
+                          <iframe
+                            className="object-cover aspect-video w-full rounded-l-xl"
+                            key={index}
+                            src={`https://customer-zo8okz8uxe6umby3.cloudflarestream.com/${data.uid}/iframe`}
+                            title="Example Stream video"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
 
-                        <div className="flex flex-col w-1/2">
-                          <span className="flex flex-row text-center items-center gap-4 my-5">
-                            <img
-                              src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
-                              width={75}
-                              className="rounded-full"
-                            />
-                            <span className="flex flex-col">
-                              <span className="text-xl font-bold text-center">
-                                Rick Astley
-                              </span>
-                              <span className="text-md text-start">
-                                @RickJackson
+                          <div className="flex flex-col w-1/2">
+                            <span className="flex flex-row text-center items-center gap-4 my-5">
+                              <img
+                                src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
+                                width={75}
+                                className="rounded-full"
+                              />
+                              <span className="flex flex-col">
+                                <span className="text-xl font-bold text-center">
+                                  Rick Astley
+                                </span>
+                                <span className="text-md text-start">
+                                  @RickJackson
+                                </span>
                               </span>
                             </span>
-                          </span>
 
-                          <span className="text-base font-base text-justify">
-                            Astley himself has been rickrolled a few times; in
-                            fact, the first time he was rickrolled actually
-                            pre-dated the viral phenomenon. In an interview with
-                            Larry King, Astley stated that the first time he
-                            fell for the prank was through an email his friend
-                            sent him during the early 2000s.
-                          </span>
-                        </div>
-                      </CardContent>
+                              <span
+                                className="text-base font-base text-justify"
+                              >
+                                <h1>
+                                  <b>Title:{data.meta.name}</b>
+                                </h1>
+                                <p>{data.meta.description}</p>
+                              </span>
+                            
+                          </div>
+                        </CardContent>
+                      
                     </Card>
                   </div>
                 </CarouselItem>

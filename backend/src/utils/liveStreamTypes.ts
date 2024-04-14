@@ -2,7 +2,8 @@ export type LiveInput = {
     created: string;
     deleteRecordingAfterDays: number;
     meta: {
-      name: string;
+      name: string,
+      description: string
     };
     modified: string;
     uid: string;
