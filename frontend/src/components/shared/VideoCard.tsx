@@ -8,7 +8,7 @@ type videoCardProps = {
 
 const VideoCard = ({ title, creator, views, dateCreate, thumbnail }: videoCardProps) => {
   return (
-    <div className="flex justify-center items-center cursor-pointer ">
+    <div className="flex justify-center items-center cursor-pointer  hover:scale-110 transition ease-in-out delay-150">
       <div className="w-full min-w-64 max-w-96">
         <div className="bg-white border rounded-lg shadow-md">
           <img

@@ -22,6 +22,7 @@ import ArchiveDetails from "./components/shared/ArchiveDetails";
 import Reports from "./_root/pages/Reports";
 import Explore from "./_root/pages/Explore";
 import ArchiveCategory from "./_root/pages/ArchiveCategory";
+import LiveDetails from "./_root/pages/LiveDetails";
 
 const App = () => {
   return (
@@ -44,6 +45,7 @@ const App = () => {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/live-streams" element={<LiveStream />} />
+          <Route path="/live-streams/1" element={<LiveDetails />} />
           <Route path="/for-you" element={<ForYou />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />

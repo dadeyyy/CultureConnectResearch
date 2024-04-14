@@ -290,6 +290,7 @@ postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
             include: {
                 reports: true,
                 user: true,
+                photos: true,
             },
         });
         res.status(200).json(reportedPosts);

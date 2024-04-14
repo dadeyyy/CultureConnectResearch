@@ -9,6 +9,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const sources = [
   {
@@ -65,6 +67,8 @@ type streamState = {
 
 const LiveStream = () => {
   const [availableLivestreams, setAvailableLivestreams] = useState<streamState>([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -88,18 +92,25 @@ const LiveStream = () => {
   return (
     <div className="  w-full flex xl:flex-row xs:flex-col">
       <div className="w-full flex flex-col custom-scrollbar overflow-auto">
-        <div className="w-fullh-full flex justify-center">
+        <div className="bg-red-200 w-full p-3 flex flex-row justify-between text-center items-center px-5">
+          <div className="text-lg font-bold decoration-indigo-500">CultureConnect Live streams</div>
+          <Button className="bg-red-500">Go Live</Button>
+        </div>
+        <div className="w-full h-full flex justify-center">
           <Carousel className="w-4/5 m-auto">
             <CarouselContent className="h-full m-auto my-2">
               {Array.from({ length: 5 }).map((_, index) => (
                 <CarouselItem key={index}>
                   <div className="">
-                    <Card>
-                      <CardContent className="flex lg:aspect-[5/3] xs:aspect-[1/2] items-center h-full justify-center rounded-xl gap-3 pr-3">
+                    <Card
+                      className="cursor-pointer"
+                      onClick={() => {
+                        navigate(`/live-streams/1`);
+                      }}
+                    >
+                      <CardContent className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3">
                         <iframe
-                          className="object-cover rounded-xl"
-                          width="100%"
-                          height="100%"
+                          className="object-cover aspect-video w-full rounded-l-xl"
                           src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                           title="YouTube video player"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -139,7 +150,7 @@ const LiveStream = () => {
           <span className="text-xl font-bold px-3 text-center sticky top-0 bg-white opacity-80">
             Past Live Streams
           </span>
-          <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-3 xs:grid-cols-1 ">
+          <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-3 xs:grid-cols-1">
             {sources.map((source) => (
               <VideoCard
                 title={source.title}

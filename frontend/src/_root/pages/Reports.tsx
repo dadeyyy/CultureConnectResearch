@@ -65,7 +65,7 @@ const Reports = () => {
           },
         });
         const data = await response.json();
-
+        console.log(data);
         // Check if data is an array
         if (Array.isArray(data)) {
           setReportedPosts(data);
@@ -144,7 +144,10 @@ const Reports = () => {
             <Loader />
           ) : (
             reportedPosts.map((reportedPost) => (
-              <div key={reportedPost.id} className="w-full flex flex-row px-10 gap-10 items-center">
+              <div
+                key={reportedPost.id}
+                className="w-full flex lg:flex-row xs:flex-col px-10 lg:gap-10 xs:gap-2 items-center"
+              >
                 <div className="w-full bg-white rounded-lg p-5">
                   {" "}
                   <div className="flex-between">
