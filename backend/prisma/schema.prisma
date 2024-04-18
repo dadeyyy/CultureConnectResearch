@@ -9,48 +9,46 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-enum Role{
+
+enum Role {
   SUPERADMIN
   ADMIN
   USER
 }
 
-
 model User {
-  id          Int       @id @default(autoincrement())
-  username    String    @unique
-  password    String    
-  email       String    @unique
-  firstName String
-  lastName String
-  role Role @default(USER)
-  province String? @default("bataan")
+  id          Int          @id @default(autoincrement())
+  username    String       @unique
+  password    String
+  email       String       @unique
+  firstName   String
+  lastName    String
+  role        Role         @default(USER)
+  province    String?
   bio         String?
   avatarUrl   String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   posts       Post[]
   likes       Like[]
   comments    Comment[]
   reports     Report[]
-  archives Archive[]
-  followers    Followers[] @relation("UserFollowers")
-  following    Followers[] @relation("UserFollowing")
+  archives    Archive[]
+  followers   Followers[]  @relation("UserFollowers")
+  following   Followers[]  @relation("UserFollowing")
   sharedPosts SharedPost[]
-  interest String[]
+  interest    String[]
 }
 
-
-
- model Followers {
-   id           Int      @id @default(autoincrement())
-   followerId   Int
-   followingId  Int
-   createdAt    DateTime @default(now())
-   updatedAt    DateTime @updatedAt
-   follower     User     @relation(name: "UserFollowers", fields: [followerId], references: [id])
-   following    User     @relation(name: "UserFollowing", fields: [followingId], references: [id])
- }
+model Followers {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  follower    User     @relation(name: "UserFollowers", fields: [followerId], references: [id])
+  following   User     @relation(name: "UserFollowing", fields: [followingId], references: [id])
+}
 
 // model Following {
 //   id           Int      @id @default(autoincrement())
@@ -63,142 +61,136 @@ model User {
 // }
 
 model Post {
-  id          Int       @id @default(autoincrement())
-  caption     String
-  province    String
+  id           Int          @id @default(autoincrement())
+  caption      String
+  province     String
   municipality String
-  reportCount Int? @default(0)
-  photos      Photo[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  userId      Int
-  user        User      @relation(fields: [userId], references: [id])
-  likes       Like[]
-  comments    Comment[]
-  reports     Report[]
-  sharedPost  SharedPost[]
-  tags        String []
+  reportCount  Int?         @default(0)
+  photos       Photo[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id])
+  likes        Like[]
+  comments     Comment[]
+  reports      Report[]
+  sharedPost   SharedPost[]
+  tags         String[]
 }
-
-
 
 model SharedPost {
-  id          Int      @id @default(autoincrement())
-  caption     String
-  postId      Int      
-  userId      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  likes       Like[]
-  comments    Comment[]
-  post        Post     @relation(fields: [postId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
+  id        Int       @id @default(autoincrement())
+  caption   String
+  postId    Int
+  userId    Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  likes     Like[]
+  comments  Comment[]
+  post      Post      @relation(fields: [postId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 }
 
-
-
 model Archive {
-  id Int @id @default(autoincrement())
-  title String
-  description String
-  province String
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String
+  province     String
   municipality String
-  location Json
-  files Files[]
-  category String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId Int?
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location     Json
+  files        Files[]
+  category     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       Int?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Files {
-  id Int @id @default(autoincrement())
-  url String
-  filename String
+  id        Int     @id @default(autoincrement())
+  url       String
+  filename  String
   archiveId Int
-  archive Archive @relation(fields: [archiveId], references: [id], onDelete: Cascade)
+  archive   Archive @relation(fields: [archiveId], references: [id], onDelete: Cascade)
 }
 
 model Report {
-  id      Int      @id @default(autoincrement())
-  postId  Int
-  userId  Int
+  id           Int      @id @default(autoincrement())
+  postId       Int
+  userId       Int
   reportReason String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user    User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id])
 }
 
 model Photo {
-  id          Int       @id @default(autoincrement())
-  url         String
-  filename    String
-  postId    Int
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  url      String
+  filename String
+  postId   Int
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Explore {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  province    String
+  id           Int             @id @default(autoincrement())
+  title        String
+  description  String
+  province     String
   municipality String
-  photos      ExplorePhotos[]  
+  photos       ExplorePhotos[]
 }
 
 model ExplorePhotos {
-  id          Int       @id @default(autoincrement())
-  url         String
-  filename    String
-  postId    Int
-  explore      Explore     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id       Int     @id @default(autoincrement())
+  url      String
+  filename String
+  postId   Int
+  explore  Explore @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Like {
-  id        Int      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   postId    Int?
   sharedId  Int?
   userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  share     SharedPost?     @relation(fields: [sharedId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  post      Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  share     SharedPost? @relation(fields: [sharedId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id])
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   content   String
   postId    Int?
   sharedId  Int?
   userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  share     SharedPost?     @relation(fields: [sharedId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  post      Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  share     SharedPost? @relation(fields: [sharedId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id])
 }
-
 
 model Calendar {
-  id        Int      @id @default(autoincrement())
-  title     String
-  municipality String @default("Balanga")
-  details   String
-  location Json
-  startDate DateTime
-  endDate   DateTime?
-  repeat    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  provinceId String
-  province  Province  @relation(fields: [provinceId], references: [name])
+  id           Int       @id @default(autoincrement())
+  title        String
+  municipality String    @default("Balanga")
+  details      String
+  location     Json
+  startDate    DateTime
+  endDate      DateTime?
+  repeat       String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  provinceId   String
+  province     Province  @relation(fields: [provinceId], references: [name])
 }
 
-
 model Province {
-  name      String   @id
+  name      String     @id
   calendars Calendar[]
 }
