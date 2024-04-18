@@ -67,7 +67,9 @@ authRouter.post("/signin", validate(signInSchema), async (req, res) => {
 
 authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
   try {
+    console.log(req.body)
     const data: signUpType = req.body;
+    
 
     //Check if someone is trying to create an admin
     if (data.role === "ADMIN") {
