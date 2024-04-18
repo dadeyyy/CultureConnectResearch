@@ -11,17 +11,17 @@ function socket(server: any) {
     })
 
 
-    io.on('connection',(socket)=>{
+    io.on('connection',(socket:any)=>{
         console.log(`USER CONNECTED WITH ID OF ${socket.id}`)
         
         //Informing who joins the livestream
-        socket.on('joinLivestream', (livestreamId, username)=>{
+        socket.on('joinLivestream', (livestreamId :string, username: string)=>{
             //Joins to a specific room
             socket.join(livestreamId);
             socket.to(livestreamId).emit('userJoined', username)
         })
 
-        socket.on('comment', (message, username, liveStreamId)=>{
+        socket.on('comment', (message:string, username:string, liveStreamId:string)=>{
             //Save the comment to the database
 
 
