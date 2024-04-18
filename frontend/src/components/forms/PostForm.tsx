@@ -26,6 +26,9 @@ import FileUploader from "../shared/FileUploader";
 import { provincesTest, municipalities } from "@/lib/provinces";
 import { blacklist } from "./PostInfo";
 import { useEffect, useState } from "react";
+import { Input } from "../ui/input";
+import Box from "@mui/material/Box";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const formSchema = z.object({
   caption: z.string().min(0, {
@@ -38,6 +41,7 @@ const formSchema = z.object({
     required_error: "Please select a municipal.",
   }),
   image: z.custom<File[]>(),
+  tags: z.string(),
 });
 
 type PostFormProps = {
@@ -58,6 +62,7 @@ type PostProps = {
   province: string;
   updatedAt: string;
   userId: number;
+  tags: string[];
 };
 
 const PostForm = ({ action }: PostFormProps) => {
@@ -65,6 +70,7 @@ const PostForm = ({ action }: PostFormProps) => {
   const [post, setPost] = useState<PostProps | null>(null);
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [selectedMunicipal, setSelectedMunicipal] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -95,12 +101,14 @@ const PostForm = ({ action }: PostFormProps) => {
       caption: post ? post?.caption : "",
       municipality: post ? post?.municipality : "",
       province: post ? post?.province : "",
+      tags: post ? post.tags.join(",") : "",
     },
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     const caption = values.caption;
-
+    console.log(values);
+    setIsLoading(true);
     if (blacklist.includes(caption)) {
       form.setError("caption", {
         type: "custom",
@@ -138,14 +146,18 @@ const PostForm = ({ action }: PostFormProps) => {
 
         if (response.ok) {
           console.log("Update successful!");
+          setIsLoading(false);
           console.log(data);
           navigate("/home");
         } else {
           console.error("Update failed");
+          setIsLoading(false);
           console.log(data);
         }
       } catch (error) {
         console.error("Error updating post:", error);
+      } finally {
+        setIsLoading(false);
       }
       return navigate(`/home`);
     }
@@ -157,6 +169,7 @@ const PostForm = ({ action }: PostFormProps) => {
       formData.append("caption", values.caption);
       formData.append("province", values.province);
       formData.append("municipality", values.municipality);
+      formData.append("tags", values.tags);
       // formData.append("image", values.image )
       if (values.image) {
         values.image.forEach((file) => {
@@ -176,9 +189,13 @@ const PostForm = ({ action }: PostFormProps) => {
         }
         const data = await response.json();
         console.log("Posting successful!", data);
+        setIsLoading(false);
         navigate("/home");
       } catch (error) {
         console.error("Error during POST request:", error);
+        setIsLoading(false);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -191,145 +208,188 @@ const PostForm = ({ action }: PostFormProps) => {
         className="flex flex-col gap-5 w-full max-w-5xl"
         encType="multipart/form-data"
       >
-        <FormField
-          control={form.control}
-          name="caption"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="shad-form_label">Caption</FormLabel>
-              <FormControl>
-                <Textarea
-                  className="shad-textarea custom-scrollbar"
-                  placeholder="Caption here"
-                  {...field}
-                  defaultValue={post?.caption}
-                />
-              </FormControl>
-              <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="image"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="shad-form_label">Add Photos</FormLabel>
-              <FormControl>
-                <FileUploader fieldChange={field.onChange} photos={post?.photos} />
-              </FormControl>
-              <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-5xl">
-          <FormField
-            control={form.control}
-            name="province"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Province</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn("justify-between", !field.value && "text-muted-foreground")}
-                      >
-                        {field.value
-                          ? provincesTest.find((province) => province.value === field.value)?.label
-                          : post?.province
-                          ? provincesTest.find((province) => province.value === post.province)
-                              ?.label
-                          : "Select Province"}
+        <div className="flex lg:flex-row xs:flex-col w-full gap-2">
+          <div className="w-full flex flex-col gap-3">
+            <FormField
+              control={form.control}
+              name="caption"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="shad-form_label">Caption</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      className="shad-textarea custom-scrollbar"
+                      placeholder="Caption here"
+                      {...field}
+                      defaultValue={post?.caption}
+                    />
+                  </FormControl>
+                  <FormMessage className="shad-form_message" />
+                </FormItem>
+              )}
+            />
 
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0">
-                    <Command className="bg-white">
-                      <CommandInput placeholder="Search province..." />
-                      <CommandEmpty>No province found.</CommandEmpty>
-                      <CommandGroup className="max-h-[200px] overflow-y-auto">
-                        {provincesTest.map((province) => (
-                          <CommandItem
-                            value={province.label}
-                            key={province.value}
-                            onSelect={() => {
-                              form.setValue("province", province.value);
-                              setSelectedProvince(province.value);
-                            }}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-5xl">
+              <FormField
+                control={form.control}
+                name="province"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Province</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
                           >
-                            {province.label}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="municipality"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Municipal</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn("justify-between", !field.value && "text-muted-foreground")}
-                        disabled={!selectedProvince || !municipalities[selectedProvince]?.length}
-                      >
-                        {selectedProvince !== null
-                          ? (municipalities[selectedProvince] || []).find(
-                              (municipal) => municipal.value === field.value
-                            )?.label
-                          : post?.province
-                          ? (municipalities[post.province] || []).find(
-                              (municipal) => municipal.value === post.municipality
-                            )?.label
-                          : "Select Municipality"}
+                            {field.value
+                              ? provincesTest.find((province) => province.value === field.value)
+                                  ?.label
+                              : post?.province
+                              ? provincesTest.find((province) => province.value === post.province)
+                                  ?.label
+                              : "Select Province"}
 
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0">
-                    <Command className="bg-white w-screen">
-                      <CommandInput placeholder="Search municipal..." />
-                      <CommandEmpty>No municipal found.</CommandEmpty>
-                      <CommandGroup className="max-h-screen overflow-y-auto">
-                        {selectedProvince &&
-                          municipalities[selectedProvince]?.map((municipal) => (
-                            <CommandItem
-                              value={municipal.label}
-                              key={municipal.value}
-                              onSelect={() => {
-                                form.setValue("municipality", municipal.value);
-                                field.onChange(municipal.value); // Update the field.value
-                                console.log("Selected Municipality:", municipal.label);
-                              }}
-                            >
-                              {municipal.label}
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Command className="bg-white">
+                          <CommandInput placeholder="Search province..." />
+                          <CommandEmpty>No province found.</CommandEmpty>
+                          <CommandGroup className="max-h-[200px] overflow-y-auto">
+                            {provincesTest.map((province) => (
+                              <CommandItem
+                                value={province.label}
+                                key={province.value}
+                                onSelect={() => {
+                                  form.setValue("province", province.value);
+                                  setSelectedProvince(province.value);
+                                }}
+                              >
+                                {province.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="municipality"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Municipal</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                            disabled={
+                              !selectedProvince || !municipalities[selectedProvince]?.length
+                            }
+                          >
+                            {selectedProvince !== null
+                              ? (municipalities[selectedProvince] || []).find(
+                                  (municipal) => municipal.value === field.value
+                                )?.label
+                              : post?.province
+                              ? (municipalities[post.province] || []).find(
+                                  (municipal) => municipal.value === post.municipality
+                                )?.label
+                              : "Select Municipality"}
+
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Command className="bg-white w-screen">
+                          <CommandInput placeholder="Search municipal..." />
+                          <CommandEmpty>No municipal found.</CommandEmpty>
+                          <CommandGroup className="max-h-[200px] overflow-y-auto">
+                            {selectedProvince &&
+                              municipalities[selectedProvince]?.map((municipal) => (
+                                <CommandItem
+                                  value={municipal.label}
+                                  key={municipal.value}
+                                  onSelect={() => {
+                                    form.setValue("municipality", municipal.value);
+                                    field.onChange(municipal.value); // Update the field.value
+                                    console.log("Selected Municipality:", municipal.label);
+                                  }}
+                                >
+                                  {municipal.label}
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="shad-form_label">
+                    Add Tags (separated by comma " , ")
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Art, Expression, Learn"
+                      type="text"
+                      className="shad-input"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="shad-form_message" />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className=" w-full">
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="shad-form_label">Add Photos</FormLabel>
+                  <FormControl>
+                    <FileUploader fieldChange={field.onChange} photos={post?.photos} />
+                  </FormControl>
+                  <FormMessage className="shad-form_message" />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
+        {isLoading && (
+          <div className="w-full ">
+            <Box sx={{ width: "100%" }}>
+              <LinearProgress />
+            </Box>
+          </div>
+        )}
         <div className="flex gap-4 items-center justify-end">
           <Button type="button" className="shad-button_dark-4" onClick={() => navigate(-1)}>
             Cancel

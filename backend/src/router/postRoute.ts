@@ -2,7 +2,7 @@ import express from "express";
 import { isAuthenticated, isAuthor, validate } from "../middleware/middleware.js";
 import { db } from "../utils/db.server.js";
 import { upload, cloudinary } from "../utils/cloudinary.js";
-import { postSchema, postTypeSchema } from "../utils/Schemas.js";
+import { postSchema, postTypeSchema, sharedPostTypeSchema } from "../utils/Schemas.js";
 
 const postRoute = express.Router();
 
@@ -16,6 +16,7 @@ postRoute.post(
     try {
       const data: postTypeSchema = req.body;
       const files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      const tags = data.tags?.replace(/ /g, "").split(",") || [];
 
       const images = files?.map((file) => ({
         url: file.path,
@@ -29,6 +30,7 @@ postRoute.post(
           photos: {
             create: images,
           },
+          tags: tags,
         },
         include: {
           photos: true,
@@ -48,7 +50,7 @@ postRoute.post(
 // GET ALL THE POST
 postRoute.get("/post", isAuthenticated, async (req, res) => {
   try {
-    const limit: number = parseInt(req.query.limit as string) || 1;
+    const limit: number = parseInt(req.query.limit as string) || 2;
     const offset: number = parseInt(req.query.offset as string) || 0;
 
     const allPost = await db.post.findMany({
@@ -65,6 +67,60 @@ postRoute.get("/post", isAuthenticated, async (req, res) => {
     });
 
     res.status(200).json(allPost);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Cannot get the posts" });
+  }
+});
+
+//fetch all
+postRoute.get("/post/all", async (req, res) => {
+  const limit: number = parseInt(req.query.limit as string) || 1;
+  const regularOffset: number = parseInt(req.query.offset as string) || 0;
+  const sharedOffset: number = parseInt(req.query.sharedOffset as string) || 0; // New offset for shared posts
+
+  try {
+    const regularPosts = await db.post.findMany({
+      include: {
+        photos: true,
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: regularOffset,
+      take: limit,
+    });
+
+    const regularPostsWithType = regularPosts.map((post) => ({
+      ...post,
+      type: "regular",
+    }));
+
+    const sharedPosts = await db.sharedPost.findMany({
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: sharedOffset, // Use separate offset for shared posts
+      take: limit,
+    });
+
+    const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
+      ...sharedPost,
+      type: "shared",
+    }));
+
+    const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
+
+    // Sort combined posts by createdAt
+    const sortedPosts = allPosts.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    res.status(200).json(sortedPosts);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Cannot get the posts" });
@@ -101,7 +157,9 @@ postRoute.get("/post/:id", async (req, res) => {
       },
       include: {
         photos: true,
-        user: { select: { id: true, username: true, firstName: true, lastName: true } }, // Corrected include syntax
+        user: {
+          select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+        }, // Corrected include syntax
       },
     });
 
@@ -354,10 +412,12 @@ postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
 
 //following posts
 postRoute.get("/following/posts", isAuthenticated, async (req, res) => {
-  try {
-    const userId = req.session.user?.id;
+  const limit: number = parseInt(req.query.limit as string) || 1;
+  const regularOffset: number = parseInt(req.query.offset as string) || 0;
+  const sharedOffset: number = parseInt(req.query.sharedOffset as string) || 0;
+  const userId = req.session.user?.id;
 
-    // Fetch the IDs of users whom the current user follows
+  try {
     const followingIds = await db.followers.findMany({
       where: {
         followerId: userId,
@@ -366,31 +426,63 @@ postRoute.get("/following/posts", isAuthenticated, async (req, res) => {
         followingId: true,
       },
     });
-
-    console.log(followingIds);
     const followingUserIds = followingIds.map((entry) => entry.followingId);
-    console.log(followingUserIds);
-    // Fetch posts from users whom the current user follows
-    const followingPosts = await db.post.findMany({
+
+    const regularPosts = await db.post.findMany({
+      include: {
+        photos: true,
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: regularOffset,
+      take: limit,
       where: {
         userId: {
           in: followingUserIds,
         },
       },
+    });
+
+    const regularPostsWithType = regularPosts.map((post) => ({
+      ...post,
+      type: "regular",
+    }));
+
+    const sharedPosts = await db.sharedPost.findMany({
       include: {
-        photos: true,
         user: true,
-        comments: true,
       },
       orderBy: {
         createdAt: "desc",
       },
+      skip: sharedOffset, // Use separate offset for shared posts
+      take: limit,
+      where: {
+        userId: {
+          in: followingUserIds,
+        },
+      },
     });
-    console.log(followingPosts);
-    res.status(200).json(followingPosts);
+
+    const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
+      ...sharedPost,
+      type: "shared",
+    }));
+
+    const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
+
+    // Sort combined posts by createdAt
+    const sortedPosts = allPosts.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    res.status(200).json(sortedPosts);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Failed to fetch following posts" });
+    res.status(500).json({ error: "Cannot get the posts" });
   }
 });
+
 export default postRoute;

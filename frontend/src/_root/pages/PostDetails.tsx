@@ -96,7 +96,7 @@ const PostDetails = () => {
                       {post.user.firstName} {post.user.lastName}
                     </p>
                     {user.id === post.userId && user.role === `ADMIN` && (
-                      <Badge className="bg-green-300 font-light text-xs border border-gray-300">
+                      <Badge className="bg-green-300 font-semibold text-xs border text-gray-600 capitalize border-gray-300">
                         {user.province}
                       </Badge>
                     )}
@@ -143,15 +143,22 @@ const PostDetails = () => {
 
             <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
               <p>{post.caption}</p>{" "}
+              <ul className="flex gap-1 mt-2">
+                {post.tags.map((tag, index) => (
+                  <li key={index} className="text-light-3 small-regular">
+                    #{tag}
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="w-full">
               <Carousel photos={post.photos || []} />
-              <PostStats post={post} userId={user.id} />
+              <PostStats postId={post.id} userId={user.id} type="regular" />
             </div>
           </div>
 
           <div className="post_details-info">
-            <Comments postId={post.id} action="detail" />
+            <Comments postId={post.id} action="detail" type="regular" />
           </div>
         </div>
       )}

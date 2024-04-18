@@ -84,11 +84,5 @@ followRouter.get("/followers-count/:userId", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-followRouter.get("/people-you-may-know", async (req, res) => {
-    try {
-    }
-    catch (error) {
-    }
-});
 export default followRouter;
 //# sourceMappingURL=followRoute.js.map

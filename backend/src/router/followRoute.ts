@@ -86,12 +86,4 @@ followRouter.get("/followers-count/:userId", async (req, res) => {
   }
 });
 
-followRouter.get("/people-you-may-know", async (req, res) => {
-  try{
-    
-  }catch(error){
-
-  }
-})
-
 export default followRouter;

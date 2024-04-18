@@ -23,6 +23,7 @@ import Reports from "./_root/pages/Reports";
 import Explore from "./_root/pages/Explore";
 import ArchiveCategory from "./_root/pages/ArchiveCategory";
 import LiveDetails from "./_root/pages/LiveDetails";
+import SharedPostDetails from "./_root/pages/SharedPostDetails";
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
           <Route path="/archives/:province" element={<ArchiveProvince />} />
           <Route path="/archives/:province/:category" element={<ArchiveCategory />} />
           <Route path="/archives/:province/:category/:id" element={<ArchiveDetails />} />
+          <Route path="/shared-post/:id" element={<SharedPostDetails />} />
         </Route>
       </Routes>
 

@@ -48,4 +48,37 @@ userRoute.get("/user/:userId", async (req, res) => {
   }
 });
 
+userRoute.get("/peoples", async (req, res) => {
+  try {
+    const userId = String(req.session.user?.id); // Convert userId to string
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    console.log("Received userId:", userId);
+    const followingIds = await db.followers.findMany({
+      where: {
+        followerId: parseInt(userId), // ParseInt expects string input
+      },
+      select: {
+        followingId: true,
+      },
+    });
+
+    const followingIdsArray = followingIds.map((entry) => entry.followingId);
+
+    const people = await db.user.findMany({
+      where: {
+        NOT: [{ id: { in: followingIdsArray } }, { id: parseInt(userId) }],
+      },
+      take: 10,
+    });
+    res.status(200).json({ people });
+  } catch (error) {
+    console.error("Error in /peoples route:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default userRoute;

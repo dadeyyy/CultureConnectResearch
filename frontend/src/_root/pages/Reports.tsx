@@ -127,93 +127,100 @@ const Reports = () => {
   }
 
   return (
-    <div className="bg-red-200 w-full overflow-auto">
-      <div className="bg-red-300 w-full h-16 text-center p-3 sticky">
-        <span className="text-xl font-bold">Reported Posts</span>
-        {progress && (
-          <div className="w-full">
-            <Box sx={{ width: "100%" }}>
-              <LinearProgress />
-            </Box>
-          </div>
-        )}
-      </div>
-      <div className="flex h-full">
+    <div className="flex flex-1 overflow-y-scroll custom-scrollbar">
+      <div className="explore-container">
+        <div className=" w-full h-16 text-center p-3 sticky">
+          <span className="text-xl font-bold">Reported Posts</span>
+          {progress && (
+            <div className="w-full">
+              <Box sx={{ width: "100%" }}>
+                <LinearProgress />
+              </Box>
+            </div>
+          )}
+        </div>
         <div className="w-full flex flex-col items-center gap-5 h-full py-5 ">
           {loading ? (
             <Loader />
           ) : (
             reportedPosts.map((reportedPost) => (
-              <div
-                key={reportedPost.id}
-                className="w-full flex lg:flex-row xs:flex-col px-10 lg:gap-10 xs:gap-2 items-center"
-              >
-                <div className="w-full bg-white rounded-lg p-5">
-                  {" "}
-                  <div className="flex-between">
-                    <div className="flex items-center gap-3">
-                      <Link to={`/profile/${reportedPost.user.id}`}>
-                        <img
-                          src={
-                            reportedPost?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"
-                          }
-                          alt="user"
-                          className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
-                        />
-                      </Link>
-
-                      <div className="flex flex-col">
-                        <div className="flex flex-row text-center gap-2">
-                          <p className="base-medium lg:body-bold text-dark-1">
-                            {reportedPost.user.firstName} {reportedPost.user.lastName}
-                          </p>
-                          {user.id === reportedPost?.user.id && user.role === `ADMIN` && (
-                            <Badge className="bg-green-300 font-light text-xs border border-gray-300">
-                              {user.province}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex gap-2 text-dark-3">
-                          <p className="subtle-regular lg:text-xs">
-                            {multiFormatDateString(reportedPost.createdAt)}
-                          </p>
-                          <p className="subtle-regular lg:text-xs">
-                            {"In "}
-                            {reportedPost?.municipality &&
-                              municipalities[reportedPost.province]?.find(
-                                (municipal) => municipal.value === reportedPost.municipality
-                              )?.label}
-                            {", "}
-                            {reportedPost?.province &&
-                              provincesTest.find(
-                                (province) => province.value === reportedPost.province
-                              )?.label}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <Link to={`/posts/${reportedPost.id}`}>
-                    <div className="small-medium lg:base-medium py-5">
-                      <p>{filterInappropriateWords(reportedPost.caption)}</p>
-                    </div>
-                  </Link>
-                  <Carousel photos={reportedPost?.photos || []} />
-                  <PostStats post={reportedPost} userId={user.id} />
-                  {/* <Comments postId={reportedPost.id} action="home" /> */}
-                </div>
-                <div className="w-fullh-full ">
+              <div key={reportedPost.id} className="w-full flex flex-col xs:gap-2 items-center">
+                <div className="w-full p-2 border rounded-xl bg-red-200">
                   <Button
-                    className="bg-red-500 hover:scale-110 hover:bg-red-900 hover:text-white"
+                    className="bg-red-500 hover:scale-110 hover:bg-red-900 hover:text-white w-full"
                     onClick={() => handleDeletePost(reportedPost.id)}
                   >
                     Delete this post
                   </Button>
+                  <div className="w-full bg-white rounded-lg p-5">
+                    <div className="flex-between">
+                      <div className="flex items-center gap-3">
+                        <Link to={`/profile/${reportedPost.user.id}`}>
+                          <img
+                            src={
+                              reportedPost?.user.avatarUrl ||
+                              "/assets/icons/profile-placeholder.svg"
+                            }
+                            alt="user"
+                            className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
+                          />
+                        </Link>
+
+                        <div className="flex flex-col">
+                          <div className="flex flex-row text-center gap-2">
+                            <p className="base-medium lg:body-bold text-dark-1">
+                              {reportedPost.user.firstName} {reportedPost.user.lastName}
+                            </p>
+                            {user.id === reportedPost?.user.id && user.role === `ADMIN` && (
+                              <Badge className="bg-green-300 font-light text-xs border border-gray-300">
+                                {user.province}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-2 text-dark-3">
+                            <p className="subtle-regular lg:text-xs">
+                              {multiFormatDateString(reportedPost.createdAt)}
+                            </p>
+                            <p className="subtle-regular lg:text-xs">
+                              {"In "}
+                              {reportedPost?.municipality &&
+                                municipalities[reportedPost.province]?.find(
+                                  (municipal) => municipal.value === reportedPost.municipality
+                                )?.label}
+                              {", "}
+                              {reportedPost?.province &&
+                                provincesTest.find(
+                                  (province) => province.value === reportedPost.province
+                                )?.label}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Link to={`/posts/${reportedPost.id}`}>
+                      <div className="small-medium lg:base-medium py-5">
+                        <p>{filterInappropriateWords(reportedPost.caption)}</p>
+                      </div>
+                    </Link>
+                    <Carousel photos={reportedPost?.photos || []} />
+                    <PostStats postId={reportedPost.id} userId={user.id} type="regular" />
+                    {/* <Comments postId={reportedPost.id} action="home" /> */}
+                  </div>
                 </div>
               </div>
             ))
           )}
         </div>
+      </div>
+      <div className="home-creators">
+        <span className="text-sm">
+          <span className="hover:underline cursor-pointer m-1">Terms of Service</span>
+          <span className="hover:underline cursor-pointer m-1">Privacy Policy</span>
+          <span className="hover:underline cursor-pointer m-1"> About</span>
+          <div>
+            <span className="m-1">© 2024 CultureConnect.</span>
+          </div>
+        </span>
       </div>
     </div>
   );

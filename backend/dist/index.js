@@ -11,9 +11,11 @@ import likeRoute from "./router/likeRoute.js";
 import calendarRoute from "./router/calendarRoute.js";
 import algoRoute from "./router/algoRoute.js";
 import archiveRoute from "./router/archive.js";
-import liveStreamRoute from './router/liveStream.js';
-import { createServer } from 'node:http';
+import followRouter from "./router/followRoute.js";
+import liveStreamRoute from "./router/liveStream.js";
+import { createServer } from "node:http";
 import socket from "./socket.js";
+import shareRoute from "./router/shareRoute.js";
 if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
@@ -41,15 +43,17 @@ app.use(session({
 }));
 app.use(morgan("tiny"));
 //Routers
-app.use('/', authRouter);
-app.use('/', postRoute);
-app.use('/', userRoute);
-app.use('/', commentRoute);
-app.use('/', likeRoute);
-app.use('/', calendarRoute);
-app.use('/', algoRoute);
-app.use('/', archiveRoute);
-app.use('/', liveStreamRoute);
+app.use("/", authRouter);
+app.use("/", postRoute);
+app.use("/", userRoute);
+app.use("/", commentRoute);
+app.use("/", likeRoute);
+app.use("/", calendarRoute);
+app.use("/", algoRoute);
+app.use("/", archiveRoute);
+app.use("/", liveStreamRoute);
+app.use("/", followRouter);
+app.use("/", shareRoute);
 server.listen(PORT, () => {
     console.log(`LISTENING ON PORT ${PORT}`);
 });

@@ -37,6 +37,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Loader from "@/components/shared/Loader";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
@@ -187,7 +188,7 @@ const Calendar = () => {
       return eventInput;
     }) || [];
 
-  const formatDateToWord = (dateString: string | undefined): string => {
+  const formatDateToWord = (dateString: string): string => {
     const options: Intl.DateTimeFormatOptions = { month: "long", day: "numeric" };
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", options);
@@ -196,6 +197,31 @@ const Calendar = () => {
   return (
     <div className="calendar_details-container">
       <div className="w-full h-full flex lg:flex-row xs:flex-col ">
+        <div className="w-full p-5 py-10 bg-blue-200 xs:h-2/3 lg:h-full overflow-auto">
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
+            initialView="dayGridMonth"
+            selectable={
+              user.role === "ADMIN" &&
+              user.province?.toLowerCase() === selectedProvince.toLowerCase()
+            }
+            editable={
+              user.role === "ADMIN" &&
+              user.province?.toLowerCase() === selectedProvince.toLowerCase()
+            }
+            locales={allLocales}
+            locale="en"
+            events={INITIAL_EVENTS}
+            select={handleDateSelect}
+            eventClick={handleEventClick}
+            headerToolbar={{
+              left: "prev,next today",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay",
+            }}
+            contentHeight={600}
+          />
+        </div>
         <div className="lg:w-[300px] xs:w-full lg:pb-12 xs:pb-8 lg:pt-8 xs:pt-2 pl-5 border-r-2 border-gray pr-3 bg-red-50 xs:overflow-auto">
           <FormControl fullWidth>
             <InputLabel id="label">Province</InputLabel>
@@ -251,93 +277,72 @@ const Calendar = () => {
             <SheetHeader>
               <SheetTitle className="text-2xl text-center">Event Details</SheetTitle>
             </SheetHeader>
-            <div className="flex flex-col gap-3 ">
-              <div className="flex flex-col gap-5">
-                <div className="flex">
-                  <Label className="mr-5 font-extrabold text-lg">Event Title: </Label>
-                  <Label className="text-lg font-regular">{calendarDetails?.title}</Label>
-                </div>
-                <div className="flex">
-                  <Label className="mr-5 font-extrabold text-lg">Event Details: </Label>
-                  <Label className="text-lg font-regular  ">{calendarDetails?.details}</Label>
-                </div>
-                <div className="flex">
-                  <Label className="mr-5 font-extrabold text-lg">Event repeat: </Label>
-                  <Label className="text-lg font-regular max-h-56 overflow-auto">
-                    {calendarDetails?.repeat}
-                  </Label>
-                </div>
-                <div className="flex">
-                  <Label className="mr-5 font-extrabold text-lg">Event Date: </Label>
-                  <Label className="text-lg font-regular">
-                    {calendarDetails?.endDate === null
-                      ? formatDateToWord(calendarDetails?.startDate)
-                      : `${formatDateToWord(calendarDetails?.startDate)} to ${formatDateToWord(
-                          calendarDetails?.endDate
-                        )}`}
-                  </Label>
-                </div>
-                <div className="flex">
-                  <Label className="mr-5 font-extrabold text-lg">Event Location: </Label>
-                  <Label className="text-lg font-regular">
-                    In {calendarDetails?.municipality}, {calendarDetails?.provinceId}
-                  </Label>
-                </div>
-                <div className="flex flex-col gap-1">
-                  {/* <Button
+            {!calendarDetails ? (
+              <Loader />
+            ) : (
+              <div className="flex flex-col gap-3 ">
+                <div className="flex flex-col gap-5">
+                  <div className="flex">
+                    <Label className="mr-5 font-extrabold text-lg">Event Title: </Label>
+                    <Label className="text-lg font-regular">{calendarDetails.title}</Label>
+                  </div>
+                  <div className="flex">
+                    <Label className="mr-5 font-extrabold text-lg">Event Details: </Label>
+                    <Label className="text-lg font-regular  ">{calendarDetails.details}</Label>
+                  </div>
+                  <div className="flex">
+                    <Label className="mr-5 font-extrabold text-lg">Event repeat: </Label>
+                    <Label className="text-lg font-regular max-h-56 overflow-auto">
+                      {calendarDetails.repeat}
+                    </Label>
+                  </div>
+                  <div className="flex">
+                    <Label className="mr-5 font-extrabold text-lg">Event Date: </Label>
+                    <Label className="text-lg font-regular">
+                      {calendarDetails?.endDate === null
+                        ? formatDateToWord(calendarDetails.startDate)
+                        : `${formatDateToWord(calendarDetails.startDate)} to ${formatDateToWord(
+                            calendarDetails.endDate
+                          )}`}
+                    </Label>
+                  </div>
+                  <div className="flex">
+                    <Label className="mr-5 font-extrabold text-lg">Event Location: </Label>
+                    <Label className="text-lg font-regular">
+                      In {calendarDetails?.municipality}, {calendarDetails?.provinceId}
+                    </Label>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {/* <Button
                     className={`bg-red-500 ${user.role === "ADMIN" ? "" : "hidden"}`}
                     onClick={handleDeleteClick}
                   >
                     Delete
                   </Button> */}
+                  </div>
+                </div>
+                <div className="flex flex-col pl-3 h-full">
+                  <Label className="mr-5 font-bold text-lg">Map: </Label>
+                  <ReactMapGl
+                    mapLib={import("mapbox-gl")}
+                    initialViewState={{
+                      longitude: calendarDetails?.location.coordinates[0],
+                      latitude: calendarDetails?.location.coordinates[1],
+                      zoom: 10,
+                    }}
+                    style={{ width: "100%", height: 550 }}
+                    mapStyle="mapbox://styles/mapbox/streets-v9"
+                  >
+                    <Marker
+                      latitude={calendarDetails?.location.coordinates[1] || 0}
+                      longitude={calendarDetails?.location.coordinates[0] || 0}
+                    />
+                  </ReactMapGl>
                 </div>
               </div>
-              <div className="flex flex-col pl-3 h-full">
-                <Label className="mr-5 font-bold text-lg">Map: </Label>
-                <ReactMapGl
-                  mapLib={import("mapbox-gl")}
-                  initialViewState={{
-                    longitude: calendarDetails?.location.coordinates[0],
-                    latitude: calendarDetails?.location.coordinates[1],
-                    zoom: 10,
-                  }}
-                  style={{ width: "100%", height: 550 }}
-                  mapStyle="mapbox://styles/mapbox/streets-v9"
-                >
-                  <Marker
-                    latitude={calendarDetails?.location.coordinates[1] || 0}
-                    longitude={calendarDetails?.location.coordinates[0] || 0}
-                  />
-                </ReactMapGl>
-              </div>
-            </div>
+            )}
           </SheetContent>
         </Sheet>
-        <div className="w-full p-5 py-10 bg-blue-200 xs:h-2/3 lg:h-full overflow-auto">
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
-            initialView="dayGridMonth"
-            selectable={
-              user.role === "ADMIN" &&
-              user.province?.toLowerCase() === selectedProvince.toLowerCase()
-            }
-            editable={
-              user.role === "ADMIN" &&
-              user.province?.toLowerCase() === selectedProvince.toLowerCase()
-            }
-            locales={allLocales}
-            locale="en"
-            events={INITIAL_EVENTS}
-            select={handleDateSelect}
-            eventClick={handleEventClick}
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
-            }}
-            contentHeight={600}
-          />
-        </div>
       </div>
     </div>
   );

@@ -76,7 +76,8 @@ model Post {
   likes       Like[]
   comments    Comment[]
   reports     Report[]
-  sharedPost  SharedPost?
+  sharedPost  SharedPost[]
+  tags        String []
 }
 
 
@@ -84,14 +85,16 @@ model Post {
 model SharedPost {
   id          Int      @id @default(autoincrement())
   caption     String
-  postId      Int      @unique
+  postId      Int      
   userId      Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
+  likes       Like[]
+  comments    Comment[]
   post        Post     @relation(fields: [postId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
 }
+
 
 
 model Archive {
@@ -161,19 +164,23 @@ model Like {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  share     SharedPost?     @relation(fields: [sharedId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
   content   String
-  postId    Int
+  postId    Int?
+  sharedId  Int?
   userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  share     SharedPost?     @relation(fields: [sharedId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 }
+
 
 model Calendar {
   id        Int      @id @default(autoincrement())

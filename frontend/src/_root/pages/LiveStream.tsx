@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import VideoCard from '@/components/shared/VideoCard';
+import { useEffect, useState } from "react";
+import VideoCard from "@/components/shared/VideoCard";
 // import { io } from 'socket.io-client';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/carousel";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 // const sources = [
 //   {
@@ -74,9 +74,7 @@ type streamState = {
 }[];
 
 const LiveStream = () => {
-  const [availableLivestreams, setAvailableLivestreams] = useState<streamState>(
-    []
-  );
+  const [availableLivestreams, setAvailableLivestreams] = useState<streamState>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
@@ -84,12 +82,10 @@ const LiveStream = () => {
   useEffect(() => {
     const fetchLiveStreamData = async () => {
       try {
-        const liveStreamResponse = await fetch(
-          'http://localhost:8000/getLiveStreams'
-        );
+        const liveStreamResponse = await fetch("http://localhost:8000/getLiveStreams");
 
         if (!liveStreamResponse.ok) {
-          throw new Error('Failed to get livestream data!');
+          throw new Error("Failed to get livestream data!");
         }
 
         const data1 = await liveStreamResponse.json();
@@ -98,7 +94,7 @@ const LiveStream = () => {
         if (error instanceof Error) {
           setError(error);
         } else {
-          setError(new Error('An unknown error occurred.'));
+          setError(new Error("An unknown error occurred."));
         }
       }
     };
@@ -110,15 +106,14 @@ const LiveStream = () => {
     <div className="  w-full flex xl:flex-row xs:flex-col">
       <div className="w-full flex flex-col custom-scrollbar overflow-auto">
         <div className="bg-red-200 w-full p-3 flex flex-row justify-between text-center items-center px-5">
-          <div className="text-lg font-bold decoration-indigo-500">
-            CultureConnect Live streams
-          </div>
+          <div className="text-lg font-bold decoration-indigo-500">CultureConnect Live streams</div>
           <Button className="bg-red-500">Go Live</Button>
         </div>
         <div className="w-full h-full flex justify-center">
           <Carousel className="w-4/5 m-auto">
             <CarouselContent className="h-full m-auto my-2">
-            {availableLivestreams.map((data, index) => (                <CarouselItem key={index}>
+              {availableLivestreams.map((data, index) => (
+                <CarouselItem key={index}>
                   <div className="">
                     <Card
                       className="cursor-pointer"
@@ -126,49 +121,38 @@ const LiveStream = () => {
                         navigate(`/live-streams/1`);
                       }}
                     >
-                      
-                        <CardContent
-                          className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3"
-                        >
-                          <iframe
-                            className="object-cover aspect-video w-full rounded-l-xl"
-                            key={index}
-                            src={`https://customer-zo8okz8uxe6umby3.cloudflarestream.com/${data.uid}/iframe`}
-                            title="Example Stream video"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          ></iframe>
+                      <CardContent className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3">
+                        <iframe
+                          className="object-cover aspect-video w-full rounded-l-xl"
+                          key={index}
+                          src={`https://customer-zo8okz8uxe6umby3.cloudflarestream.com/${data.uid}/iframe`}
+                          title="Example Stream video"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
 
-                          <div className="flex flex-col w-1/2">
-                            <span className="flex flex-row text-center items-center gap-4 my-5">
-                              <img
-                                src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
-                                width={75}
-                                className="rounded-full"
-                              />
-                              <span className="flex flex-col">
-                                <span className="text-xl font-bold text-center">
-                                  Rick Astley
-                                </span>
-                                <span className="text-md text-start">
-                                  @RickJackson
-                                </span>
-                              </span>
+                        <div className="flex flex-col w-1/2">
+                          <span className="flex flex-row text-center items-center gap-4 my-5">
+                            <img
+                              src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
+                              width={75}
+                              className="rounded-full"
+                            />
+                            <span className="flex flex-col">
+                              <span className="text-xl font-bold text-center">Rick Astley</span>
+                              <span className="text-md text-start">@RickJackson</span>
                             </span>
+                          </span>
 
-                              <span
-                                className="text-base font-base text-justify"
-                              >
-                                <h1>
-                                  <b>Title:{data.meta.name}</b>
-                                </h1>
-                                <p>{data.meta.description}</p>
-                              </span>
-                            
-                          </div>
-                        </CardContent>
-                      
+                          <span className="text-base font-base text-justify">
+                            <h1>
+                              <b>Title:{data.meta.name}</b>
+                            </h1>
+                            <p>{data.meta.description}</p>
+                          </span>
+                        </div>
+                      </CardContent>
                     </Card>
                   </div>
                 </CarouselItem>
