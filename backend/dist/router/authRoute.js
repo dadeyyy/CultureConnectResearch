@@ -3,6 +3,7 @@ import { validate } from "../middleware/middleware.js";
 import { signInSchema, signUpSchema } from "../utils/AuthSchema.js";
 import { db } from "../utils/db.server.js";
 import bcrypt from "bcrypt";
+import axios from 'axios';
 const authRouter = express.Router();
 authRouter.post("/signin", validate(signInSchema), async (req, res) => {
     try {
@@ -92,10 +93,26 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ error: "Username or email is already taken" });
         }
+        const response = await axios.post(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs`, {
+            meta: { name: `${data.username} livestream` },
+            defaultCreator: `${data.username}`,
+            recording: { mode: 'off' },
+        }, {
+            headers: {
+                Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
+            },
+        });
+        const responseData = response.data;
+        if (!responseData.success) {
+            return res.status(500).json({ error: "Cloudflare creation of live input error!" });
+        }
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const newUser = await db.user.create({
             data: {
                 ...req.body,
+                url: responseData.result.rtmps.url,
+                streamKey: responseData.result.rtmps.streamKey,
+                videoUID: responseData.result.uid,
                 password: hashedPassword,
             },
         });

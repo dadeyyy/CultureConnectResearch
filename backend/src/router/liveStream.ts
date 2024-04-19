@@ -7,6 +7,8 @@ import {
   pastLiveStreamApiResponse,
   liveStreamData,
 } from '../utils/liveStreamTypes.js';
+import { db } from '../utils/db.server.js';
+import { isAuthenticated } from '../middleware/middleware.js';
 const liveStreamRoute = express.Router();
 
 //Creating live input
@@ -168,5 +170,61 @@ liveStreamRoute.get('/liveStream/:id', async (req, res) => {
     return res.status(500).json({error: err})
   }
 });
+
+
+liveStreamRoute.get('/getUrlStreamKey', isAuthenticated, async (req,res)=>{
+  try{
+    const sessionId = req.session.user?.id
+    const user = await db.user.findUnique({
+      where:{
+        id: sessionId
+      }
+    })
+    if(user){
+      return res.json({url: user.url, streamKey: user.streamKey, videoUID: user.videoUID})
+    }
+
+    return res.status(404).json({message:"User not found!"})
+  }
+  catch(err){
+    console.log(err)
+    res.status(500).json({message:"Internal server error"})
+  }
+})
+
+liveStreamRoute.post('/startLiveStream',isAuthenticated, async(req,res)=>{
+  const body:{title:string,description:string, uid: string} = req.body;
+  const user = req.session.user?.id
+  if(user){
+   
+    await db.liveStream.create({
+      data:{
+        ...body,
+        userId: user
+      }
+    })
+
+    const setToAutomatic = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs/${body.uid}`,{
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
+        Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
+      },
+      method: "PUT",
+      body: JSON.stringify({
+        meta: {"name" : `${body.title}`, "description" : `${body.description}`},
+        recording: {
+          "mode" : "automatic"
+        }
+      })
+    })
+
+    if(setToAutomatic.ok){
+    const data = await setToAutomatic.json();
+    console.log(data)
+    res.status(200).json({message: "successfully created livestream!"})
+    }
+  }
+})
 
 export default liveStreamRoute;

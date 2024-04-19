@@ -46,7 +46,7 @@ const App = () => {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/live-streams" element={<LiveStream />} />
-          <Route path="/live-streams/1" element={<LiveDetails />} />
+          <Route path="/live-streams/:id" element={<LiveDetails />} />
           <Route path="/for-you" element={<ForYou />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />
@@ -54,8 +54,14 @@ const App = () => {
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
           <Route path="/archives/:province" element={<ArchiveProvince />} />
-          <Route path="/archives/:province/:category" element={<ArchiveCategory />} />
-          <Route path="/archives/:province/:category/:id" element={<ArchiveDetails />} />
+          <Route
+            path="/archives/:province/:category"
+            element={<ArchiveCategory />}
+          />
+          <Route
+            path="/archives/:province/:category/:id"
+            element={<ArchiveDetails />}
+          />
           <Route path="/shared-post/:id" element={<SharedPostDetails />} />
         </Route>
       </Routes>
