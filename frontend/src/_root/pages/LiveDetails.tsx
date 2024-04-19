@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { Input } from "@/components/ui/input";
 import { filterInappropriateWords } from "@/lib/CaptionFilter";
+import { useParams } from "react-router-dom";
 
 const sources = [
   {
@@ -41,7 +42,8 @@ const sources = [
     creator: "YawningBastard",
     views: "69",
     dateCreate: "23 hours ago",
-    thumbnail: "https://static-cse.canva.com/blob/1424409/1600w-wK95f3XNRaM.jpg",
+    thumbnail:
+      "https://static-cse.canva.com/blob/1424409/1600w-wK95f3XNRaM.jpg",
   },
   {
     title: "Spiderman ey",
@@ -56,7 +58,8 @@ const sources = [
     creator: "GirlFromNowhere",
     views: "2 days ago",
     dateCreate: "21 hours ago",
-    thumbnail: "https://miro.medium.com/v2/resize:fit:680/1*n0t58ubvkW8hzqf1trUlMw.jpeg",
+    thumbnail:
+      "https://miro.medium.com/v2/resize:fit:680/1*n0t58ubvkW8hzqf1trUlMw.jpeg",
   },
 ];
 
@@ -240,6 +243,9 @@ const idColor = (id: number) => {
 };
 
 const LiveDetails = () => {
+  const params = useParams();
+  console.log(params);
+
   return (
     <div className="w-full flex xl:flex-row xs:flex-col">
       <div className="w-full custom-scrollbar overflow-auto">
@@ -261,15 +267,18 @@ const LiveDetails = () => {
                       className="rounded-full"
                     />
                     <span className="flex flex-col">
-                      <span className="text-xl font-bold text-center">Rick Astley</span>
+                      <span className="text-xl font-bold text-center">
+                        Rick Astley
+                      </span>
                       <span className="text-md text-start">@RickJackson</span>
                     </span>
                   </span>
 
                   <span className="text-base font-base text-justify">
-                    Astley himself has been rickrolled a few times; in fact, the first time he was
-                    rickrolled actually pre-dated the viral phenomenon. In an interview with Larry
-                    King, Astley stated that the first time he fell for the prank was through an
+                    Astley himself has been rickrolled a few times; in fact, the
+                    first time he was rickrolled actually pre-dated the viral
+                    phenomenon. In an interview with Larry King, Astley stated
+                    that the first time he fell for the prank was through an
                     email his friend sent him during the early 2000s.
                   </span>
                 </Card>

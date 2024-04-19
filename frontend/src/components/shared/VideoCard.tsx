@@ -1,12 +1,16 @@
 type videoCardProps = {
-  title: String;
-  creator: String;
-  views: String;
-  dateCreate: String;
-  thumbnail: String;
+  title: string;
+  creator: string;
+  dateCreate: string;
+  thumbnail: string;
 };
 
-const VideoCard = ({ title, creator, views, dateCreate, thumbnail }: videoCardProps) => {
+const VideoCard = ({
+  title,
+  creator,
+  dateCreate,
+  thumbnail,
+}: videoCardProps) => {
   return (
     <div className="flex justify-center items-center cursor-pointer  hover:scale-110 transition ease-in-out delay-150">
       <div className="w-full min-w-64 max-w-96">
@@ -19,9 +23,7 @@ const VideoCard = ({ title, creator, views, dateCreate, thumbnail }: videoCardPr
           <div className="py-2 px-4 flex flex-col">
             <span className="text-sm font-bold">{title}</span>
             <span className="text-sm">{creator}</span>
-            <span className="text-xs">
-              {views} views {dateCreate}
-            </span>
+            <span className="text-xs">{dateCreate}</span>
           </div>
         </div>
       </div>

@@ -47,7 +47,7 @@ const App = () => {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/live-streams" element={<LiveStream />} />
-          <Route path="/live-streams/1" element={<LiveDetails />} />
+          <Route path="/live-streams/:id" element={<LiveDetails />} />
           <Route path="/for-you" element={<ForYou />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />
