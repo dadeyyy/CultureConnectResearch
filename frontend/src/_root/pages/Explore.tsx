@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FollowCard from "@/components/shared/followCard";
-import ArchiveComponent from "@/components/shared/ArchiveComponent";
 import {
   Accordion,
   AccordionContent,
@@ -20,6 +19,7 @@ import ReactMapGl, { Marker } from "react-map-gl";
 import { Label } from "@radix-ui/react-label";
 import { Link } from "react-router-dom";
 import { multiFormatDateString } from "@/lib/utils";
+import Peoples from "@/components/shared/Peoples";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
@@ -122,9 +122,12 @@ const Explore = () => {
   useEffect(() => {
     const searchItems = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/search?query=${searchValue}`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `http://localhost:8000/search?query=${searchValue}`,
+          {
+            credentials: "include",
+          }
+        );
         const data: SearchResult = await response.json();
         setSearchResults(data);
         console.log(data);
@@ -136,7 +139,10 @@ const Explore = () => {
   }, [searchValue]);
 
   const formatDateToWord = (dateString: string): string => {
-    const options: Intl.DateTimeFormatOptions = { month: "long", day: "numeric" };
+    const options: Intl.DateTimeFormatOptions = {
+      month: "long",
+      day: "numeric",
+    };
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", options);
   };
@@ -147,7 +153,12 @@ const Explore = () => {
         <div className="explore-inner_container">
           <h2 className="h3-bold md:h2-bold w-full">Explore</h2>
           <div className="flex gap-1 px-4 w-full rounded-lg bg-gray-200">
-            <img src="/assets/icons/explore.svg" width={24} height={24} alt="search" />
+            <img
+              src="/assets/icons/explore.svg"
+              width={24}
+              height={24}
+              alt="search"
+            />
             <Input
               type="text"
               placeholder="Search"
@@ -168,18 +179,25 @@ const Explore = () => {
                   <span className="text-xl font-bold m-auto">For you</span>
                   <hr className="border-2 border-gray-500 w-1/3 m-auto" />
                   <div className="home-posts">
-                    <span className="text-lg font-semibold">Based on your likes:</span>
+                    <span className="text-lg font-semibold">
+                      Based on your likes:
+                    </span>
                     {isPostLoading ? (
                       <Loader />
                     ) : error ? (
                       <div className="error-container">
-                        <p className="body-medium text-dark-1">Error: {error}</p>
+                        <p className="body-medium text-dark-1">
+                          Error: {error}
+                        </p>
                       </div>
                     ) : (
                       <>
                         <ul className="flex flex-col flex-1 gap-9 w-full">
                           {visiblePosts.map((post) => (
-                            <li key={post.id} className="flex justify-center w-full">
+                            <li
+                              key={post.id}
+                              className="flex justify-center w-full"
+                            >
                               <PostCard post={post} userId={user.id} />
                             </li>
                           ))}
@@ -217,7 +235,10 @@ const Explore = () => {
                     ) : searchResults.posts.length > 0 ? (
                       <ul className="flex flex-col flex-1 gap-9 w-full">
                         {searchResults.posts.map((post) => (
-                          <li key={post.id} className="flex justify-center w-full">
+                          <li
+                            key={post.id}
+                            className="flex justify-center w-full"
+                          >
                             <PostCard post={post} userId={user.id} />
                           </li>
                         ))}
@@ -239,7 +260,10 @@ const Explore = () => {
                     ) : searchResults.users.length > 0 ? (
                       <ul className="flex flex-col flex-1 gap-9 w-full">
                         {searchResults.users.map((user) => (
-                          <li key={user.id} className="flex justify-center w-full">
+                          <li
+                            key={user.id}
+                            className="flex justify-center w-full"
+                          >
                             <FollowCard userId={user.id.toString()} />
                           </li>
                         ))}
@@ -261,17 +285,26 @@ const Explore = () => {
                     ) : searchResults.archives.length > 0 ? (
                       <ul className="flex flex-col flex-1 gap-2 w-full">
                         {searchResults.archives.map((archive) => (
-                          <li key={archive.id} className="flex justify-center w-full">
+                          <li
+                            key={archive.id}
+                            className="flex justify-center w-full"
+                          >
                             <Link
                               to={`/archives/${archive.province}/${archive.category}/${archive.id}`}
                               className="w-full"
                             >
                               <div className="px-2 py-2 border hover:rounded-md w-full border-transparent border-b-black  hover:border-black ease-in-out duration-300 flex gap-3">
-                                <img src={"/assets/icons/archive-icon-2.svg"} width={40} />
+                                <img
+                                  src={"/assets/icons/archive-icon-2.svg"}
+                                  width={40}
+                                />
                                 <div>
-                                  <h2 className="text-md font-bold">{archive.title}</h2>
+                                  <h2 className="text-md font-bold">
+                                    {archive.title}
+                                  </h2>
                                   <p className="text-sm">
-                                    Date Created: {multiFormatDateString(archive.createdAt)}
+                                    Date Created:{" "}
+                                    {multiFormatDateString(archive.createdAt)}
                                   </p>
                                   <p className="text-sm capitalize">
                                     Municipality: {archive.municipality}
@@ -306,9 +339,9 @@ const Explore = () => {
                                 <span className="font-semibold">
                                   {event.endDate === null
                                     ? formatDateToWord(event.startDate)
-                                    : `${formatDateToWord(event.startDate)} to ${formatDateToWord(
-                                        event.endDate
-                                      )}`}
+                                    : `${formatDateToWord(
+                                        event.startDate
+                                      )} to ${formatDateToWord(event.endDate)}`}
                                 </span>
                                 <span>{event.details}</span>
                                 <div className="flex flex-col h-full">
@@ -324,8 +357,12 @@ const Explore = () => {
                                     mapStyle="mapbox://styles/mapbox/streets-v9"
                                   >
                                     <Marker
-                                      latitude={event.location.coordinates[1] || 0}
-                                      longitude={event.location.coordinates[0] || 0}
+                                      latitude={
+                                        event.location.coordinates[1] || 0
+                                      }
+                                      longitude={
+                                        event.location.coordinates[0] || 0
+                                      }
                                     />
                                   </ReactMapGl>
                                 </div>
@@ -345,15 +382,8 @@ const Explore = () => {
         </div>
       </div>
 
-      <div className="home-creators">
-        <span className="text-sm">
-          <span className="hover:underline cursor-pointer m-1">Terms of Service</span>
-          <span className="hover:underline cursor-pointer m-1">Privacy Policy</span>
-          <span className="hover:underline cursor-pointer m-1"> About</span>
-          <div>
-            <span className="m-1">© 2024 CultureConnect.</span>
-          </div>
-        </span>
+      <div className="home-creators custom-scrollbar overflow-x-auto gap-2">
+        <Peoples />
       </div>
     </div>
   );

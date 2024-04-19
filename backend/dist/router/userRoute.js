@@ -51,7 +51,7 @@ userRoute.get("/peoples", async (req, res) => {
         console.log("Received userId:", userId);
         const followingIds = await db.followers.findMany({
             where: {
-                followerId: parseInt(userId), // ParseInt expects string input
+                followerId: parseInt(userId),
             },
             select: {
                 followingId: true,

@@ -414,5 +414,58 @@ postRoute.get("/following/posts", isAuthenticated, async (req, res) => {
         res.status(500).json({ error: "Cannot get the posts" });
     }
 });
+//get reports via province e
+postRoute.get("/get-post/:userId", isAuthenticated, async (req, res) => {
+    try {
+        const userId = parseInt(req.params.userId);
+        const posts = await db.post.findMany({
+            where: {
+                userId: userId,
+            },
+            include: {
+                photos: true,
+                user: {
+                    select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                },
+            },
+        });
+        if (posts) {
+            return res.status(200).json(posts);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Cannot get the reported posts" });
+    }
+});
+postRoute.get("/user/likes", isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        console.log(userId);
+        const likedPosts = await db.like.findMany({
+            where: {
+                userId: userId,
+                postId: {
+                    not: null,
+                },
+            },
+            include: {
+                post: {
+                    include: {
+                        photos: true,
+                        user: {
+                            select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                        },
+                    },
+                },
+            },
+        });
+        res.status(200).json(likedPosts);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
+    }
+});
 export default postRoute;
 //# sourceMappingURL=postRoute.js.map

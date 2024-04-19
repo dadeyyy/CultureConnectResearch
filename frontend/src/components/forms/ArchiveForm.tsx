@@ -73,11 +73,17 @@ type Archive = {
   updatedAt: string;
 };
 
-const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archiveData }) => {
+const ArchiveForm: React.FC<ArchiveFormProps> = ({
+  provinceData,
+  action,
+  archiveData,
+}) => {
   const [province, setProvince] = useState(provinceData);
   const [archive, setArchive] = useState<Archive | null>(null);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
-  const [selectedMunicipality, setSelectedMunicipality] = useState<string | undefined>();
+  const [selectedMunicipality, setSelectedMunicipality] = useState<
+    string | undefined
+  >();
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
@@ -137,6 +143,9 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
             method: "PUT",
             body: formData,
             credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
         );
 
@@ -174,11 +183,14 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
         });
       }
       try {
-        const response = await fetch(`http://localhost:8000/archive/${provinceData}`, {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        });
+        const response = await fetch(
+          `http://localhost:8000/archive/${provinceData}`,
+          {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+          }
+        );
         if (!response.ok) {
           console.error("Error during POST request:", response);
           return;
@@ -196,14 +208,20 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
 
   const handleFilesRemoved = (removedFileNames: string[]) => {
     // Update the state of deletedFiles
-    setDeletedFiles((prevDeletedFiles) => [...prevDeletedFiles, ...removedFileNames]);
+    setDeletedFiles((prevDeletedFiles) => [
+      ...prevDeletedFiles,
+      ...removedFileNames,
+    ]);
   };
 
   console.log(isLoading);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} encType="multipart/form-data">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        encType="multipart/form-data"
+      >
         <div className="p-2">
           {isLoading && (
             <div className="w-full ">
@@ -223,7 +241,9 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="shad-form_label">Title</FormLabel>
+                            <FormLabel className="shad-form_label">
+                              Title
+                            </FormLabel>
                             <FormControl>
                               <Textarea
                                 className="shad-textarea custom-scrollbar"
@@ -242,7 +262,9 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="shad-form_label">Description</FormLabel>
+                            <FormLabel className="shad-form_label">
+                              Description
+                            </FormLabel>
                             <FormControl>
                               <Textarea
                                 className="shad-textarea custom-scrollbar"
@@ -263,7 +285,9 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
                             name="municipality"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="shad-form_label">Title</FormLabel>
+                                <FormLabel className="shad-form_label">
+                                  Title
+                                </FormLabel>
                                 <FormControl>
                                   <Select
                                     onValueChange={field.onChange}
@@ -276,18 +300,25 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
                                         {selectedMunicipality}
                                       </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent position="popper" className="bg-white">
-                                      {municipalities[provinceData].map((municipality) => (
-                                        <SelectItem
-                                          key={municipality.value}
-                                          value={municipality.value}
-                                          onSelect={() =>
-                                            setSelectedMunicipality(municipality.value)
-                                          }
-                                        >
-                                          {municipality.label}
-                                        </SelectItem>
-                                      ))}
+                                    <SelectContent
+                                      position="popper"
+                                      className="bg-white"
+                                    >
+                                      {municipalities[provinceData].map(
+                                        (municipality) => (
+                                          <SelectItem
+                                            key={municipality.value}
+                                            value={municipality.value}
+                                            onSelect={() =>
+                                              setSelectedMunicipality(
+                                                municipality.value
+                                              )
+                                            }
+                                          >
+                                            {municipality.label}
+                                          </SelectItem>
+                                        )
+                                      )}
                                     </SelectContent>
                                   </Select>
                                 </FormControl>
@@ -305,16 +336,25 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Category</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger>
                                   <SelectValue placeholder="Please select a category" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="document">Historical Document</SelectItem>
-                                <SelectItem value="artifacts">Artifacts</SelectItem>
-                                <SelectItem value="monuments">Monuments and buildings</SelectItem>
+                                <SelectItem value="document">
+                                  Historical Document
+                                </SelectItem>
+                                <SelectItem value="artifacts">
+                                  Artifacts
+                                </SelectItem>
+                                <SelectItem value="monuments">
+                                  Monuments and buildings
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>

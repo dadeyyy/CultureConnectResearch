@@ -160,5 +160,50 @@ shareRoute.delete("/shared-post/:sharedId", isAuthenticated, async (req, res) =>
         return res.status(500).json({ error, message: "Internal Server Error!" });
     }
 });
+// GET SPECIFIC SHARED POST
+shareRoute.get("/get-shared-post/:userId", async (req, res) => {
+    try {
+        // Get parameter ID
+        const userId = parseInt(req.params.userId);
+        // Find post in the database
+        const sharedPost = await db.sharedPost.findMany({
+            where: {
+                userId: userId,
+            },
+            include: {
+                user: {
+                    select: {
+                        avatarUrl: true,
+                        createdAt: true,
+                        firstName: true,
+                        id: true,
+                        lastName: true,
+                        role: true,
+                        username: true,
+                        province: true,
+                    },
+                },
+                post: {
+                    include: {
+                        photos: true,
+                        user: {
+                            select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                        },
+                    },
+                },
+            },
+        });
+        // If post is found, return post
+        if (sharedPost) {
+            return res.status(200).json(sharedPost);
+        }
+        // If not, return not found
+        return res.status(404).json({ error: "Post not found!" });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
 export default shareRoute;
 //# sourceMappingURL=shareRoute.js.map
