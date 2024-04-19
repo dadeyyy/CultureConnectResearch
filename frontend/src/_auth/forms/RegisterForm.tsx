@@ -24,6 +24,12 @@ import { registration } from "@/lib/validation";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "https://thtnjmmhcbvokonvsfsr.supabase.co";
+const supabaseAnonKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRodG5qbW1oY2J2b2tvbnZzZnNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4OTUxMDAsImV4cCI6MjAyMDQ3MTEwMH0.GON_tySFWBpm6MZtN-_XnzC6vbb9E2SuMwbxcHfBip4";
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -40,14 +46,54 @@ const RegisterForm = () => {
   });
   const [page, setPage] = useState(1);
 
+  const [checkedInterests, setCheckedInterests] = useState<string[]>([]);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { id } = event.target;
+    if (event.target.checked) {
+      setCheckedInterests((prevInterests) => [...prevInterests, id]);
+    } else {
+      setCheckedInterests((prevInterests) =>
+        prevInterests.filter((interest) => interest !== id)
+      );
+    }
+  };
+
+  const sendOTP = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: "https://example.com/welcome",
+        },
+      });
+      console.log(data);
+      if (error) {
+        console.error("Error sending OTP:", error.message);
+      } else {
+        console.log("OTP sent successfully");
+      }
+    } catch (error) {
+      console.error("Error sending OTP:");
+    }
+  };
+
   // BACKEND SERVER SUBMISSION
   const onSubmit = async (values: z.infer<typeof registration>) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
     if (page === 1) {
+      sendOTP(values.email, values.password);
       setPage(2);
     } else if (page === 2) {
+      setPage(3);
+    } else if (page === 3) {
       const { confirmPassword, ...signUpValues } = values;
+      const updatedValues = {
+        ...signUpValues,
+        interest: checkedInterests,
+      };
 
       try {
         const response = await fetch("http://localhost:8000/signup", {
@@ -55,7 +101,7 @@ const RegisterForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(signUpValues),
+          body: JSON.stringify(updatedValues),
         });
         const data = await response.json();
         if (response.ok) {
@@ -112,7 +158,7 @@ const RegisterForm = () => {
                   <DialogTitle>Sign up to CultureConnect.</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
-                  {page === 1 ? (
+                  {page === 1 && (
                     <>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <FormField
@@ -219,36 +265,50 @@ const RegisterForm = () => {
                         )}
                       />
                     </>
-                  ) : (
+                  )}
+                  {page === 2 && <div>aaa</div>}
+                  {page === 3 && (
                     <>
-                      <div className="bg-red-200">
-                        <span
-                          className="cursor-pointer"
-                          onClick={() => {
-                            setPage(1);
-                          }}
-                        >
-                          <img src={"/assets/icons/back.svg"} width={35} />
-                        </span>
-
-                        <div className="flex flex-wrap gap-2">
-                          <div className="p-2 border rounded-xl border-black">a</div>
-                          <div className="p-2 border rounded-xl border-black">dasdasdas</div>
-                          <div className="p-2 border rounded-xl border-black">dasdasdas</div>
-                          <div className="p-2 border rounded-xl border-black">dasdasdas</div>
-                          <div className="p-2 border rounded-xl border-black">dasdasdas</div>
-                          <div className="p-2 border rounded-xl border-black">dasdasdas</div>
-
-
-                          
-                        </div>
+                      <div className="mb-3">Select at least 3 interests</div>
+                      <div className="flex flex-wrap gap-2 w-full">
+                        {interests.map((interest) => (
+                          <div
+                            key={interest.value}
+                            className={`flex gap-2 py-1 px-5 rounded-xl border ${
+                              checkedInterests.includes(interest.value)
+                                ? "border-blue-500"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              id={interest.value}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label
+                              htmlFor={interest.value}
+                              className="text-base font-medium"
+                            >
+                              {interest.label}
+                            </label>
+                          </div>
+                        ))}
                       </div>
                     </>
                   )}
 
                   <DialogFooter>
+                    <Button
+                      type="button"
+                      className={`my-5 ${page === 1 ? "hidden" : "block"}`}
+                      onClick={() => {
+                        setPage(page - 1);
+                      }}
+                    >
+                      Back
+                    </Button>
                     <Button type="submit" className="my-5">
-                      {page === 1 ? "Next" : "Submit"}
+                      {page === 1 || page === 2 ? "Next" : "Submit"}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -275,5 +335,21 @@ const RegisterForm = () => {
     </div>
   );
 };
+
+const interests = [
+  { label: "Culture", value: "culture" },
+  { label: "Festivals", value: "festivals" },
+  { label: "Fiesta", value: "fiesta" },
+  { label: "Art", value: "art" },
+  { label: "Music", value: "music" },
+  { label: "Food", value: "food" },
+  { label: "History", value: "history" },
+  { label: "People", value: "People" },
+  { label: "Language", value: "language" },
+  { label: "Traditions", value: "traditions" },
+  { label: "Religion", value: "religion" },
+  { label: "Dance", value: "dance" },
+  { label: "Architecture", value: "architecture" },
+];
 
 export default RegisterForm;

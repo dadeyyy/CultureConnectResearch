@@ -93,4 +93,49 @@ export type IPost = {
     username: string;
   };
   userId: number;
+  tags: string[];
+};
+
+export type ISharedPost = {
+  id: number;
+  caption: string;
+  postId?: number;
+  userId: number;
+  createdAt: string;
+  user: {
+    avatarUrl: string | null;
+    createdAt: string;
+    firstName: string;
+    id: number;
+    lastName: string;
+    role: string;
+    username: string;
+    province?: string;
+  };
+  post: {
+    id: number;
+    caption: string;
+    createdAt: string;
+    municipality: string;
+    photos: {
+      id: number;
+      url: string;
+      filename: string;
+      postId: number;
+    }[];
+    province: string;
+    reportCount: number;
+    updatedAt: string;
+    user: {
+      avatarUrl: string | null;
+      firstName: string;
+      id: number;
+      lastName: string;
+      role: string;
+      username: string;
+      province?: string;
+    };
+    userId: number;
+    tags: string[];
+  };
 };

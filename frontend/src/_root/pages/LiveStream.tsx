@@ -1,66 +1,103 @@
-import { useEffect, useState } from 'react';
-import VideoCard from '@/components/shared/VideoCard';
+import { useEffect, useState } from "react";
+import VideoCard from "@/components/shared/VideoCard";
 // import { io } from 'socket.io-client';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/carousel";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import toast from "react-hot-toast";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
-// const sources = [
-//   {
-//     title: 'I am a demon',
-//     creator: 'MrBeast',
-//     views: '110 Million',
-//     dateCreate: '24 hours ago',
-//     thumbnail:
-//       'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e0846834-6d3f-48bf-89a4-b80cd5803824/dfou32q-a8d70115-4924-4a1e-b0ec-682db24cb813.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2UwODQ2ODM0LTZkM2YtNDhiZi04OWE0LWI4MGNkNTgwMzgyNFwvZGZvdTMycS1hOGQ3MDExNS00OTI0LTRhMWUtYjBlYy02ODJkYjI0Y2I4MTMuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.wAbbuTHUjT0CuD4NZL82zmOLhN3sx3nxNtb4aeXxdkk',
-//   },
-//   {
-//     title: 'Unang araw palang minahal na kita',
-//     creator: 'Gloco',
-//     views: '110',
-//     dateCreate: '4 hours ago',
-//     thumbnail:
-//       'https://scontent.fsfs1-1.fna.fbcdn.net/v/t1.6435-9/50428424_1284288608376759_5096522740211384320_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeGYi7YuMZqxlazw7y6FCx-y3t5DaPKM9RTe3kNo8oz1FOVHNi3VtRAI3t_GBTCTVBI&_nc_ohc=FUdTBvo4764Ab5B1UMH&_nc_ht=scontent.fsfs1-1.fna&oh=00_AfA7lo_UYZT_-603OxKTVVjYgndLF7iD4oEcXPJFt7raXw&oe=663E56A0',
-//   },
-//   {
-//     title: 'Wow grape',
-//     creator: 'IndianNigka',
-//     views: '9',
-//     dateCreate: '4 hours ago',
-//     thumbnail: 'https://i.ytimg.com/vi/FFZSgalRSQQ/maxresdefault.jpg',
-//   },
-//   {
-//     title: 'Cheese Club',
-//     creator: 'YawningBastard',
-//     views: '69',
-//     dateCreate: '23 hours ago',
-//     thumbnail:
-//       'https://static-cse.canva.com/blob/1424409/1600w-wK95f3XNRaM.jpg',
-//   },
-//   {
-//     title: 'Spiderman ey',
-//     creator: 'ChewingGum',
-//     views: '690',
-//     dateCreate: '7 hours ago',
-//     thumbnail:
-//       'https://marketplace.canva.com/EAFW7JwIojo/2/0/1600w/canva-red-colorful-tips-youtube-thumbnail-FxVVsqyawqY.jpg',
-//   },
-//   {
-//     title: 'Eye Catching Youtube Thumbnail',
-//     creator: 'GirlFromNowhere',
-//     views: '2 days ago',
-//     dateCreate: '21 hours ago',
-//     thumbnail:
-//       'https://miro.medium.com/v2/resize:fit:680/1*n0t58ubvkW8hzqf1trUlMw.jpeg',
-//   },
-// ];
+const formSchema = z.object({
+  title: z.string().min(2, {
+    message: "You cannot create an livestreram without a title.",
+  }),
+  description: z.string({
+    required_error: "Add a description.",
+  }),
+});
+
+export type pastLiveStreamTypes = {
+  uid: string;
+  creator: string;
+  thumbnail: string;
+  thumbnailTimestampPct: number;
+  readyToStream: boolean;
+  readyToStreamAt: string;
+  status: {
+    state: string;
+    pctComplete: string;
+    errorReasonCode: string;
+    errorReasonText: string;
+  };
+  meta: {
+    name: string;
+  };
+  created: string;
+  modified: string;
+  scheduledDeletion: unknown;
+  size: number;
+  preview: string;
+  allowedOrigins: string[];
+  requireSignedURLs: boolean;
+  uploaded: string;
+  uploadExpiry: unknown;
+  maxSizeBytes: number | null;
+  maxDurationSeconds: number | null;
+  duration: number;
+  input: {
+    width: number;
+    height: number;
+  };
+  playback: {
+    hls: string;
+    dash: string;
+  };
+  watermark: unknown;
+  liveInput: string;
+  clippedFrom: unknown;
+  publicDetails: {
+    title: string | null;
+    share_link: string | null;
+    channel_link: string | null;
+    logo: string | null;
+  };
+}[];
+
+// export type pastLiveStreamApiResponse = {
+//   result: pastLiveStreamTypes[];
+//   success: boolean;
+//   errors: unknown[];
+//   messages: unknown[];
+// };
 
 type streamState = {
   created: string;
@@ -77,6 +114,70 @@ const LiveStream = () => {
   const [availableLivestreams, setAvailableLivestreams] = useState<streamState>(
     []
   );
+  const [pastLiveStream, setPastLiveStream] = useState<pastLiveStreamTypes>([]);
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [url, setUrl] = useState("");
+  const [streamKey, setStreamKey] = useState("");
+  const [videoUID, setVideoUID] = useState("");
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
+  });
+
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    const valuesWithUID = {
+      title: values.title,
+      description: values.description,
+      uid: videoUID,
+    };
+
+    console.log(valuesWithUID);
+
+    const response = await fetch("http://localhost:8000/startLiveStream", {
+      body: JSON.stringify(valuesWithUID),
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setFullName(`${data.firstName} ${data.lastName}`);
+      setUsername(`${data.username}`);
+      toast.success("Created LiveStream!");
+    }
+  };
+
+  console.log("FULLNAME", fullName);
+  console.log("USERNAME", username);
+
+  const copyToClipboard = () => {
+    navigator.clipboard
+      .writeText(streamKey)
+      .then(() => {
+        toast.success("Stream key copied to clipboard");
+      })
+      .catch((error) => {
+        toast.error("Failed to copy stream key to clipboard:");
+      });
+  };
+
+  const copyToClipboardU = () => {
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        toast.success("Url copied to clipboard");
+      })
+      .catch((error) => {
+        toast.error("Failed to copy Url to clipboard:");
+      });
+  };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
@@ -85,20 +186,31 @@ const LiveStream = () => {
     const fetchLiveStreamData = async () => {
       try {
         const liveStreamResponse = await fetch(
-          'http://localhost:8000/getLiveStreams'
+          "http://localhost:8000/getLiveStreams"
         );
 
         if (!liveStreamResponse.ok) {
-          throw new Error('Failed to get livestream data!');
+          throw new Error("Failed to get livestream data!");
         }
 
         const data1 = await liveStreamResponse.json();
         setAvailableLivestreams(data1);
+
+        const pastLiveStreamResponse = await fetch(
+          "http://localhost:8000/pastLiveStreams"
+        );
+
+        if (!pastLiveStreamResponse.ok) {
+          throw new Error("No past livestreams");
+        }
+
+        const data2 = await pastLiveStreamResponse.json();
+        setPastLiveStream(data2);
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error);
         } else {
-          setError(new Error('An unknown error occurred.'));
+          setError(new Error("An unknown error occurred."));
         }
       }
     };
@@ -106,93 +218,251 @@ const LiveStream = () => {
     fetchLiveStreamData();
   }, []);
 
+  useEffect(() => {
+    const fetchPastLiveStreamData = async () => {
+      try {
+        const pastLiveStreamResponse = await fetch(
+          "http://localhost:8000/pastLiveStreams"
+        );
+
+        if (!pastLiveStreamResponse.ok) {
+          throw new Error("No past livestreams");
+        }
+
+        const data2 = await pastLiveStreamResponse.json();
+        setPastLiveStream(data2);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error);
+        } else {
+          setError(new Error("An unknown error occurred."));
+        }
+      }
+    };
+
+    fetchPastLiveStreamData();
+  }, []);
+
+  useEffect(() => {
+    const fetchUrlStreamKey = async () => {
+      try {
+        const getUrlStreamKey = await fetch(
+          "http://localhost:8000/getUrlStreamKey",
+          {
+            credentials: "include",
+          }
+        );
+
+        if (!getUrlStreamKey.ok) {
+          throw new Error("Error fetching url & streamKey");
+        }
+
+        const data: { url: string; streamKey: string; videoUID: string } =
+          await getUrlStreamKey.json();
+        setUrl(data.url);
+        setStreamKey(data.streamKey);
+        setVideoUID(data.videoUID);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error);
+        } else {
+          setError(new Error("An unknown error occurred."));
+        }
+      }
+    };
+
+    fetchUrlStreamKey();
+  }, []);
+
   return (
-    <div className="  w-full flex xl:flex-row xs:flex-col">
+    <div className="w-full flex xl:flex-row xs:flex-col">
       <div className="w-full flex flex-col custom-scrollbar overflow-auto">
         <div className="bg-red-200 w-full p-3 flex flex-row justify-between text-center items-center px-5">
           <div className="text-lg font-bold decoration-indigo-500">
             CultureConnect Live streams
           </div>
-          <Button className="bg-red-500">Go Live</Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button className="bg-red-500">Go Live</Button>
+            </SheetTrigger>
+            <SheetContent className="min-w-[720px]">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleSubmit)}
+                  encType="multipart/form-data"
+                >
+                  <SheetHeader>
+                    <SheetTitle>Go Live</SheetTitle>
+                    <SheetDescription>Description</SheetDescription>
+                  </SheetHeader>
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="shad-form_label">
+                            Title
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              placeholder="Enter Title"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="shad-form_message" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="shad-form_label">
+                            Description
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              placeholder="Enter Description"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="shad-form_message" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="url" className="text-base">
+                        Url
+                      </Label>
+                      <div className="flex flex-row">
+                        <Input
+                          id="url"
+                          value={url}
+                          className="w-full"
+                          readOnly
+                        />
+                        <Button
+                          type="button"
+                          onClick={copyToClipboardU}
+                          className="bg-white hover:bg-blue-200"
+                        >
+                          <img src="/assets/icons/copy.svg" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="streamkey" className="text-base">
+                        Streamkey
+                      </Label>
+                      <div className="flex flex-row">
+                        <Input
+                          id="streamkey"
+                          value={streamKey}
+                          className="w-full"
+                          readOnly
+                        />
+                        <Button
+                          type="button"
+                          onClick={copyToClipboard}
+                          className="bg-white hover:bg-blue-200"
+                        >
+                          <img src="/assets/icons/copy.svg" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <SheetFooter>
+                    <SheetClose asChild>
+                      <Button type="submit" className="w-full">
+                        Go Live
+                      </Button>
+                    </SheetClose>
+                  </SheetFooter>
+                </form>
+              </Form>
+            </SheetContent>
+          </Sheet>
         </div>
-        <div className="w-full h-full flex justify-center">
-          <Carousel className="w-4/5 m-auto">
-            <CarouselContent className="h-full m-auto my-2">
-            {availableLivestreams.map((data, index) => (                <CarouselItem key={index}>
+        <Carousel className="lg:w-[720px] xl:w-[1080px] m-auto xs:w-[330px]">
+          <CarouselContent className="h-full m-auto my-2">
+            {availableLivestreams.length === 0 ? (
+              <h1 className="text-center w-full">No live stream available</h1>
+            ) : (
+              availableLivestreams.map((data, index) => (
+                <CarouselItem key={index}>
                   <div className="">
                     <Card
                       className="cursor-pointer"
                       onClick={() => {
-                        navigate(`/live-streams/1`);
+                        navigate(`/live-streams/${videoUID}`);
                       }}
                     >
-                      
-                        <CardContent
-                          className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3"
-                        >
-                          <iframe
-                            className="object-cover aspect-video w-full rounded-l-xl"
-                            key={index}
-                            src={`https://customer-zo8okz8uxe6umby3.cloudflarestream.com/${data.uid}/iframe`}
-                            title="Example Stream video"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          ></iframe>
+                      <CardContent className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3">
+                        <iframe
+                          className="object-cover aspect-video w-full rounded-l-xl"
+                          key={index}
+                          src={`https://customer-zo8okz8uxe6umby3.cloudflarestream.com/${data.uid}/iframe`}
+                          title="Example Stream video"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
 
-                          <div className="flex flex-col w-1/2">
-                            <span className="flex flex-row text-center items-center gap-4 my-5">
-                              <img
-                                src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
-                                width={75}
-                                className="rounded-full"
-                              />
-                              <span className="flex flex-col">
-                                <span className="text-xl font-bold text-center">
-                                  Rick Astley
-                                </span>
-                                <span className="text-md text-start">
-                                  @RickJackson
-                                </span>
+                        <div className="flex flex-col w-1/2">
+                          <span className="flex flex-row text-center items-center gap-4 my-5">
+                            <img
+                              src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
+                              width={75}
+                              className="rounded-full"
+                            />
+                            <span className="flex flex-col">
+                              <span className="text-xl font-bold text-center">
+                                Rick Astley
+                              </span>
+                              <span className="text-md text-start">
+                                @RickJackson
                               </span>
                             </span>
+                          </span>
 
-                              <span
-                                className="text-base font-base text-justify"
-                              >
-                                <h1>
-                                  <b>Title:{data.meta.name}</b>
-                                </h1>
-                                <p>{data.meta.description}</p>
-                              </span>
-                            
-                          </div>
-                        </CardContent>
-                      
+                          <span className="text-base font-base text-justify">
+                            <h1>
+                              <b>Title:{data.meta.name}</b>
+                            </h1>
+                            <p>{data.meta.description}</p>
+                          </span>
+                        </div>
+                      </CardContent>
                     </Card>
                   </div>
                 </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        </div>
+              ))
+            )}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
         <div className="flex flex-col gap-2 my-5 xl:max-h-2/3 xs:max-h-96 custom-scrollbar">
           <span className="text-xl font-bold px-3 text-center sticky top-0 bg-white opacity-80">
             Past Live Streams
           </span>
-          {/* <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-3 xs:grid-cols-1">
-            {sources.map((source) => (
+          <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-3 xs:grid-cols-1">
+            {pastLiveStream.map((source, index) => (
               <VideoCard
-                title={source.title}
+                key={index}
+                title={source.meta.name}
                 creator={source.creator}
-                views={source.views}
-                dateCreate={source.dateCreate}
+                dateCreate={source.created}
                 thumbnail={source.thumbnail}
               />
             ))}
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

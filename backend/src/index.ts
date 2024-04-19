@@ -12,10 +12,10 @@ import calendarRoute from "./router/calendarRoute.js";
 import algoRoute from "./router/algoRoute.js";
 import archiveRoute from "./router/archive.js";
 import followRouter from "./router/followRoute.js";
-import liveStreamRoute from './router/liveStream.js';
-import {createServer} from 'node:http'
+import liveStreamRoute from "./router/liveStream.js";
+import { createServer } from "node:http";
 import socket from "./socket.js";
-
+import shareRoute from "./router/shareRoute.js";
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
@@ -23,16 +23,13 @@ if (process.env.NODE_ENV !== "production") {
 
 const PORT: number = parseInt(process.env.PORT as string, 10);
 const app = express();
-const server = createServer(app)
+const server = createServer(app);
 
 if (!process.env.PORT) {
   process.exit(1);
 }
 
-
-
-socket(server)
-
+socket(server);
 
 declare module "express-session" {
   interface SessionData {
@@ -69,17 +66,17 @@ app.use(
 app.use(morgan("tiny"));
 
 //Routers
-app.use('/', authRouter);
-app.use('/', postRoute);
-app.use('/', userRoute);
-app.use('/', commentRoute);
-app.use('/', likeRoute);
-app.use('/', calendarRoute);
-app.use('/', algoRoute);
-app.use('/', archiveRoute);
-app.use('/', liveStreamRoute)
-
-
+app.use("/", authRouter);
+app.use("/", postRoute);
+app.use("/", userRoute);
+app.use("/", commentRoute);
+app.use("/", likeRoute);
+app.use("/", calendarRoute);
+app.use("/", algoRoute);
+app.use("/", archiveRoute);
+app.use("/", liveStreamRoute);
+app.use("/", followRouter);
+app.use("/", shareRoute);
 
 server.listen(PORT, () => {
   console.log(`LISTENING ON PORT ${PORT}`);

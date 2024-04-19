@@ -27,6 +27,7 @@ export type IPost = {
     username: string;
   };
   userId: number;
+  tags: string[];
 };
 
 interface IPostContext {
@@ -50,8 +51,8 @@ export const ForYouProvider: React.FC<ForYouProviderProps> = ({ children }) => {
   const fetchPosts = useCallback(async () => {
     try {
       const response = await fetch("http://localhost:8000/algorithm", { credentials: "include" });
-      const data= await response.json();
-      console.log("ALGORITHM", data)
+      const data = await response.json();
+      console.log("ALGORITHM", data);
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

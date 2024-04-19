@@ -25,9 +25,8 @@ module.exports = {
     },
     extend: {
       colors: {
-        "primary-500": "#4169e1",
-        "primary-600": "#003366",
-        primary: "#6495ed",
+        "primary-500": "#877EFF",
+        "primary-600": "#5D5FEF",
         "secondary-500": "#FFB620",
         "off-white": "#D0DFFF",
         "dark-1": "#000000",
@@ -82,7 +81,7 @@ module.exports = {
         465: "465px",
       },
       fontFamily: {
-        inter: ["Roboto, sans-serif"],
+        inter: ["Montserrat"],
       },
       keyframes: {
         "accordion-down": {

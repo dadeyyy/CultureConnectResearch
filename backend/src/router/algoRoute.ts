@@ -76,4 +76,67 @@ algoRoute.get("/algorithm", isAuthenticated, async (req, res) => {
   }
 });
 
+algoRoute.get("/search", async (req, res) => {
+  const { query } = req.query;
+  try {
+    const searchResults = await db.$transaction([
+      db.post.findMany({
+        where: {
+          OR: [
+            { caption: { contains: query as string, mode: "insensitive" } },
+            { province: { contains: query as string, mode: "insensitive" } },
+            { municipality: { contains: query as string, mode: "insensitive" } },
+          ],
+        },
+        include: {
+          photos: true,
+          user: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      db.user.findMany({
+        where: {
+          OR: [
+            { username: { contains: query as string, mode: "insensitive" } },
+            { firstName: { contains: query as string, mode: "insensitive" } },
+            { lastName: { contains: query as string, mode: "insensitive" } },
+          ],
+        },
+      }),
+      db.archive.findMany({
+        where: {
+          OR: [
+            { title: { contains: query as string, mode: "insensitive" } },
+            { description: { contains: query as string, mode: "insensitive" } },
+            { province: { contains: query as string, mode: "insensitive" } },
+            { municipality: { contains: query as string, mode: "insensitive" } },
+          ],
+        },
+      }),
+      db.calendar.findMany({
+        where: {
+          OR: [
+            { title: { contains: query as string, mode: "insensitive" } },
+            { details: { contains: query as string, mode: "insensitive" } },
+            { municipality: { contains: query as string, mode: "insensitive" } },
+            { provinceId: { contains: query as string, mode: "insensitive" } },
+          ],
+        },
+      }),
+    ]);
+
+    res.json({
+      posts: searchResults[0],
+      users: searchResults[1],
+      archives: searchResults[2],
+      events: searchResults[3],
+    });
+  } catch (error) {
+    console.error("Error in search route:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default algoRoute;

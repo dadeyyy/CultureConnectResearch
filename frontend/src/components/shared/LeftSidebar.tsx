@@ -93,7 +93,7 @@ const LeftSidebar = () => {
   };
 
   return (
-    <nav className="leftsidebar sticky border border-r-gray-300">
+    <nav className="leftsidebar sticky border border-r-gray-300 items-center">
       <Link to="/home" className="flex gap-3 items-center my-5 mx-2 ">
         <img src="/assets/images/logo-2.svg" alt="logo" width={170} height={36} />
       </Link>

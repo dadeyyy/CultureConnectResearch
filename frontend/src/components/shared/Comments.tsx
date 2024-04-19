@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 interface CommentProps {
   postId: number;
   action: "home" | "detail";
+  type: "regular" | "shared";
 }
 
 interface Comment {
@@ -35,7 +36,7 @@ interface UserProfile {
   username: string;
 }
 
-const Comments = ({ postId, action }: CommentProps) => {
+const Comments = ({ postId, action, type }: CommentProps) => {
   const { user, isLoading } = useUserContext();
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
@@ -50,9 +51,12 @@ const Comments = ({ postId, action }: CommentProps) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/post/${postId}/comments`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `http://localhost:8000/${type === "shared" ? "shared-post" : "post"}/${postId}/comments`,
+          {
+            credentials: "include",
+          }
+        );
         const data = await response.json();
         setComments(data.comments);
         setOpenStates(Array(data.comments.length).fill(false)); // Initialize open states for each comment
@@ -75,7 +79,9 @@ const Comments = ({ postId, action }: CommentProps) => {
     } else if (selectedValue === "delete") {
       try {
         const response = await fetch(
-          `http://localhost:8000/post/${postId}/comment/${comments[index].id}`,
+          `http://localhost:8000/${type === "shared" ? "shared-post" : "post"}/${postId}/comment/${
+            comments[index].id
+          }`,
           {
             credentials: "include",
             method: "DELETE",
@@ -98,16 +104,19 @@ const Comments = ({ postId, action }: CommentProps) => {
 
   const handleCommentSubmit = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/post/${postId}/comment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: newComment,
-        }),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:8000/${type === "shared" ? "shared-post" : "post"}/${postId}/comment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: newComment,
+          }),
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         console.error("Error submitting comment. Server responded with:", response);

@@ -9,6 +9,7 @@ postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSch
     try {
         const data = req.body;
         const files = req.files;
+        const tags = data.tags?.replace(/ /g, "").split(",") || [];
         const images = files?.map((file) => ({
             url: file.path,
             filename: file.filename,
@@ -20,6 +21,7 @@ postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSch
                 photos: {
                     create: images,
                 },
+                tags: tags,
             },
             include: {
                 photos: true,
@@ -37,7 +39,7 @@ postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSch
 // GET ALL THE POST
 postRoute.get("/post", isAuthenticated, async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 1;
+        const limit = parseInt(req.query.limit) || 2;
         const offset = parseInt(req.query.offset) || 0;
         const allPost = await db.post.findMany({
             include: {
@@ -52,6 +54,51 @@ postRoute.get("/post", isAuthenticated, async (req, res) => {
             },
         });
         res.status(200).json(allPost);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Cannot get the posts" });
+    }
+});
+//fetch all
+postRoute.get("/post/all", async (req, res) => {
+    const limit = parseInt(req.query.limit) || 1;
+    const regularOffset = parseInt(req.query.offset) || 0;
+    const sharedOffset = parseInt(req.query.sharedOffset) || 0; // New offset for shared posts
+    try {
+        const regularPosts = await db.post.findMany({
+            include: {
+                photos: true,
+                user: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            skip: regularOffset,
+            take: limit,
+        });
+        const regularPostsWithType = regularPosts.map((post) => ({
+            ...post,
+            type: "regular",
+        }));
+        const sharedPosts = await db.sharedPost.findMany({
+            include: {
+                user: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            skip: sharedOffset, // Use separate offset for shared posts
+            take: limit,
+        });
+        const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
+            ...sharedPost,
+            type: "shared",
+        }));
+        const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
+        // Sort combined posts by createdAt
+        const sortedPosts = allPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        res.status(200).json(sortedPosts);
     }
     catch (error) {
         console.log(error);
@@ -86,7 +133,9 @@ postRoute.get("/post/:id", async (req, res) => {
             },
             include: {
                 photos: true,
-                user: { select: { id: true, username: true, firstName: true, lastName: true } }, // Corrected include syntax
+                user: {
+                    select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                }, // Corrected include syntax
             },
         });
         // If post is found, return post
@@ -302,9 +351,11 @@ postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
 });
 //following posts
 postRoute.get("/following/posts", isAuthenticated, async (req, res) => {
+    const limit = parseInt(req.query.limit) || 1;
+    const regularOffset = parseInt(req.query.offset) || 0;
+    const sharedOffset = parseInt(req.query.sharedOffset) || 0;
+    const userId = req.session.user?.id;
     try {
-        const userId = req.session.user?.id;
-        // Fetch the IDs of users whom the current user follows
         const followingIds = await db.followers.findMany({
             where: {
                 followerId: userId,
@@ -313,31 +364,107 @@ postRoute.get("/following/posts", isAuthenticated, async (req, res) => {
                 followingId: true,
             },
         });
-        console.log(followingIds);
         const followingUserIds = followingIds.map((entry) => entry.followingId);
-        console.log(followingUserIds);
-        // Fetch posts from users whom the current user follows
-        const followingPosts = await db.post.findMany({
+        const regularPosts = await db.post.findMany({
+            include: {
+                photos: true,
+                user: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            skip: regularOffset,
+            take: limit,
             where: {
                 userId: {
                     in: followingUserIds,
                 },
             },
+        });
+        const regularPostsWithType = regularPosts.map((post) => ({
+            ...post,
+            type: "regular",
+        }));
+        const sharedPosts = await db.sharedPost.findMany({
             include: {
-                photos: true,
                 user: true,
-                comments: true,
             },
             orderBy: {
                 createdAt: "desc",
             },
+            skip: sharedOffset, // Use separate offset for shared posts
+            take: limit,
+            where: {
+                userId: {
+                    in: followingUserIds,
+                },
+            },
         });
-        console.log(followingPosts);
-        res.status(200).json(followingPosts);
+        const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
+            ...sharedPost,
+            type: "shared",
+        }));
+        const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
+        // Sort combined posts by createdAt
+        const sortedPosts = allPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        res.status(200).json(sortedPosts);
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({ error: "Failed to fetch following posts" });
+        res.status(500).json({ error: "Cannot get the posts" });
+    }
+});
+//get reports via province e
+postRoute.get("/get-post/:userId", isAuthenticated, async (req, res) => {
+    try {
+        const userId = parseInt(req.params.userId);
+        const posts = await db.post.findMany({
+            where: {
+                userId: userId,
+            },
+            include: {
+                photos: true,
+                user: {
+                    select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                },
+            },
+        });
+        if (posts) {
+            return res.status(200).json(posts);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Cannot get the reported posts" });
+    }
+});
+postRoute.get("/user/likes", isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        console.log(userId);
+        const likedPosts = await db.like.findMany({
+            where: {
+                userId: userId,
+                postId: {
+                    not: null,
+                },
+            },
+            include: {
+                post: {
+                    include: {
+                        photos: true,
+                        user: {
+                            select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                        },
+                    },
+                },
+            },
+        });
+        res.status(200).json(likedPosts);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
     }
 });
 export default postRoute;

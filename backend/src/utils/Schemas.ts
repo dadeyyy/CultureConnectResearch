@@ -6,6 +6,7 @@ export const postSchema = z.object({
   municipality: z.string({ required_error: "municipality is required!" }),
   userId: z.number().optional(),
   deletedFiles: z.array(z.string()).optional(),
+  tags: z.string(),
 });
 
 export type postTypeSchema = z.infer<typeof postSchema>;
@@ -46,3 +47,9 @@ export const archiveSchema = z.object({
 });
 
 export type archiveTypeSchema = z.infer<typeof archiveSchema>;
+
+export const sharedPostSchema = z.object({
+  caption: z.string({ required_error: "caption is required" }),
+});
+
+export type sharedPostTypeSchema = z.infer<typeof sharedPostSchema>;

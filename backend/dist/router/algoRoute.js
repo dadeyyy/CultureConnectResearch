@@ -64,5 +64,67 @@ algoRoute.get("/algorithm", isAuthenticated, async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+algoRoute.get("/search", async (req, res) => {
+    const { query } = req.query;
+    try {
+        const searchResults = await db.$transaction([
+            db.post.findMany({
+                where: {
+                    OR: [
+                        { caption: { contains: query, mode: "insensitive" } },
+                        { province: { contains: query, mode: "insensitive" } },
+                        { municipality: { contains: query, mode: "insensitive" } },
+                    ],
+                },
+                include: {
+                    photos: true,
+                    user: true,
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+            }),
+            db.user.findMany({
+                where: {
+                    OR: [
+                        { username: { contains: query, mode: "insensitive" } },
+                        { firstName: { contains: query, mode: "insensitive" } },
+                        { lastName: { contains: query, mode: "insensitive" } },
+                    ],
+                },
+            }),
+            db.archive.findMany({
+                where: {
+                    OR: [
+                        { title: { contains: query, mode: "insensitive" } },
+                        { description: { contains: query, mode: "insensitive" } },
+                        { province: { contains: query, mode: "insensitive" } },
+                        { municipality: { contains: query, mode: "insensitive" } },
+                    ],
+                },
+            }),
+            db.calendar.findMany({
+                where: {
+                    OR: [
+                        { title: { contains: query, mode: "insensitive" } },
+                        { details: { contains: query, mode: "insensitive" } },
+                        { municipality: { contains: query, mode: "insensitive" } },
+                        { provinceId: { contains: query, mode: "insensitive" } },
+                    ],
+                },
+            }),
+        ]);
+        res.json({
+            posts: searchResults[0],
+            users: searchResults[1],
+            archives: searchResults[2],
+            events: searchResults[3],
+        });
+    }
+    catch (error) {
+        console.error("Error in search route:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 export default algoRoute;
 //# sourceMappingURL=algoRoute.js.map

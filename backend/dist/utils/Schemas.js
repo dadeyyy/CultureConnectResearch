@@ -5,6 +5,7 @@ export const postSchema = z.object({
     municipality: z.string({ required_error: "municipality is required!" }),
     userId: z.number().optional(),
     deletedFiles: z.array(z.string()).optional(),
+    tags: z.string(),
 });
 export const exploreSchema = z.object({
     title: z.string({ required_error: "title is required" }),
@@ -30,5 +31,8 @@ export const archiveSchema = z.object({
     municipality: z.string({ required_error: "municipality is required" }),
     category: z.string({ required_error: "category is required" }),
     deletedFiles: z.array(z.string()).optional(),
+});
+export const sharedPostSchema = z.object({
+    caption: z.string({ required_error: "caption is required" }),
 });
 //# sourceMappingURL=Schemas.js.map

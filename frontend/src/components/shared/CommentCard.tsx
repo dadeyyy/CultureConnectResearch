@@ -25,7 +25,7 @@ interface Comment {
 }
 
 interface UserProfile {
-  avatarUrl: string | null;
+  imageUrl: string | null;
   bio: string | null;
   createdAt: string;
   email: string;
@@ -55,7 +55,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
           credentials: "include",
         });
         const data = await response.json();
-
+        console.log(data);
         if (response.ok) {
           setCommentUser(data.user);
         } else {
@@ -74,7 +74,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
     <div key={comment.id} className="flex gap-3 mb-3 items-center">
       <div className="text-dark-1 flex flex-row gap-2 ">
         <img
-          src={commentUser?.avatarUrl || "/assets/icons/profile-placeholder.svg"}
+          src={commentUser?.imageUrl || "/assets/icons/profile-placeholder.svg"}
           alt="profile picture"
           className="h-8 w-8 rounded-full bg-cover"
         />

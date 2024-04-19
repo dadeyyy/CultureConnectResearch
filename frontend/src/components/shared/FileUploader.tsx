@@ -88,7 +88,7 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
   return (
     <div
       {...getRootProps()}
-      className="flex flex-center flex-col bg-light-1 rounded-xl cursor-pointer"
+      className="flex flex-center flex-col rounded-xl cursor-pointer bg-red-200 h-[500px]"
     >
       <input {...getInputProps()} className="cursor-pointer" ref={inputRef} />
 

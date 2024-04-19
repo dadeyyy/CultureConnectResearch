@@ -1,11 +1,30 @@
-import { Route, Routes, Link, Outlet, useParams, useLocation } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  Link,
+  Outlet,
+  useParams,
+  useLocation,
+} from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 // import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
 import Loader from "@/components/shared/Loader";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GridPostList from "@/components/shared/GridPostList";
 import { useEffect, useState } from "react";
+import { ISharedPost } from "@/lib/utils";
 
 interface StabBlockProps {
   value: string | number;
@@ -26,6 +45,40 @@ interface userProfile {
   username: string;
 }
 
+type IPost = {
+  id: number;
+  caption: string;
+  createdAt: string;
+  municipality: string;
+  photos: {
+    id: number;
+    url: string;
+    filename: string;
+    postId: number;
+  }[];
+  province: string;
+  reportCount: number;
+  updatedAt: string;
+  user: {
+    avatarUrl: string | null;
+    firstName: string;
+    id: number;
+    lastName: string;
+    role: string;
+    username: string;
+    province?: string;
+  };
+  userId: number;
+  tags: string[];
+};
+
+type LikePost = {
+  id: number;
+  postId: number;
+  userId: number;
+  post: IPost;
+};
+
 const StatBlock = ({ value, label }: StabBlockProps) => (
   <div className="flex-center gap-2">
     <p className="small-semibold lg:body-bold text-primary-500">{value}</p>
@@ -41,11 +94,82 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followingCount, setFollowingCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const [sharedPost, setSharedPost] = useState<ISharedPost[]>([]);
+  const [likedPost, setLikedPost] = useState<LikePost[]>([]);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/get-post/${id}`, {
+          credentials: "include",
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          setPosts(data);
+        } else {
+          console.error("eError fetching posts:");
+        }
+      } catch (error) {
+        console.error("eError fetching posts:", error);
+      }
+    };
+
+    getPosts();
+  }, [id]);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/get-shared-post/${id}`,
+          {
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          setSharedPost(data);
+        } else {
+          console.error("eError fetching posts:");
+        }
+      } catch (error) {
+        console.error("eError fetching posts:", error);
+      }
+    };
+
+    getPosts();
+  }, [id]);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/user/likes`, {
+          credentials: "include",
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          setLikedPost(data);
+        } else {
+          console.error("eError fetching posts:");
+        }
+      } catch (error) {
+        console.error("eError fetching posts:", error);
+      }
+    };
+
+    getPosts();
+  }, [id]);
 
   useEffect(() => {
     const fetchFollowingCount = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/following-count/${id}`);
+        const response = await fetch(
+          `http://localhost:8000/following-count/${id}`
+        );
         const data = await response.json();
 
         if (response.ok) {
@@ -60,7 +184,9 @@ const Profile = () => {
 
     const fetchFollowersCount = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/followers-count/${id}`);
+        const response = await fetch(
+          `http://localhost:8000/followers-count/${id}`
+        );
         const data = await response.json();
 
         if (response.ok) {
@@ -82,7 +208,6 @@ const Profile = () => {
       try {
         const response = await fetch(`http://localhost:8000/user/${id}`);
         const data = await response.json();
-        console.log(data);
         if (response.ok) {
           setCurrentUser((prevUser) => ({
             ...prevUser,
@@ -102,7 +227,9 @@ const Profile = () => {
   useEffect(() => {
     const checkIfFollowing = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/is-following/${id}`);
+        const response = await fetch(
+          `http://localhost:8000/is-following/${id}`
+        );
         const data = await response.json();
 
         if (response.ok) {
@@ -132,7 +259,10 @@ const Profile = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ followerId: user.id, followingId: currentUser.id }),
+        body: JSON.stringify({
+          followerId: user.id,
+          followingId: currentUser.id,
+        }),
       });
 
       if (response.ok) {
@@ -169,16 +299,18 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
-      <div className="profile-inner_container bg-red-300">
+      <div className="profile-inner_container">
         <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7 p-5">
           <img
-            src={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
+            src={
+              currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"
+            }
             alt="profile"
             className="w-28 h-28 lg:h-40 lg:w-40 object-cover rounded-full"
           />
           <div className="flex flex-col flex-1 justify-between md:mt-2">
             <div className="flex flex-col w-full">
-              <h1 className="text-center xl:text-left h3-bold md:h1-semibold w-full">
+              <h1 className="text-center xl:text-left h3-bold md:h1-semibold w-full capitalize">
                 {currentUser.firstName} {currentUser.lastName}
               </h1>
               <p className="small-regular md:body-medium test-dark-3 text-center xl:text-left">
@@ -205,8 +337,15 @@ const Profile = () => {
                   user.id !== currentUser.id && "hidden"
                 }`}
               >
-                <img src={"/assets/icons/edit.svg"} alt="edit" width={20} height={20} />
-                <p className="flex whitespace-nowrap small-medium">Edit Profile</p>
+                <img
+                  src={"/assets/icons/edit.svg"}
+                  alt="edit"
+                  width={20}
+                  height={20}
+                />
+                <p className="flex whitespace-nowrap small-medium">
+                  Edit Profile
+                </p>
               </Link>
             </div>
             <div className={`${user.id === currentUser.id && "hidden"}`}>
@@ -221,34 +360,124 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      <div className="lg:w-4/5 xs:w-full">
+        <Tabs defaultValue="post" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="post" className="text-lg">
+              Posts
+            </TabsTrigger>
+            <TabsTrigger value="shared" className="text-lg">
+              Shared
+            </TabsTrigger>
+            <TabsTrigger value="likes" className="text-lg">
+              Likes
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="post">
+            <Card className="pt-5">
+              <CardContent className="justify-center flex">
+                {!posts ? (
+                  <div>The user has not posted yet.</div>
+                ) : (
+                  <GridPostList posts={posts} />
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="shared">
+            <Card>
+              <CardHeader>
+                <CardTitle>Shared</CardTitle>
+              </CardHeader>
+              <CardContent className="justify-center flex">
+                {!sharedPost ? (
+                  <div>The user has not posted yet.</div>
+                ) : (
+                  <ul className="grid-container">
+                    {sharedPost.map((post) => (
+                      <li key={post.post.id} className="relative min-w-80 h-80">
+                        <Link
+                          to={`/shared-post/${post.id}`}
+                          className="grid-post_link"
+                        >
+                          <img
+                            src={post.post.photos[0].url}
+                            alt="post"
+                            className="h-full w-full object-cover"
+                          />
+                        </Link>
 
-      {currentUser.id === user.id && (
-        <div className="flex max-w-5xl w-full">
-          <Link
-            to={`/profile/${id}`}
-            className={`profile-tab rounded-l-lg ${
-              pathname === `/profile/${id}` && "!bg-blue-200"
-            }`}
-          >
-            <img src={"/assets/icons/posts.svg"} alt="posts" width={20} height={20} />
-            Posts
-          </Link>
-          <Link
-            to={`/profile/${id}/liked-posts`}
-            className={`profile-tab rounded-r-lg ${
-              pathname === `/profile/${id}/liked-posts` && "!bg-blue-200"
-            }`}
-          >
-            <img src={"/assets/icons/like.svg"} alt="like" width={20} height={20} />
-            Liked Posts
-          </Link>
-        </div>
-      )}
+                        <div className="grid-post_user">
+                          <div className="flex items-center justify-start gap-2 flex-1">
+                            <img
+                              src={
+                                post.post.user.avatarUrl ||
+                                "/assets/icons/profile-placeholder.svg"
+                              }
+                              alt="creator"
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <p className="line-clamp-1 capitalize">
+                              {post.post.user.firstName}{" "}
+                              {post.post.user.lastName}
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="likes">
+            <Card>
+              <CardHeader>
+                <CardTitle>Likes</CardTitle>
+              </CardHeader>
+              <CardContent className="justify-center flex">
+                {!likedPost ? (
+                  <div>The user has not posted yet.</div>
+                ) : (
+                  <ul className="grid-container">
+                    {likedPost.map((like) => (
+                      <li key={like.post.id} className="relative min-w-80 h-80">
+                        <Link
+                          to={`/posts/${like.post.id}`}
+                          className="grid-post_link"
+                        >
+                          <img
+                            src={like.post.photos[0].url}
+                            alt="post"
+                            className="h-full w-full object-cover"
+                          />
+                        </Link>
 
-      <Routes>
-        {/* <Route index element={<GridPostList posts={currentUser.posts} showUser={false} />} /> */}
-      </Routes>
-      <Outlet />
+                        <div className="grid-post_user">
+                          <div className="flex items-center justify-start gap-2 flex-1">
+                            <img
+                              src={
+                                like.post.user.avatarUrl ||
+                                "/assets/icons/profile-placeholder.svg"
+                              }
+                              alt="creator"
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <p className="line-clamp-1 capitalize">
+                              {like.post.user.firstName}{" "}
+                              {like.post.user.lastName}
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
