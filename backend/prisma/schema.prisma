@@ -46,8 +46,7 @@ model User {
 }
 
 model LiveStream {
-  id          Int                 @id @default(autoincrement())
-  uid         String
+  uid         String              @id
   title       String
   description String
   userId      Int
@@ -60,12 +59,13 @@ model LiveStream {
 model LiveStreamComment {
   id           Int        @id @default(autoincrement())
   content      String
+  username String
   userId       Int
-  liveStreamId Int
+  liveStreamId String     // Change the type to String to match uid
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   user         User       @relation(fields: [userId], references: [id])
-  liveStream   LiveStream @relation(fields: [liveStreamId], references: [id])
+  liveStream   LiveStream @relation(fields: [liveStreamId], references: [uid]) // Change reference to uid
 }
 
 model Followers {

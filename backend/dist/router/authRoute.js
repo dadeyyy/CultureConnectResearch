@@ -95,7 +95,7 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
         const response = await axios.post(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs`, {
             meta: { name: `${data.username} livestream` },
             defaultCreator: `${data.username}`,
-            recording: { mode: 'off' },
+            recording: { mode: 'automatic' },
         }, {
             headers: {
                 Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
@@ -115,7 +115,6 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
                 password: hashedPassword,
             },
         });
-        console.log(newUser);
         res.status(200).json({
             message: `${newUser.firstName} ${newUser.lastName} was successfully created`,
         });

@@ -108,7 +108,7 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
       {
         meta: { name:`${data.username} livestream`},
         defaultCreator: `${data.username}`,
-        recording: { mode: 'off' },
+        recording: { mode: 'automatic' },
       },
       {
         headers: {
@@ -134,7 +134,6 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
       },
     });
 
-    console.log(newUser);
 
     res.status(200).json({
       message: `${newUser.firstName} ${newUser.lastName} was successfully created`,

@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
-import VideoCard from "@/components/shared/VideoCard";
+import { useEffect, useState } from 'react';
+import VideoCard from '@/components/shared/VideoCard';
 // import { io } from 'socket.io-client';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/carousel';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetClose,
@@ -22,11 +22,11 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import toast from "react-hot-toast";
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from '@/components/ui/sheet';
+import toast from 'react-hot-toast';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
   FormControl,
@@ -34,14 +34,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 
 const formSchema = z.object({
   title: z.string().min(2, {
-    message: "You cannot create an livestreram without a title.",
+    message: 'You cannot create an livestreram without a title.',
   }),
   description: z.string({
-    required_error: "Add a description.",
+    required_error: 'Add a description.',
   }),
 });
 
@@ -105,6 +105,8 @@ type streamState = {
   meta: {
     name: string;
     description: string;
+    fullName: string;
+    username: string;
   };
   modified: string;
   uid: string;
@@ -115,16 +117,21 @@ const LiveStream = () => {
     []
   );
   const [pastLiveStream, setPastLiveStream] = useState<pastLiveStreamTypes>([]);
-  const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
-  const [url, setUrl] = useState("");
-  const [streamKey, setStreamKey] = useState("");
-  const [videoUID, setVideoUID] = useState("");
+  const [liveDetails, setLiveDetails] = useState({
+    fullName: '',
+    username: '',
+    title: '',
+    description: '',
+  });
+  const [url, setUrl] = useState('');
+  const [streamKey, setStreamKey] = useState('');
+  const [videoUID, setVideoUID] = useState('');
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      description: "",
+      title: '',
+      description: '',
     },
   });
 
@@ -137,34 +144,37 @@ const LiveStream = () => {
 
     console.log(valuesWithUID);
 
-    const response = await fetch("http://localhost:8000/startLiveStream", {
+    const response = await fetch('http://localhost:8000/startLiveStream', {
       body: JSON.stringify(valuesWithUID),
-      method: "POST",
-      credentials: "include",
+      method: 'POST',
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
-
+    const data = await response.json();
+    console.log(data);
     if (response.ok) {
-      const data = await response.json();
-      setFullName(`${data.firstName} ${data.lastName}`);
-      setUsername(`${data.username}`);
-      toast.success("Created LiveStream!");
+      setLiveDetails({
+        title: data.meta.name,
+        description: data.meta.description,
+        fullName: data.meta.fullName,
+        username: data.meta.username,
+      });
+      toast.success('Created LiveStream!');
+      return;
     }
+    toast.error(`${data.message}`);
   };
-
-  console.log("FULLNAME", fullName);
-  console.log("USERNAME", username);
 
   const copyToClipboard = () => {
     navigator.clipboard
       .writeText(streamKey)
       .then(() => {
-        toast.success("Stream key copied to clipboard");
+        toast.success('Stream key copied to clipboard');
       })
       .catch((error) => {
-        toast.error("Failed to copy stream key to clipboard:");
+        toast.error('Failed to copy stream key to clipboard:');
       });
   };
 
@@ -172,10 +182,10 @@ const LiveStream = () => {
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        toast.success("Url copied to clipboard");
+        toast.success('Url copied to clipboard');
       })
       .catch((error) => {
-        toast.error("Failed to copy Url to clipboard:");
+        toast.error('Failed to copy Url to clipboard:');
       });
   };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -186,22 +196,22 @@ const LiveStream = () => {
     const fetchLiveStreamData = async () => {
       try {
         const liveStreamResponse = await fetch(
-          "http://localhost:8000/getLiveStreams"
+          'http://localhost:8000/getLiveStreams'
         );
 
         if (!liveStreamResponse.ok) {
-          throw new Error("Failed to get livestream data!");
+          throw new Error('Failed to get livestream data!');
         }
 
         const data1 = await liveStreamResponse.json();
         setAvailableLivestreams(data1);
 
         const pastLiveStreamResponse = await fetch(
-          "http://localhost:8000/pastLiveStreams"
+          'http://localhost:8000/pastLiveStreams'
         );
 
         if (!pastLiveStreamResponse.ok) {
-          throw new Error("No past livestreams");
+          throw new Error('No past livestreams');
         }
 
         const data2 = await pastLiveStreamResponse.json();
@@ -210,7 +220,7 @@ const LiveStream = () => {
         if (error instanceof Error) {
           setError(error);
         } else {
-          setError(new Error("An unknown error occurred."));
+          setError(new Error('An unknown error occurred.'));
         }
       }
     };
@@ -222,11 +232,11 @@ const LiveStream = () => {
     const fetchPastLiveStreamData = async () => {
       try {
         const pastLiveStreamResponse = await fetch(
-          "http://localhost:8000/pastLiveStreams"
+          'http://localhost:8000/pastLiveStreams'
         );
 
         if (!pastLiveStreamResponse.ok) {
-          throw new Error("No past livestreams");
+          throw new Error('No past livestreams');
         }
 
         const data2 = await pastLiveStreamResponse.json();
@@ -235,7 +245,7 @@ const LiveStream = () => {
         if (error instanceof Error) {
           setError(error);
         } else {
-          setError(new Error("An unknown error occurred."));
+          setError(new Error('An unknown error occurred.'));
         }
       }
     };
@@ -247,14 +257,14 @@ const LiveStream = () => {
     const fetchUrlStreamKey = async () => {
       try {
         const getUrlStreamKey = await fetch(
-          "http://localhost:8000/getUrlStreamKey",
+          'http://localhost:8000/getUrlStreamKey',
           {
-            credentials: "include",
+            credentials: 'include',
           }
         );
 
         if (!getUrlStreamKey.ok) {
-          throw new Error("Error fetching url & streamKey");
+          throw new Error('Error fetching url & streamKey');
         }
 
         const data: { url: string; streamKey: string; videoUID: string } =
@@ -266,7 +276,7 @@ const LiveStream = () => {
         if (error instanceof Error) {
           setError(error);
         } else {
-          setError(new Error("An unknown error occurred."));
+          setError(new Error('An unknown error occurred.'));
         }
       }
     };
@@ -400,7 +410,7 @@ const LiveStream = () => {
                     <Card
                       className="cursor-pointer"
                       onClick={() => {
-                        navigate(`/live-streams/${videoUID}`);
+                        navigate(`/live-streams/${data.uid}`);
                       }}
                     >
                       <CardContent className="flex lg:flex-row xs:flex-col items-center justify-center rounded-xl p-0 pr-2 border-2 gap-3">
@@ -423,10 +433,10 @@ const LiveStream = () => {
                             />
                             <span className="flex flex-col">
                               <span className="text-xl font-bold text-center">
-                                Rick Astley
+                                {data.meta.fullName}
                               </span>
                               <span className="text-md text-start">
-                                @RickJackson
+                                @{data.meta.username}
                               </span>
                             </span>
                           </span>
@@ -453,13 +463,13 @@ const LiveStream = () => {
             Past Live Streams
           </span>
           <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-3 xs:grid-cols-1">
-            {pastLiveStream.map((source, index) => (
+            {pastLiveStream.map((data, index) => (
               <VideoCard
                 key={index}
-                title={source.meta.name}
-                creator={source.creator}
-                dateCreate={source.created}
-                thumbnail={source.thumbnail}
+                title={data.meta.name}
+                creator={data.creator}
+                dateCreate={data.created}
+                thumbnail={data.thumbnail}
               />
             ))}
           </div>

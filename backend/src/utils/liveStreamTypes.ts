@@ -119,3 +119,56 @@ export type pastLiveStreamApiResponse = {
   messages: any[]; 
 
 }
+
+
+export type editVideoTypes = {
+  result: {
+    uid: string;
+  creator: any; // You can replace 'any' with a more specific type if available
+  thumbnail: string;
+  thumbnailTimestampPct: number;
+  readyToStream: boolean;
+  readyToStreamAt: string;
+  status: {
+    state: string;
+    pctComplete: string;
+    errorReasonCode: string;
+    errorReasonText: string;
+  };
+  meta: {
+    name: string;
+  };
+  created: string;
+  modified: string;
+  scheduledDeletion: any; // You can replace 'any' with a more specific type if available
+  size: number;
+  preview: string;
+  allowedOrigins: string[];
+  requireSignedURLs: boolean;
+  uploaded: string;
+  uploadExpiry: any; // You can replace 'any' with a more specific type if available
+  maxSizeBytes: number | null;
+  maxDurationSeconds: number | null;
+  duration: number;
+  input: {
+    width: number;
+    height: number;
+  };
+  playback: {
+    hls: string;
+    dash: string;
+  };
+  watermark: any; // You can replace 'any' with a more specific type if available
+  liveInput: string;
+  clippedFrom: any; // You can replace 'any' with a more specific type if available
+  publicDetails: {
+    title: string | null;
+    share_link: string | null;
+    channel_link: string | null;
+    logo: string | null;
+  };
+  }
+  success: boolean;
+  errors: any[]; 
+  messages: any[]; 
+}
