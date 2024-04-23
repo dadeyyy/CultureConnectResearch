@@ -140,7 +140,7 @@ const Comments = ({ postId, action, type }: CommentProps) => {
   const displayedComments = comments.slice(0, numberOfCommentsToShow);
 
   return (
-    <div className={`post-comments px-2 border border-white border-t-light-4`}>
+    <div className={`px-2 border border-transparent border-t-light-4 h-full`}>
       <h2 className={`${action === "home" ? "hidden p-0" : ""} font-bold ml-5 text-lg`}>
         Comments
       </h2>
@@ -155,12 +155,8 @@ const Comments = ({ postId, action, type }: CommentProps) => {
         </a>
       )}
 
-      <div
-        className={`mt-2 flex flex-col-reverse max-h-[500px]  overflow-y-auto  ${
-          action === "detail" ? "py-5 h-full" : ""
-        }`}
-      >
-        <div>
+      <div className={`flex flex-col h-[100%] ${action === "detail" ? "h-full" : ""}`}>
+        <div className="py-2">
           {displayedComments.map((comment, index) => (
             <CommentCard
               key={comment.id}
@@ -172,34 +168,34 @@ const Comments = ({ postId, action, type }: CommentProps) => {
             />
           ))}
         </div>
-      </div>
-      <div className="flex gap-3 items-center w-full ">
-        <img
-          src={
-            isLoading
-              ? "/assets/icons/profile-placeholder.svg"
-              : user.imageUrl || "/assets/icons/profile-placeholder.svg"
-          }
-          alt="profile picture"
-          className="h-12 w-12 rounded-full bg-cover"
-        />
-        <div className="flex w-full py-2 ">
-          <>
-            <Input
-              type="text"
-              placeholder="Add a comment"
-              className="w-full border border-white border-b-2 bg-gray-100 border-b-slate-950"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
-            <Button
-              type="button"
-              className="bg-white hover:bg-white hover:scale-125 transition ease-in-out delay-150"
-              onClick={handleCommentSubmit}
-            >
-              <img src="/assets/icons/send.svg" width={20} height={20} alt="send" />
-            </Button>
-          </>
+        <div className="flex gap-3 items-center w-full my-2 sticky">
+          <img
+            src={
+              isLoading
+                ? "/assets/icons/profile-placeholder.svg"
+                : user.imageUrl || "/assets/icons/profile-placeholder.svg"
+            }
+            alt="profile picture"
+            className="h-12 w-12 rounded-full bg-cover"
+          />
+          <div className="flex w-full py-2 bg-red-200 rounded-xl px-2">
+            <>
+              <Input
+                type="text"
+                placeholder="Add a comment"
+                className="w-full border border-white border-b-2 bg-gray-100 border-b-slate-950"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+              <Button
+                type="button"
+                className="hover:bg-transparent hover:scale-150 transition ease-in-out delay-150 bg-transparent"
+                onClick={handleCommentSubmit}
+              >
+                <img src="/assets/icons/send.svg" width={20} height={20} alt="send" />
+              </Button>
+            </>
+          </div>
         </div>
       </div>
     </div>

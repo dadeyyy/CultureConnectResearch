@@ -235,7 +235,7 @@ const ArchiveProvince = () => {
                           <p className="font-bold">{archive.title}</p>
                           <p className="text-sm">
                             Created {multiFormatDateString(archive.createdAt)} -{" "}
-                            {archive.municipality}
+                            <span className="capitalize">{archive.municipality}</span>
                           </p>
                           <p className="text-xs">Category: {archive.category}</p>
                         </span>

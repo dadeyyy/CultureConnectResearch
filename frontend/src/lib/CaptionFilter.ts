@@ -453,18 +453,23 @@ export const filterInappropriateWords = (text: string): string => {
 
   const replaceLookalikeCharacters = (word: string): string => {
     let replacedWord = word;
+
     for (const [lookalike, replacement] of Object.entries(lookalikeCharacters)) {
       const regex = new RegExp(escapeRegExp(lookalike), "gi");
       replacedWord = replacedWord.replace(regex, replacement);
     }
+
     return replacedWord;
   };
 
-  let filteredText = text;
+  let filteredText = replaceLookalikeCharacters(text);
+
   inappropriateWords.forEach((word) => {
     const replacedWord = replaceLookalikeCharacters(word);
     const regex = new RegExp(`\\b${escapeRegExp(replacedWord)}\\b`, "gi");
-    filteredText = filteredText.replace(regex, "*".repeat(word.length));
+    filteredText = filteredText.replace(regex, (match) => {
+      return match.replace(/[aeiouAEIOU]/g, "*"); // Replace vowels with asterisks
+    });
   });
 
   return filteredText;

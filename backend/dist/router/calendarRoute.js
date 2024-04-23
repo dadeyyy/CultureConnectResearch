@@ -62,39 +62,32 @@ calendarRoute.post("/create-calendar", isAuthenticated, isAdmin, validate(calend
         return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!!" });
     }
 });
-// calendarRoute.put(
-//   '/update-calendar/:calendarId',
-//   isAuthenticated,
-//   isAdmin,
-//   validate(calendarSchema),
-//   async (req, res) => {
-//     try {
-//       const calendarId = parseInt(req.params.calendarId);
-//       const updatedData: calendarTypeSchema = req.body;
-//       const { date } = updatedData;
-//       const parsedDate = new Date(date);
-//       const existingCalendar = await db.calendar.findUnique({
-//         where: { id: calendarId },
-//       });
-//       if (!existingCalendar) {
-//         return res.status(404).json({ message: 'Calendar not found' });
-//       }
-//       const updatedCalendar = await db.calendar.update({
-//         where: { id: calendarId },
-//         data: {
-//           ...updatedData,
-//           date: parsedDate,
-//         },
-//       });
-//       return res.status(200).json(updatedCalendar);
-//     } catch (error) {
-//       console.error(error);
-//       return res
-//         .status(500)
-//         .json({ error, message: 'INTERNAL SERVER ERROR!!' });
-//     }
-//   }
-// );
+calendarRoute.put("/update-calendar/:calendarId", isAuthenticated, isAdmin, validate(calendarSchema), async (req, res) => {
+    try {
+        const calendarId = parseInt(req.params.calendarId);
+        const updatedData = req.body;
+        const { startDate } = updatedData;
+        const parsedDate = new Date(startDate);
+        const existingCalendar = await db.calendar.findUnique({
+            where: { id: calendarId },
+        });
+        if (!existingCalendar) {
+            return res.status(404).json({ message: "Calendar not found" });
+        }
+        const updatedCalendar = await db.calendar.update({
+            where: { id: calendarId },
+            data: {
+                ...updatedData,
+                startDate: parsedDate,
+            },
+        });
+        return res.status(200).json(updatedCalendar);
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!!" });
+    }
+});
 calendarRoute.delete("/delete-calendar/:calendarId", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const calendarId = parseInt(req.params.calendarId);

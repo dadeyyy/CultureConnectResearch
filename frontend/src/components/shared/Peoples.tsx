@@ -1,8 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserContext } from "@/context/AuthContext";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
 import FollowCard from "./followCard";
+
 type peopleProps = {
   id: string;
   username: string;
@@ -42,18 +43,20 @@ const Peoples = () => {
     fetchPeople();
   }, []);
 
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
+
   return (
     <>
       <div className="flex gap-1 items-center mt-5 hover:cursor-pointer">
-        <img
-          src={
-            isLoading
-              ? "/assets/icons/profile-placeholder.svg"
-              : user.imageUrl || "/assets/icons/profile-placeholder.svg"
-          }
-          alt="profile picture"
-          className="h-12 w-12 rounded-full bg-cover"
-        />
+        <Avatar>
+          <AvatarImage src={user.imageUrl} alt={`profile-pictre`} />
+          <AvatarFallback>{getInitials(user.firstName, user.lastName)}</AvatarFallback>
+        </Avatar>
+
         <div
           className="flex flex-col"
           onClick={() => {
@@ -64,7 +67,7 @@ const Peoples = () => {
             <p>Loading...</p>
           ) : (
             <>
-              <p className="font-bold text-regular">
+              <p className="font-bold text-regular capitalize">
                 {user.firstName} {user.lastName}
               </p>
               <p className="small-regular text-light-3">@{user.username}</p>
@@ -94,10 +97,7 @@ const Peoples = () => {
         <>
           <div className="flex flex-col gap-2">
             {people.map((person) => (
-              <div
-                key={person.id}
-                className="flex items-center space-x-4 cursor-pointer"
-              >
+              <div key={person.id} className="flex items-center space-x-4 cursor-pointer">
                 <FollowCard userId={person.id} />
               </div>
             ))}
@@ -105,12 +105,8 @@ const Peoples = () => {
         </>
       )}
       <span className="text-sm">
-        <span className="hover:underline cursor-pointer m-1">
-          Terms of Service
-        </span>
-        <span className="hover:underline cursor-pointer m-1">
-          Privacy Policy
-        </span>
+        <span className="hover:underline cursor-pointer m-1">Terms of Service</span>
+        <span className="hover:underline cursor-pointer m-1">Privacy Policy</span>
         <span className="hover:underline cursor-pointer m-1"> About</span>
         <div>
           <span className="m-1">© 2024 CultureConnect.</span>

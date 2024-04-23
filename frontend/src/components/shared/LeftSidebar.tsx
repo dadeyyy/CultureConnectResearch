@@ -2,13 +2,16 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import PostForm from "../forms/PostForm";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
@@ -73,10 +76,6 @@ const LeftSidebar = () => {
       route: `/profile/${user.id}`,
       label: "Profile",
     },
-    {
-      route: "/create-post",
-      label: "Create Post",
-    },
   ].filter(Boolean);
 
   console.log(user.imageUrl);
@@ -90,6 +89,12 @@ const LeftSidebar = () => {
     localStorage.removeItem("currentUser");
 
     return navigate("/");
+  };
+
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
   };
 
   return (
@@ -116,20 +121,41 @@ const LeftSidebar = () => {
                     } ${isCreate ? "text-sm" : ""}`}
                   >
                     {!isCreate && (
-                      <img
-                        src={link.imgURL}
-                        alt={link.label}
-                        className={`h-5 w-5 ${
-                          link.label === "Profile" ? "h-7 w-7 rounded-full" : ""
-                        }`}
-                      />
+                      <>
+                        {link.label === "Profile" ? (
+                          <Avatar>
+                            <AvatarImage src={link.imgURL} alt={link.label} />
+                            <AvatarFallback>
+                              {getInitials(user.firstName, user.lastName)}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <img src={link.imgURL} alt={link.label} className={`h-5 w-5`} />
+                        )}
+                      </>
                     )}
+
                     {link.label}
                   </NavLink>
                 </div>
               </li>
             );
           })}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button className={`leftsidebar-create`}>Create Post</Button>
+            </SheetTrigger>
+            <SheetContent className="xl:min-w-[1080px] xs:w-full max-h-full  py-5" side={"left"}>
+              <div className="w-full flex flex-col h-full">
+                <div className="flex justify-between">
+                  <SheetHeader>
+                    <SheetTitle className="font-bold text-lg">Add Post</SheetTitle>
+                  </SheetHeader>
+                </div>
+                <PostForm action="Create" />
+              </div>
+            </SheetContent>
+          </Sheet>
         </ul>
       </div>
       <div className="flex flex-col-reverse">

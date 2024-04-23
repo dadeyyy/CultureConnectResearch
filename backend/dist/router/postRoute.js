@@ -134,7 +134,15 @@ postRoute.get("/post/:id", async (req, res) => {
             include: {
                 photos: true,
                 user: {
-                    select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                    select: {
+                        id: true,
+                        username: true,
+                        firstName: true,
+                        lastName: true,
+                        avatarUrl: true,
+                        role: true,
+                        province: true,
+                    },
                 }, // Corrected include syntax
             },
         });
@@ -153,13 +161,16 @@ postRoute.get("/post/:id", async (req, res) => {
 postRoute.put("/post/:postId", isAuthenticated, isAuthor, upload.array("image"), validate(postSchema), async (req, res) => {
     try {
         const postId = parseInt(req.params.postId);
+        console.log(req.body);
         const data = req.body;
         const files = req.files;
+        const tags = data.tags?.replace(/ /g, "").split(",") || [];
         const dataNoFiles = {
             caption: data.caption,
             province: data.province,
             municipality: data.municipality,
             userId: req.session.user?.id,
+            tags: tags,
         };
         let newFiles = [];
         if (files && files.length > 0) {
@@ -195,7 +206,7 @@ postRoute.put("/post/:postId", isAuthenticated, isAuthor, upload.array("image"),
                 },
             });
             const dataToDelete = data.deletedFiles.filter((file) => filesToDelete?.photos.some((filename) => file === filename.filename));
-            const updatedFiles = await db.post.update({
+            await db.post.update({
                 where: { id: postId },
                 data: {
                     photos: {
@@ -206,48 +217,40 @@ postRoute.put("/post/:postId", isAuthenticated, isAuthor, upload.array("image"),
                     photos: true,
                 },
             });
-            // If there are images to delete, remove them
-            if (req.body.deleteImages && req.body.deleteImages.length > 0) {
-                const imagesToDelete = req.body.deleteImages;
-                await db.post.update({
-                    where: { id: postId },
-                    data: {
-                        photos: {
-                            deleteMany: {
-                                id: { in: imagesToDelete },
-                            },
-                        },
-                    },
-                });
-            }
-            res.status(200).json({ message: "Successfully updated post", data: updatedPost });
         }
         return res.status(200).json(updatedPost);
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 });
 postRoute.delete("/post/:postId", isAuthenticated, async (req, res) => {
     try {
         const postId = parseInt(req.params.postId);
-        //Find post to delete
+        // Find post to delete
         const post = await db.post.findUnique({
             where: {
                 id: postId,
             },
         });
-        if (post) {
-            const deletedPost = await db.post.delete({
-                where: {
-                    id: +postId,
-                },
-                include: { photos: true },
-            });
-            return res.status(200).json({ message: `Successfully deleted post! #${deletedPost.id}` });
+        if (!post) {
+            return res.status(404).json({ error: "Can't find post!" });
         }
-        return res.status(404).json({ error: "Can't find post!" });
+        // Delete associated SharedPost records first
+        await db.sharedPost.deleteMany({
+            where: {
+                postId: postId,
+            },
+        });
+        // Then delete the Post
+        const deletedPost = await db.post.delete({
+            where: {
+                id: postId,
+            },
+            include: { photos: true },
+        });
+        return res.status(200).json({ message: `Successfully deleted post! #${deletedPost.id}` });
     }
     catch (error) {
         console.log(error);
@@ -438,10 +441,13 @@ postRoute.get("/get-post/:userId", isAuthenticated, async (req, res) => {
         res.status(500).json({ error: "Cannot get the reported posts" });
     }
 });
-postRoute.get("/user/likes", isAuthenticated, async (req, res) => {
+postRoute.get("/user/likes/:id", isAuthenticated, async (req, res) => {
     try {
-        const userId = req.session.user?.id;
-        console.log(userId);
+        const userIdParam = req.params.id;
+        const userId = parseInt(userIdParam);
+        if (!userId) {
+            throw new Error("Invalid user ID");
+        }
         const likedPosts = await db.like.findMany({
             where: {
                 userId: userId,
@@ -454,7 +460,13 @@ postRoute.get("/user/likes", isAuthenticated, async (req, res) => {
                     include: {
                         photos: true,
                         user: {
-                            select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
+                            select: {
+                                id: true,
+                                username: true,
+                                firstName: true,
+                                lastName: true,
+                                avatarUrl: true,
+                            },
                         },
                     },
                 },

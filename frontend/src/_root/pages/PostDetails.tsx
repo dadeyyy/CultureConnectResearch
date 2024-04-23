@@ -10,6 +10,10 @@ import Comments from "@/components/shared/Comments";
 import { Badge } from "@/components/ui/badge";
 import { municipalities, provincesTest } from "@/lib/provinces";
 import ReportForm from "@/components/forms/ReportForm";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import PostForm from "@/components/forms/PostForm";
+import toast from "react-hot-toast";
 
 const PostDetails = () => {
   const navigate = useNavigate();
@@ -29,8 +33,6 @@ const PostDetails = () => {
         }
 
         const postData = await response.json();
-        console.log(postData);
-
         setPost(postData);
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -49,125 +51,140 @@ const PostDetails = () => {
     const data = await response.json();
 
     if (response.ok) {
-      console.log("SUCCESS", data);
+      toast.success("Deleted Successfully");
       return navigate("/home");
     } else {
-      console.log("FAILED", data);
+      toast.error("Failed to delete");
     }
   }
 
-  console.log(post);
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
 
   return (
-    <div className="flex-1 overflow-auto py-5">
-      <div className="hidden md:flex max-w-5xl w-full">
-        <Button onClick={() => navigate(-1)} variant="ghost" className="shad-button_ghost">
-          <img
-            src={"/assets/icons/back.svg"}
-            alt="back"
-            width={24}
-            height={24}
-            style={{
-              filter:
-                "invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(0%) contrast(119%)",
-            }}
-            className="fill-current text-black"
-          />
-          <p className="small-medium lg:base-medium">Back</p>
-        </Button>
-      </div>
-
+    <>
       {isLoading || !post ? (
         <Loader />
       ) : (
-        <div className="post_details-card mx-auto p-2 ">
-          <div className="post_details-info">
-            <div className="flex-between w-full">
-              <Link to={`/profile/${post.userId}`} className="flex items-center gap-3">
-                <img
-                  src={post.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
-                  alt="user"
-                  className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
-                />
-
-                <div className="flex gap-1 flex-col">
-                  <div className="flex flex-row text-center gap-2">
-                    <p className="base-medium lg:body-bold text-dark-1">
-                      {post.user.firstName} {post.user.lastName}
-                    </p>
-                    {user.id === post.userId && user.role === `ADMIN` && (
-                      <Badge className="bg-green-300 font-semibold text-xs border text-gray-600 capitalize border-gray-300">
-                        {user.province}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex-center gap-2 text-light-3">
-                    <p className="text-regular lg:text-sm ">
-                      {multiFormatDateString(post.createdAt)}
-                    </p>
-                    •
-                    <p className="text-regular lg:text-sm">
-                      {"In "}
-                      {post.municipality &&
-                        municipalities[post.province]?.find(
-                          (municipal) => municipal.value === post.municipality
-                        )?.label}
-                      {", "}
-                      {post.province &&
-                        provincesTest.find((province) => province.value === post.province)?.label}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-
-              <div className="flex-center gap-1">
-                <Link
-                  to={`/update-post/${post.id}`}
-                  className={`${user.id !== post.userId && "hidden"}`}
-                >
-                  <img src={"/assets/icons/edit.svg"} alt="edit" width={24} height={24} />
-                </Link>
-
-                <Button
-                  onClick={handleDeletePost}
-                  variant="ghost"
-                  className={`ost_details-delete_btn ${user.id !== post.userId && "hidden"}`}
-                >
-                  <img src={"/assets/icons/delete.svg"} alt="delete" width={24} height={24} />
-                </Button>
-
-                <ReportForm userId={user.id} postId={post.id} postUserId={post.userId} />
+        <div className="w-full p-5">
+          <div className="hidden md:flex max-w-5xl w-full">
+            <Button onClick={() => navigate(-1)} variant="ghost" className="shad-button_ghost">
+              <img
+                src={"/assets/icons/back.svg"}
+                alt="back"
+                width={24}
+                height={24}
+                style={{
+                  filter:
+                    "invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(0%) contrast(119%)",
+                }}
+                className="fill-current text-black"
+              />
+              <p className="small-medium lg:base-medium">Back</p>
+            </Button>
+          </div>
+          <div className=" w-full lg:w-full flex lg:flex-row xs:flex-col rounded-xl border-gray-500 border">
+            <div className="border border-transparent lg:border-r-gray-500 object-cover lg:w-[75vh] xs:w-full">
+              <Carousel photos={post.photos || []} />
+              <div className="px-5">
+                <PostStats postId={post.id} userId={user.id} type="regular" />
               </div>
             </div>
-            <hr className="border w-full border-dark-4/80" />
 
-            <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
-              <p>{post.caption}</p>{" "}
-              <ul className="flex gap-1 mt-2">
-                {post.tags.map((tag, index) => (
-                  <li key={index} className="text-light-3 small-regular">
-                    #{tag}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="w-full">
-              <Carousel photos={post.photos || []} />
-              <PostStats postId={post.id} userId={user.id} type="regular" />
-            </div>
-          </div>
+            <div className="post_details-info overflow-y-auto custom-scrollbar max-h-[85vh] w-full">
+              <div className="flex-between w-full pt-2">
+                <Link to={`/profile/${post.userId}`} className="flex items-center gap-3">
+                  <Avatar>
+                    <AvatarImage src={post.user.avatarUrl} alt={`profile-pictre`} />
+                    <AvatarFallback>
+                      {getInitials(post.user.firstName, post.user.lastName)}
+                    </AvatarFallback>
+                  </Avatar>
 
-          <div className="post_details-info">
-            <Comments postId={post.id} action="detail" type="regular" />
+                  <div className="flex gap-1 flex-col">
+                    <div className="flex flex-row text-center gap-2">
+                      <p className="lg:text-base truncate xs:text-sm body-bold text-dark-1 capitalize">
+                        {post.user.firstName} {post.user.lastName}
+                      </p>
+                      {user.id === post.userId && user.role === `ADMIN` && (
+                        <Badge className="bg-green-300 font-semibold text-xs border text-gray-600 capitalize border-gray-300">
+                          {user.province}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-light-3">
+                      <p className="text-xs ">{multiFormatDateString(post.createdAt)}</p>•
+                      <p className="text-xs">
+                        {"In "}
+                        {post.municipality &&
+                          municipalities[post.province]?.find(
+                            (municipal) => municipal.value === post.municipality
+                          )?.label}
+                        {", "}
+                        {post.province &&
+                          provincesTest.find((province) => province.value === post.province)?.label}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+
+                <div className="flex-center gap-1">
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <img
+                        src={"/assets/icons/edit.svg"}
+                        alt="edit"
+                        className={`w-5 xs:w-4 ${user.id !== post.userId && "hidden"}`}
+                      />
+                    </SheetTrigger>
+                    <SheetContent
+                      className="xl:min-w-[1080px] xs:w-full max-h-full  py-5"
+                      side={"left"}
+                    >
+                      <div className="w-full flex flex-col h-full">
+                        <div className="flex justify-between">
+                          <SheetHeader>
+                            <SheetTitle className="font-bold text-lg">Update Post</SheetTitle>
+                          </SheetHeader>
+                        </div>
+                        <PostForm action="Update" post={post} />
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+
+                  <Button
+                    onClick={handleDeletePost}
+                    variant="ghost"
+                    className={`ost_details-delete_btn ${user.id !== post.userId && "hidden"}`}
+                  >
+                    <img src={"/assets/icons/delete.svg"} alt="delete" className={`w-5 xs:w-4`} />
+                  </Button>
+
+                  <ReportForm userId={user.id} postId={post.id} postUserId={post.userId} />
+                </div>
+              </div>
+              <hr className="border w-full border-dark-4/80" />
+              <div className="flex flex-col w-full small-medium lg:base-regular overflow">
+                <p>{post.caption}</p>
+                <ul className="flex gap-1">
+                  {post.tags.map((tag, index) => (
+                    <li key={index} className="text-light-3 small-regular">
+                      #{tag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="w-full h-full py-2">
+                <Comments postId={post.id} action="detail" type="regular" />
+              </div>
+            </div>
           </div>
         </div>
       )}
-
-      <div className="w-full max-w-5xl">
-        <h3 className="body-bold md:h3-bold w-full m-10">More Related Posts</h3>
-        {/* {isUserPostLoading || !relatedPosts ? <Loader /> : <GridPostList posts={relatedPosts} />} */}
-      </div>
-    </div>
+    </>
   );
 };
 

@@ -12,9 +12,9 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-
+import Box from "@mui/material/Box";
+import LinearProgress from "@mui/material/LinearProgress";
 import {
   Select,
   SelectContent,
@@ -38,59 +38,126 @@ const FormSchema = z.object({
   endDate: z.date().optional(),
 });
 
-interface calendarProps {
-  province: string;
+interface IEvent {
+  id: string;
+  title: string;
+  details: string;
+  municipality: string;
+  repeat: string;
+  rrule: {
+    freq: string;
+    dtstart: string;
+  };
+  startDate: string;
+  endDate: string;
+  provinceId: string;
+  location: { type: string; coordinates: [number, number] };
 }
 
-const CalendarForm = ({ province }: calendarProps) => {
+interface calendarProps {
+  province: string;
+  calendarDetails?: IEvent;
+  action: "create" | "update";
+}
+
+const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       provinceId: province,
       title: "",
       details: "",
+      municipality: "",
       repeat: "once",
+      startDate: new Date(),
+      ...calendarDetails,
     },
   });
 
   //consts
-  const [checked, setChecked] = useState(false);
-  const [startDate, setStartDate] = useState(new Date());
+  const [repeatValue, setRepeatValue] = useState(calendarDetails?.repeat || "once");
+  const [isLoading, setIsLoading] = useState(false);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const formData = {
-      title: data.title,
-      details: data.details,
-      provinceId: data.provinceId,
-      repeat: data.repeat,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      municipality: data.municipality,
-    };
+    setIsLoading(true);
+    if (action === "create") {
+      const formData = {
+        title: data.title,
+        details: data.details,
+        provinceId: data.provinceId,
+        repeat: data.repeat,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        municipality: data.municipality,
+      };
 
-    console.log(formData);
-    try {
-      const response = await fetch("http://localhost:8000/create-calendar", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        toast.success("Event created!");
-      } else {
-        toast.error("Can't create an event");
+      try {
+        const response = await fetch("http://localhost:8000/create-calendar", {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
+          toast.success("Event created!");
+          window.location.reload();
+        } else {
+          toast.error("Can't create an event");
+        }
+      } catch (error) {
+        toast.error(`Error creating an event Error message ${error}`);
+      } finally {
+        setIsLoading(false); // Reset loading state after form submission completes
       }
-    } catch (error) {
-      toast.error(`Error creating an event Error message ${error}`);
+    } else {
+      const formData = {
+        title: data.title,
+        details: data.details,
+        provinceId: data.provinceId,
+        repeat: data.repeat,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        municipality: data.municipality,
+      };
+
+      try {
+        const response = await fetch(
+          `http://localhost:8000/update-calendar/${calendarDetails?.id}`,
+          {
+            method: "PUT",
+            credentials: "include",
+            body: JSON.stringify(formData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          toast.success("Event updated!");
+          window.location.reload();
+        } else {
+          toast.error("Can't update an event");
+        }
+      } catch (error) {
+        toast.error(`Error updating an event Error message ${error}`);
+      } finally {
+        setIsLoading(false); // Reset loading state after form submission completes
+      }
     }
   }
-  console.log(checked);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 relative">
+        {isLoading && (
+          <div className="w-full ">
+            <Box sx={{ width: "100%" }}>
+              <LinearProgress />
+            </Box>
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-2">
           <FormField
             control={form.control}
@@ -156,7 +223,13 @@ const CalendarForm = ({ province }: calendarProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Repeat</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={(value) => {
+                  setRepeatValue(value);
+                  field.onChange(value);
+                }}
+                defaultValue={field.value}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select repeat" />
@@ -173,20 +246,6 @@ const CalendarForm = ({ province }: calendarProps) => {
             </FormItem>
           )}
         />
-
-        <div className="flex items-center space-x-2 pt-5">
-          <Checkbox
-            onCheckedChange={() => {
-              setChecked(!checked);
-            }}
-          />
-          <label
-            htmlFor="terms"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Not a 1-day event
-          </label>
-        </div>
 
         <div className="grid grid-cols-2 gap-2">
           <FormField
@@ -223,7 +282,7 @@ const CalendarForm = ({ province }: calendarProps) => {
               </FormItem>
             )}
           />
-          {checked && (
+          {repeatValue !== "once" && (
             <FormField
               control={form.control}
               name="endDate"

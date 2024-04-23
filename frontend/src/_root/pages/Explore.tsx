@@ -20,6 +20,7 @@ import { Label } from "@radix-ui/react-label";
 import { Link } from "react-router-dom";
 import { multiFormatDateString } from "@/lib/utils";
 import Peoples from "@/components/shared/Peoples";
+import { Button } from "@/components/ui/button";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
@@ -106,37 +107,58 @@ type SearchResult = {
   events: CalendarProps[];
 };
 
+type Recommendation = {
+  like: Post[];
+  interest: Post[];
+};
+
 const Explore = () => {
   const [searchValue, setSearchValue] = useState("");
   const { user } = useUserContext();
-  const { postData, isPostLoading, error, fetchPosts } = usePostContext();
+  // const { postData, isPostLoading, error, fetchPosts } = usePostContext();
   const [showAllPosts, setShowAllPosts] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult>();
-
-  const visiblePosts = showAllPosts ? postData : postData.slice(0, 2);
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [postData, setPostData] = useState<Recommendation>();
+  const [isPostLoading, setIsPostLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const searchItems = async () => {
+    const fetchReco = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/search?query=${searchValue}`,
-          {
-            credentials: "include",
-          }
-        );
-        const data: SearchResult = await response.json();
-        setSearchResults(data);
-        console.log(data);
+        const response = await fetch("http://localhost:8000/algorithm", { credentials: "include" });
+        const data = await response.json();
+        console.log("ALGORITHM", data);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        setPostData(data);
+        setIsPostLoading(false);
       } catch (error) {
-        console.error("Error fetching search results:", error);
+        console.error("Error fetching posts:", error);
+        setError("Something went wrong while fetching posts. Please try again later.");
+        setIsPostLoading(false);
       }
     };
-    searchItems();
-  }, [searchValue]);
+    fetchReco();
+  }, []);
+
+  const searchItems = async (searchValue: string) => {
+    setIsLoading(true);
+    try {
+      const encodedSearchValue = encodeURIComponent(searchValue);
+      const response = await fetch(`http://localhost:8000/search?query=${encodedSearchValue}`, {
+        credentials: "include",
+      });
+      const data: SearchResult = await response.json();
+      setSearchResults(data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+  };
 
   const formatDateToWord = (dateString: string): string => {
     const options: Intl.DateTimeFormatOptions = {
@@ -152,73 +174,108 @@ const Explore = () => {
       <div className="explore-container">
         <div className="explore-inner_container">
           <h2 className="h3-bold md:h2-bold w-full">Explore</h2>
-          <div className="flex gap-1 px-4 w-full rounded-lg bg-gray-200">
-            <img
-              src="/assets/icons/explore.svg"
-              width={24}
-              height={24}
-              alt="search"
-            />
+          <div className="flex gap-1 w-full rounded-lg bg-gray-200 items-center">
             <Input
               type="text"
               placeholder="Search"
               className="explore-search"
               value={searchValue}
-              onChange={(e) => {
-                const { value } = e.target;
-                setSearchValue(value);
-              }}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
+            <Button
+              className="bg-transparent hover:bg-blue-200"
+              onClick={() => {
+                searchItems(searchValue);
+              }}
+            >
+              <img src="/assets/icons/explore.svg" width={24} height={24} alt="search" />
+            </Button>
           </div>
         </div>
         <div className="flex flex-col w-full py-2">
-          {searchValue === "" ? (
+          {isLoading && <Loader />}
+          {!searchResults ? (
             <>
-              {postData.length > 0 && (
+              {!postData ? (
+                <Loader />
+              ) : (
                 <>
                   <span className="text-xl font-bold m-auto">For you</span>
                   <hr className="border-2 border-gray-500 w-1/3 m-auto" />
-                  <div className="home-posts">
-                    <span className="text-lg font-semibold">
-                      Based on your likes:
-                    </span>
-                    {isPostLoading ? (
-                      <Loader />
-                    ) : error ? (
-                      <div className="error-container">
-                        <p className="body-medium text-dark-1">
-                          Error: {error}
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <ul className="flex flex-col flex-1 gap-9 w-full">
-                          {visiblePosts.map((post) => (
-                            <li
-                              key={post.id}
-                              className="flex justify-center w-full"
-                            >
-                              <PostCard post={post} userId={user.id} />
-                            </li>
-                          ))}
-                        </ul>
-                        {postData.length > 2 && !showAllPosts && (
-                          <button
-                            className="text-blue-500 hover:underline mt-4"
-                            onClick={() => setShowAllPosts(true)}
-                          >
-                            See More
-                          </button>
+                  {postData.like.length > 0 && (
+                    <>
+                      <div className="home-posts">
+                        <span className="text-lg font-semibold text-start w-full">
+                          Based on your likes:
+                        </span>
+                        {isPostLoading ? (
+                          <Loader />
+                        ) : error ? (
+                          <div className="error-container">
+                            <p className="body-medium text-dark-1">Error: {error}</p>
+                          </div>
+                        ) : (
+                          <>
+                            <ul className="flex flex-col flex-1 gap-9 w-full">
+                              {postData.like.map((post) => (
+                                <li key={post.id} className="flex justify-center w-full">
+                                  <PostCard post={post} userId={user.id} />
+                                </li>
+                              ))}
+                            </ul>
+                            {/* {postData.like.length > 2 && !showAllPosts && (
+                              <button
+                                className="text-blue-500 hover:underline mt-4"
+                                onClick={() => setShowAllPosts(true)}
+                              >
+                                See More
+                              </button>
+                            )} */}
+                          </>
                         )}
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    </>
+                  )}
+                  {postData.interest.length > 0 && (
+                    <>
+                      <div className="home-posts">
+                        <span className="text-lg font-semibold text-start w-full">
+                          Based on your interests:
+                        </span>
+                        {isPostLoading ? (
+                          <Loader />
+                        ) : error ? (
+                          <div className="error-container">
+                            <p className="body-medium text-dark-1">Error: {error}</p>
+                          </div>
+                        ) : (
+                          <>
+                            <ul className="flex flex-col flex-1 gap-9 w-full">
+                              {postData.interest.map((post) => (
+                                <li key={post.id} className="flex justify-center w-full">
+                                  <PostCard post={post} userId={user.id} />
+                                </li>
+                              ))}
+                            </ul>
+                            {/* {postData.interest.length > 2 && !showAllPosts && (
+                              <button
+                                className="text-blue-500 hover:underline mt-4"
+                                onClick={() => setShowAllPosts(true)}
+                              >
+                                See More
+                              </button>
+                            )} */}
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </>
           ) : (
             <Tabs defaultValue="posts" className="w-full ">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-4 h-12">
                 <TabsTrigger value="posts">Posts</TabsTrigger>
                 <TabsTrigger value="users">Users</TabsTrigger>
                 <TabsTrigger value="archives">Archives</TabsTrigger>
@@ -235,10 +292,7 @@ const Explore = () => {
                     ) : searchResults.posts.length > 0 ? (
                       <ul className="flex flex-col flex-1 gap-9 w-full">
                         {searchResults.posts.map((post) => (
-                          <li
-                            key={post.id}
-                            className="flex justify-center w-full"
-                          >
+                          <li key={post.id} className="flex justify-center w-full">
                             <PostCard post={post} userId={user.id} />
                           </li>
                         ))}
@@ -260,10 +314,7 @@ const Explore = () => {
                     ) : searchResults.users.length > 0 ? (
                       <ul className="flex flex-col flex-1 gap-9 w-full">
                         {searchResults.users.map((user) => (
-                          <li
-                            key={user.id}
-                            className="flex justify-center w-full"
-                          >
+                          <li key={user.id} className="flex justify-center w-full">
                             <FollowCard userId={user.id.toString()} />
                           </li>
                         ))}
@@ -285,26 +336,17 @@ const Explore = () => {
                     ) : searchResults.archives.length > 0 ? (
                       <ul className="flex flex-col flex-1 gap-2 w-full">
                         {searchResults.archives.map((archive) => (
-                          <li
-                            key={archive.id}
-                            className="flex justify-center w-full"
-                          >
+                          <li key={archive.id} className="flex justify-center w-full">
                             <Link
                               to={`/archives/${archive.province}/${archive.category}/${archive.id}`}
                               className="w-full"
                             >
                               <div className="px-2 py-2 border hover:rounded-md w-full border-transparent border-b-black  hover:border-black ease-in-out duration-300 flex gap-3">
-                                <img
-                                  src={"/assets/icons/archive-icon-2.svg"}
-                                  width={40}
-                                />
+                                <img src={"/assets/icons/archive-icon-2.svg"} width={40} />
                                 <div>
-                                  <h2 className="text-md font-bold">
-                                    {archive.title}
-                                  </h2>
+                                  <h2 className="text-md font-bold">{archive.title}</h2>
                                   <p className="text-sm">
-                                    Date Created:{" "}
-                                    {multiFormatDateString(archive.createdAt)}
+                                    Date Created: {multiFormatDateString(archive.createdAt)}
                                   </p>
                                   <p className="text-sm capitalize">
                                     Municipality: {archive.municipality}
@@ -333,15 +375,15 @@ const Explore = () => {
                       <div>
                         <Accordion type="single" collapsible className="w-full">
                           {searchResults.events.map((event) => (
-                            <AccordionItem value={event.id.toString()}>
+                            <AccordionItem value={event.id.toString()} key={event.id}>
                               <AccordionTrigger>{event.title}</AccordionTrigger>
                               <AccordionContent className="flex flex-col gap-2">
                                 <span className="font-semibold">
                                   {event.endDate === null
                                     ? formatDateToWord(event.startDate)
-                                    : `${formatDateToWord(
-                                        event.startDate
-                                      )} to ${formatDateToWord(event.endDate)}`}
+                                    : `${formatDateToWord(event.startDate)} to ${formatDateToWord(
+                                        event.endDate
+                                      )}`}
                                 </span>
                                 <span>{event.details}</span>
                                 <div className="flex flex-col h-full">
@@ -357,12 +399,8 @@ const Explore = () => {
                                     mapStyle="mapbox://styles/mapbox/streets-v9"
                                   >
                                     <Marker
-                                      latitude={
-                                        event.location.coordinates[1] || 0
-                                      }
-                                      longitude={
-                                        event.location.coordinates[0] || 0
-                                      }
+                                      latitude={event.location.coordinates[1] || 0}
+                                      longitude={event.location.coordinates[0] || 0}
                                     />
                                   </ReactMapGl>
                                 </div>

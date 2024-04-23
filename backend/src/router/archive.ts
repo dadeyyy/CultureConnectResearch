@@ -165,6 +165,7 @@ archiveRoute.put(
       const archiveId = parseInt(req.params.archiveId);
       const data: archiveTypeSchema = req.body;
       const files = req.files as Express.Multer.File[];
+      console.log(data);
 
       const dataWithoutFiles = {
         title: data.title,

@@ -25,6 +25,7 @@ import ArchiveUploader from "../shared/ArchiveUploader";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
+import toast from "react-hot-toast";
 
 interface ArchiveFormProps {
   provinceData: string | undefined;
@@ -73,17 +74,11 @@ type Archive = {
   updatedAt: string;
 };
 
-const ArchiveForm: React.FC<ArchiveFormProps> = ({
-  provinceData,
-  action,
-  archiveData,
-}) => {
+const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archiveData }) => {
   const [province, setProvince] = useState(provinceData);
   const [archive, setArchive] = useState<Archive | null>(null);
   const [provinceLabel, setProvinceLabel] = useState<string | undefined>();
-  const [selectedMunicipality, setSelectedMunicipality] = useState<
-    string | undefined
-  >();
+  const [selectedMunicipality, setSelectedMunicipality] = useState<string | undefined>();
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
@@ -143,9 +138,6 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
             method: "PUT",
             body: formData,
             credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
           }
         );
 
@@ -157,7 +149,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
 
         const data = await response.json();
         console.log("Update successful!", data);
-        navigate(`/explore/${province}/archive/${archiveData?.id}`);
+        navigate(`/archives/${province}/${archiveData?.category}/${archiveData?.id}`);
       } catch (error) {
         console.error("Error during POST request:", error);
       } finally {
@@ -175,6 +167,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
         formData.append("province", provinceData);
       }
       formData.append("municipality", values.municipality);
+      formData.append("category", values.category);
 
       if (values.archive) {
         console.log(values.archive);
@@ -182,22 +175,20 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
           formData.append(`archive`, file);
         });
       }
+
       try {
-        const response = await fetch(
-          `http://localhost:8000/archive/${provinceData}`,
-          {
-            method: "POST",
-            body: formData,
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`http://localhost:8000/archive/${provinceData}`, {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
         if (!response.ok) {
-          console.error("Error during POST request:", response);
+          toast.error("Creation Failed");
           return;
         }
         const data = await response.json();
-        console.log("Creation successful!", data);
-        navigate(`/explore/${province}`);
+        toast.success("Creation successful!", data);
+        navigate(`/archives/${province}`);
       } catch (error) {
         console.error("Error during POST request:", error);
       } finally {
@@ -208,20 +199,14 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
 
   const handleFilesRemoved = (removedFileNames: string[]) => {
     // Update the state of deletedFiles
-    setDeletedFiles((prevDeletedFiles) => [
-      ...prevDeletedFiles,
-      ...removedFileNames,
-    ]);
+    setDeletedFiles((prevDeletedFiles) => [...prevDeletedFiles, ...removedFileNames]);
   };
 
   console.log(isLoading);
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        encType="multipart/form-data"
-      >
+      <form onSubmit={form.handleSubmit(handleSubmit)} encType="multipart/form-data">
         <div className="p-2">
           {isLoading && (
             <div className="w-full ">
@@ -241,9 +226,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="shad-form_label">
-                              Title
-                            </FormLabel>
+                            <FormLabel className="shad-form_label">Title</FormLabel>
                             <FormControl>
                               <Textarea
                                 className="shad-textarea custom-scrollbar"
@@ -262,9 +245,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="shad-form_label">
-                              Description
-                            </FormLabel>
+                            <FormLabel className="shad-form_label">Description</FormLabel>
                             <FormControl>
                               <Textarea
                                 className="shad-textarea custom-scrollbar"
@@ -285,9 +266,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                             name="municipality"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="shad-form_label">
-                                  Title
-                                </FormLabel>
+                                <FormLabel className="shad-form_label">Municipality</FormLabel>
                                 <FormControl>
                                   <Select
                                     onValueChange={field.onChange}
@@ -300,25 +279,18 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                                         {selectedMunicipality}
                                       </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent
-                                      position="popper"
-                                      className="bg-white"
-                                    >
-                                      {municipalities[provinceData].map(
-                                        (municipality) => (
-                                          <SelectItem
-                                            key={municipality.value}
-                                            value={municipality.value}
-                                            onSelect={() =>
-                                              setSelectedMunicipality(
-                                                municipality.value
-                                              )
-                                            }
-                                          >
-                                            {municipality.label}
-                                          </SelectItem>
-                                        )
-                                      )}
+                                    <SelectContent position="popper" className="bg-white">
+                                      {municipalities[provinceData].map((municipality) => (
+                                        <SelectItem
+                                          key={municipality.value}
+                                          value={municipality.value}
+                                          onSelect={() =>
+                                            setSelectedMunicipality(municipality.value)
+                                          }
+                                        >
+                                          {municipality.label}
+                                        </SelectItem>
+                                      ))}
                                     </SelectContent>
                                   </Select>
                                 </FormControl>
@@ -336,25 +308,16 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Category</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
                                   <SelectValue placeholder="Please select a category" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="document">
-                                  Historical Document
-                                </SelectItem>
-                                <SelectItem value="artifacts">
-                                  Artifacts
-                                </SelectItem>
-                                <SelectItem value="monuments">
-                                  Monuments and buildings
-                                </SelectItem>
+                                <SelectItem value="document">Historical Document</SelectItem>
+                                <SelectItem value="artifact">Artifacts</SelectItem>
+                                <SelectItem value="monument">Monuments and buildings</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>
@@ -381,7 +344,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({
                             fieldChange={field.onChange}
                             photos={archiveData?.files}
                             action={action}
-                            onFilesRemoved={handleFilesRemoved} // Add this line
+                            onFilesRemoved={handleFilesRemoved}
                           />
                         </FormControl>
                         <FormMessage className="shad-form_message" />

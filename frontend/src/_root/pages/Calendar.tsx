@@ -27,16 +27,7 @@ import FormControl from "@mui/material/FormControl";
 import { DateSelectArg, EventApi, EventClickArg, EventInput } from "@fullcalendar/core/index.js";
 import rrulePlugin from "@fullcalendar/rrule";
 import CalendarForm from "@/components/forms/CalendarForm";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import Loader from "@/components/shared/Loader";
 
 mapboxgl.accessToken =
@@ -104,6 +95,27 @@ const Calendar = () => {
     },
     [calendarDetails]
   );
+
+  const handleDeleteClick = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:8000/delete-calendar/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        window.location.reload();
+        toast.success(data.message);
+
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete calendar");
+    }
+  };
 
   useEffect(() => {
     const fetchCalendar = async () => {
@@ -173,14 +185,14 @@ const Calendar = () => {
         id: event.id,
         title: event.title,
         start: new Date(event.startDate).toISOString().replace(/T.*$/, ""),
-        end: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
+        // end: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
         color: getEventColor(event.repeat),
       };
 
       if (event.repeat !== "once") {
         eventInput.rrule = {
           dtstart: new Date(event.startDate).toISOString().replace(/T.*$/, ""),
-          // until: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
+          until: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
           freq: event.repeat,
         };
       }
@@ -253,7 +265,7 @@ const Calendar = () => {
                   Input information for the event you want to add
                 </DialogDescription>
               </DialogHeader>{" "}
-              <CalendarForm province={selectedProvince} />
+              <CalendarForm province={selectedProvince} action="create" />
             </DialogContent>
           </Dialog>
 
@@ -309,16 +321,33 @@ const Calendar = () => {
                   <div className="flex">
                     <Label className="mr-5 font-extrabold text-lg">Event Location: </Label>
                     <Label className="text-lg font-regular">
-                      In {calendarDetails?.municipality}, {calendarDetails?.provinceId}
+                      In {calendarDetails.municipality}, {calendarDetails.provinceId}
                     </Label>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    {/* <Button
-                    className={`bg-red-500 ${user.role === "ADMIN" ? "" : "hidden"}`}
-                    onClick={handleDeleteClick}
-                  >
-                    Delete
-                  </Button> */}
+                  <div className={`flex flex-col gap-1 ${user.role === "ADMIN" ? "" : "hidden"}`}>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className={`bg-blue-500`}>Edit</Button>
+                      </DialogTrigger>
+                      <DialogContent className="w-full bg-white ">
+                        <DialogHeader>
+                          <DialogTitle>Edit event</DialogTitle>
+                          <DialogDescription>Edit information for the event</DialogDescription>
+                        </DialogHeader>{" "}
+                        <CalendarForm
+                          province={selectedProvince}
+                          calendarDetails={calendarDetails}
+                          action="update"
+                        />
+                      </DialogContent>
+                    </Dialog>
+
+                    <Button
+                      className={`bg-red-500`}
+                      onClick={() => handleDeleteClick(calendarDetails.id)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
                 <div className="flex flex-col pl-3 h-full">
