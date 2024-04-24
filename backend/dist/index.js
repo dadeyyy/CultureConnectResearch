@@ -41,10 +41,9 @@ app.use(session({
 }));
 app.use(morgan("tiny"));
 //Routers
-
-app.get('/test',(req,res)=>{
-    return res.json({message: "WORKINGGGG"})
-})
+app.get('/test', (req, res) => {
+    res.json({ message: "IT WORKS!" });
+});
 app.use("/", authRouter);
 app.use("/", postRoute);
 app.use("/", userRoute);

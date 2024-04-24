@@ -11,7 +11,7 @@ import { archiveSchema, archiveTypeSchema } from '../utils/Schemas.js';
 import { cloudinary, upload, uploadArchive } from '../utils/cloudinary.js';
 import { Multer } from 'multer';
 
-import Geocoding from '@mapbox/mapbox-sdk/services/geocoding';
+import Geocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
 
 const mapboxToken =
   'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';

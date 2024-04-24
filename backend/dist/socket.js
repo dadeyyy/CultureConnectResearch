@@ -4,7 +4,7 @@ function socket(server) {
     const botName = 'Livestream bot';
     const io = new Server(server, {
         cors: {
-            origin: process.env.PORT
+            origin: 'http://localhost:5173'
         },
         connectionStateRecovery: {},
     });
