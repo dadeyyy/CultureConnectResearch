@@ -15,6 +15,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useUserContext } from "@/context/AuthContext";
+import HeritageForm from "@/components/forms/HeritageForm";
+import Carousel from "@/components/shared/Carousel";
+import toast from "react-hot-toast";
 
 interface Point {
   id: number;
@@ -51,12 +55,16 @@ interface HeritagePoint {
   id: number;
   municipality: string;
   province: string;
-  title: string;
+  name: string;
   location: {
     type: string;
     coordinates: [number, number];
   };
   createdAt: string;
+  files: {
+    id: number;
+    url: string;
+  }[];
 }
 
 type MapProps = {
@@ -73,14 +81,15 @@ const MapForm: React.FC = () => {
   const [mapData, setMapData] = useState<Point[]>([]);
   type SelectedMarkerType = Point | ArchivePoint | HeritagePoint | null;
 
-  const [selectedMarker, setSelectedMarker] = useState<SelectedMarkerType>(null);
+  const [selectedMarker, setSelectedMarker] =
+    useState<SelectedMarkerType>(null);
   const [lng, setLng] = useState<number>(-70.9);
   const [lat, setLat] = useState<number>(42.35);
   const [zoom, setZoom] = useState<number>(9);
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
   const [parameter, setParameter] = useState("locations");
   const navigate = useNavigate();
-  const [prevMarker, setPrevMarker] = useState(0);
+  const { user } = useUserContext();
 
   console.log(parameter);
   useEffect(() => {
@@ -132,12 +141,16 @@ const MapForm: React.FC = () => {
             el.style.backgroundImage = `url("../public/assets/icons/event-point.svg")`;
           } else if (parameter === "archives") {
             el.style.backgroundImage = `url("../public/assets/icons/archive-point.svg")`;
+          } else if (parameter === "heritages") {
+            el.style.backgroundImage = `url(${item.files[0].url})`;
           }
 
           el.style.width = "50px";
           el.style.height = "50px";
 
-          const marker = new mapboxgl.Marker(el).setLngLat(item.location.coordinates).addTo(map);
+          const marker = new mapboxgl.Marker(el)
+            .setLngLat(item.location.coordinates)
+            .addTo(map);
           const popup = new mapboxgl.Popup({ offset: 25 });
           const popupContent = document.createElement("div");
           popupContent.innerHTML = `<span>${item.title}</span>`;
@@ -146,7 +159,6 @@ const MapForm: React.FC = () => {
           popup.addClassName(
             "bg-white text-black text-sm m-0 font-semibold px-2 py-0 rounded-lg shadow-md"
           );
-          marker.setPopup(popup);
 
           marker.getElement().addEventListener("click", () => {
             // Reset previous marker size
@@ -164,13 +176,11 @@ const MapForm: React.FC = () => {
           });
 
           el.addEventListener("mouseenter", () => {
-            marker.togglePopup();
             el.style.width = "75px";
             el.style.height = "75px";
           });
 
           el.addEventListener("mouseleave", () => {
-            marker.togglePopup();
             el.style.width = "50px";
             el.style.height = "50px";
           });
@@ -185,17 +195,41 @@ const MapForm: React.FC = () => {
   }, [mapData]);
 
   const formatDateToWord = (dateString: string): string => {
-    const options: Intl.DateTimeFormatOptions = { month: "long", day: "numeric" };
+    const options: Intl.DateTimeFormatOptions = {
+      month: "long",
+      day: "numeric",
+    };
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", options);
   };
+
+  async function handleDeletePost(province: string, id: number) {
+    const response = await fetch(
+      `http://localhost:8000/heritage/${province}/${id}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toast.success("Deleted Successfully");
+      return navigate(0);
+    } else {
+      toast.error("Failed to delete");
+    }
+  }
 
   return (
     <div className="top-0 bottom-0 w-full p-5 xs:p-0 relative">
       <div className="lg:w-1/2 xs:w-full absolute gap-2 flex items-center z-10  flex-col p-5">
         <div className="grid grid-cols-3 gap-2 w-full">
           <Button
-            className={`h-full ${parameter === "locations" && "bg-blue-900 text-white"}`}
+            className={`h-full ${
+              parameter === "locations" && "bg-blue-900 text-white"
+            }`}
             onClick={() => {
               setParameter("locations");
               setSelectedMarker(null);
@@ -204,7 +238,9 @@ const MapForm: React.FC = () => {
             Events
           </Button>
           <Button
-            className={`h-full ${parameter === "heritages" && "bg-blue-900 text-white"}`}
+            className={`h-full ${
+              parameter === "heritages" && "bg-blue-900 text-white"
+            }`}
             onClick={() => {
               setParameter("heritages");
               setSelectedMarker(null);
@@ -213,7 +249,9 @@ const MapForm: React.FC = () => {
             Heritages
           </Button>
           <Button
-            className={`h-full ${parameter === "archives" && "bg-blue-900 text-white"}`}
+            className={`h-full ${
+              parameter === "archives" && "bg-blue-900 text-white"
+            }`}
             onClick={() => {
               setParameter("archives");
               setSelectedMarker(null);
@@ -227,42 +265,21 @@ const MapForm: React.FC = () => {
         </div>
         <Sheet>
           <SheetTrigger asChild>
-            <Button className="bg-red-200 border border-gray-300 hover:bg-blue-800">
-              Add a heritage
-            </Button>
+            {user.role === "ADMIN" && parameter === "heritages" && (
+              <Button className="bg-red-200 border border-gray-300 hover:bg-blue-800">
+                Add a heritage
+              </Button>
+            )}
           </SheetTrigger>
-          <SheetContent className="bg-blue-200 min-w-[450px]">
+          <SheetContent className="min-w-[720px] max-h-full overflow-auto custom-scrollbar">
             <SheetHeader>
               <SheetTitle>Add a heritage</SheetTitle>
               <SheetDescription>
-                Add a cultural heritage based on the location you are administering.
+                Add a cultural heritage based on the location you are
+                administering.
               </SheetDescription>
             </SheetHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input id="name" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Province
-                </Label>
-                <Input id="username" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Municipality
-                </Label>
-                <Input id="username" className="col-span-3" />
-              </div>
-            </div>
-            <SheetFooter>
-              <SheetClose asChild>
-                <Button type="submit">Add heritage</Button>
-              </SheetClose>
-            </SheetFooter>
+            <HeritageForm provinceData={user.province} action="Create" />
           </SheetContent>
         </Sheet>
       </div>
@@ -272,7 +289,16 @@ const MapForm: React.FC = () => {
         <div className="absolute bg-white px-5 py-10 xs:py-5 shadow-lg rounded-lg lg:top-0 lg:right-0 xs:bottom-0 xs:top-48 h-full w-[450px] xs:max-w-screen-sm opacity-90">
           <div className="flex">
             <span className="border border-white border-b-black w-[400px] px-2 mb-5">
-              <h3 className="font-bold my-2 text-2xl">{selectedMarker.title}</h3>
+              {"title" in selectedMarker && (
+                <h3 className="font-bold my-2 text-2xl">
+                  {selectedMarker.title}
+                </h3>
+              )}
+              {"name" in selectedMarker && (
+                <h3 className="font-bold my-2 text-2xl">
+                  {selectedMarker.name}
+                </h3>
+              )}
             </span>
             <button
               onClick={() => setSelectedMarker(null)}
@@ -296,7 +322,9 @@ const MapForm: React.FC = () => {
                   : ""}
               </p>
               {selectedMarker && "details" in selectedMarker && (
-                <p className="mt-5 overflow-auto h-3/4">{selectedMarker.details}</p>
+                <p className="mt-5 overflow-auto h-3/4">
+                  {selectedMarker.details}
+                </p>
               )}
             </>
           ) : parameter === "archives" ? (
@@ -311,12 +339,14 @@ const MapForm: React.FC = () => {
                   ? `Municipality of ${
                       selectedMarker.municipality &&
                       municipalities[selectedMarker.province]?.find(
-                        (municipal) => municipal.value === selectedMarker.municipality
+                        (municipal) =>
+                          municipal.value === selectedMarker.municipality
                       )?.label
                     } in ${
                       selectedMarker.province &&
-                      provincesTest.find((province) => province.value === selectedMarker.province)
-                        ?.label
+                      provincesTest.find(
+                        (province) => province.value === selectedMarker.province
+                      )?.label
                     }`
                   : ""}
               </p>
@@ -334,11 +364,62 @@ const MapForm: React.FC = () => {
                 </span>
               )}
               {selectedMarker && "description" in selectedMarker && (
-                <p className="mt-5 overflow-auto h-3/4">{selectedMarker.description}</p>
+                <p className="mt-5 overflow-auto h-3/4">
+                  {selectedMarker.description}
+                </p>
               )}
             </>
           ) : (
-            parameter === "heritages" && <>{/* Add the content for "heritages" here */}</>
+            parameter === "heritages" && (
+              <>
+                {"createdAt" in selectedMarker && selectedMarker.createdAt && (
+                  <h2 className="font-semibold mb-1">
+                    Date: {formatDateToWord(selectedMarker.createdAt)}
+                  </h2>
+                )}
+                <p className="font-semibold mb-1">
+                  {selectedMarker.municipality}
+                  {"province" in selectedMarker && selectedMarker.province
+                    ? ` at ${selectedMarker.province}`
+                    : ""}
+                </p>
+                {selectedMarker && "description" in selectedMarker && (
+                  <p className="mt-3 overflow-auto h-16">
+                    {selectedMarker.description}
+                  </p>
+                )}
+
+                <div className="flex flex-col gap-2">
+                  {selectedMarker && "files" in selectedMarker && (
+                    <>
+                      {selectedMarker.files.map((photo) =>
+                        typeof photo === "string" ? (
+                          <img key={photo} src={photo} alt="Image" />
+                        ) : (
+                          <img key={photo.id} src={photo.url} alt="Image" />
+                        )
+                      )}
+                    </>
+                  )}
+                  {selectedMarker && "province" in selectedMarker && (
+                    <Button
+                      onClick={() => {
+                        handleDeletePost(
+                          selectedMarker.province,
+                          selectedMarker.id
+                        );
+                      }}
+                      variant="ghost"
+                      className={`bg-red-200 w-full ${
+                        user.province === "ADMIN" && "hidden"
+                      }`}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              </>
+            )
           )}
         </div>
       )}

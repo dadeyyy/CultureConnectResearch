@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   // directUrl         = env("DIRECT_URL")
 }
 
@@ -44,9 +44,8 @@ model User {
   videoUID           String?
   liveStream         LiveStream[]
   LiveStreamComments LiveStreamComment[]
-  heritages          Heritage[] 
+  heritages          Heritage[]
 }
-
 
 model Heritage {
   id           Int      @id @default(autoincrement())
@@ -62,8 +61,6 @@ model Heritage {
   user         User?    @relation(fields: [userId], references: [id])
 }
 
-
-
 model LiveStream {
   uid         String              @id
   title       String
@@ -78,9 +75,9 @@ model LiveStream {
 model LiveStreamComment {
   id           Int        @id @default(autoincrement())
   content      String
-  username String
+  username     String
   userId       Int
-  liveStreamId String     // Change the type to String to match uid
+  liveStreamId String // Change the type to String to match uid
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   user         User       @relation(fields: [userId], references: [id])
@@ -154,13 +151,13 @@ model Archive {
 }
 
 model Files {
-  id        Int     @id @default(autoincrement())
-  url       String
-  filename  String
-  archiveId Int
-  heritageId Int?    // Adding a foreign key to associate files with Heritage
+  id         Int       @id @default(autoincrement())
+  url        String
+  filename   String
+  archiveId  Int?
+  heritageId Int? // Adding a foreign key to associate files with Heritage
   heritage   Heritage? @relation(fields: [heritageId], references: [id])
-  archive   Archive? @relation(fields: [archiveId], references: [id], onDelete: Cascade)
+  archive    Archive?  @relation(fields: [archiveId], references: [id], onDelete: Cascade)
 }
 
 model Report {

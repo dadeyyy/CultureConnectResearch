@@ -231,7 +231,7 @@
   }
 
   .home-creators {
-    @apply hidden xl:flex flex-col w-full lg:max-w-screen-sm 2xl:max-w-screen-lg px-6 py-5 gap-5 sticky top-0 border border-l-gray-300  bg-slate-100;
+    @apply hidden xl:flex flex-col w-full lg:max-w-screen-sm 2xl:max-w-screen-sm px-6 py-5 gap-5 sticky top-0 border border-l-gray-300  bg-slate-100;
   }
   /* Post Details */
   .calendar_details-container {

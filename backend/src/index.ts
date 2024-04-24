@@ -18,17 +18,15 @@ import socket from "./socket.js";
 import shareRoute from "./router/shareRoute.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import helmet from "helmet";
+import heritageRoute from "./router/heritage.js";
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
 
-
-
 const app = express();
 // app.use(helmet())
 const server = createServer(app);
-
 
 socket(server);
 
@@ -78,10 +76,11 @@ app.use("/", archiveRoute);
 app.use("/", liveStreamRoute);
 app.use("/", followRouter);
 app.use("/", shareRoute);
+app.use("/", heritageRoute);
 
 //Error Handler:
 app.use(errorHandler);
-const port = process.env.PORT || 8000
+const port = process.env.PORT || 8000;
 server.listen(port, () => {
   console.log(`LISTENING ON PORT ${port}`);
 });
