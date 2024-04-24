@@ -44,6 +44,21 @@ model User {
   videoUID           String?
   liveStream         LiveStream[]
   LiveStreamComments LiveStreamComment[]
+  heritages          Heritage[]
+}
+
+model Heritage {
+  id           Int      @id @default(autoincrement())
+  name         String
+  description  String
+  province     String
+  municipality String
+  location     Json
+  files        Files[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       Int?
+  user         User?    @relation(fields: [userId], references: [id])
 }
 
 model LiveStream {
@@ -136,11 +151,13 @@ model Archive {
 }
 
 model Files {
-  id        Int     @id @default(autoincrement())
-  url       String
-  filename  String
-  archiveId Int
-  archive   Archive @relation(fields: [archiveId], references: [id], onDelete: Cascade)
+  id         Int       @id @default(autoincrement())
+  url        String
+  filename   String
+  archiveId  Int
+  heritageId Int? // Adding a foreign key to associate files with Heritage
+  heritage   Heritage? @relation(fields: [heritageId], references: [id])
+  archive    Archive?  @relation(fields: [archiveId], references: [id], onDelete: Cascade)
 }
 
 model Report {

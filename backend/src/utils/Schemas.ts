@@ -53,3 +53,12 @@ export const sharedPostSchema = z.object({
 });
 
 export type sharedPostTypeSchema = z.infer<typeof sharedPostSchema>;
+
+export const heritageSchema = z.object({
+  name: z.string({ required_error: "name is required" }),
+  description: z.string({ required_error: "description is required" }),
+  municipality: z.string({ required_error: "municipality is required" }),
+});
+
+
+export type heritageTypeSchema = z.infer<typeof heritageSchema>

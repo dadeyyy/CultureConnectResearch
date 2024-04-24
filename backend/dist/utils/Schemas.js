@@ -35,4 +35,9 @@ export const archiveSchema = z.object({
 export const sharedPostSchema = z.object({
     caption: z.string({ required_error: "caption is required" }),
 });
+export const heritageSchema = z.object({
+    name: z.string({ required_error: "name is required" }),
+    description: z.string({ required_error: "description is required" }),
+    municipality: z.string({ required_error: "municipality is required" }),
+});
 //# sourceMappingURL=Schemas.js.map

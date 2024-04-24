@@ -31,4 +31,15 @@ const archiveStorage = new CloudinaryStorage({
 
 const uploadArchive = multer({ storage: archiveStorage });
 
-export { cloudinary, storage, upload, uploadArchive, archiveStorage };
+
+const heritageStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params:{
+    folder: 'heritage',
+    allowedFormats: ['jpg', 'png', 'jpeg'],
+  }as any
+})
+
+const uploadHeritage = multer({storage: heritageStorage})
+
+export { cloudinary, storage, upload, uploadArchive, archiveStorage, heritageStorage, uploadHeritage };
