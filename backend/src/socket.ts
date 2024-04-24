@@ -6,7 +6,7 @@ function socket(server: any) {
   const botName = 'Livestream bot';
   const io = new Server(server, {
     cors: {
-      origin: 'http://localhost:5173',
+      origin: process.env.PORT 
     },
     connectionStateRecovery: {},
   });
@@ -65,25 +65,3 @@ function socket(server: any) {
 }
 
 export default socket;
-
-// io.on('connection', (socket: any) => {
-//     console.log(`USER CONNECTED WITH ID OF ${socket.id}`);
-
-//     //Informing who joins the livestream
-//     socket.on('joinLiveStream', (livestreamId: string, username: string) => {
-//       socket.join(livestreamId);
-//       socket.to(livestreamId).emit('userJoins', username);
-//     });
-
-//     socket.on(
-//       'comment',
-//       (message: string, username: string, liveStreamId: string) => {
-//         //Save the comment to the database
-
-//         // Broadcast the comment to all users in the same livestream
-//         io.in(liveStreamId).emit('newComment', { message, username });
-//       }
-//     );
-
-//     socket.on('disconnect', () => {});
-//   });

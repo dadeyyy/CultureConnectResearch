@@ -25,7 +25,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const app = express();
-// app.use(helmet())
 const server = createServer(app);
 
 socket(server);
@@ -44,7 +43,7 @@ declare module "express-session" {
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173", // Specify the origin of your frontend
+    origin: "*",
     credentials: true, // Enable credentials (including cookies)
   })
 );

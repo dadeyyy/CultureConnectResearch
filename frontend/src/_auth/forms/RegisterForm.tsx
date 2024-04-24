@@ -59,32 +59,32 @@ const RegisterForm = () => {
     }
   };
 
-  const sendOTP = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          emailRedirectTo: 'https://example.com/welcome',
-        },
-      });
-      console.log(data);
-      if (error) {
-        console.error('Error sending OTP:', error.message);
-      } else {
-        console.log('OTP sent successfully');
-      }
-    } catch (error) {
-      console.error('Error sending OTP:');
-    }
-  };
+  // const sendOTP = async (email: string, password: string) => {
+  //   try {
+  //     const { data, error } = await supabase.auth.signUp({
+  //       email: email,
+  //       password: password,
+  //       options: {
+  //         emailRedirectTo: 'https://example.com/welcome',
+  //       },
+  //     });
+  //     console.log(data);
+  //     if (error) {
+  //       console.error('Error sending OTP:', error.message);
+  //     } else {
+  //       console.log('OTP sent successfully');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error sending OTP:');
+  //   }
+  // };
 
   // BACKEND SERVER SUBMISSION
   const onSubmit = async (values: z.infer<typeof registration>) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
     if (page === 1) {
-      sendOTP(values.email, values.password);
+      // sendOTP(values.email, values.password);
       setPage(2);
     } else if (page === 2) {
       const { confirmPassword, ...signUpValues } = values;

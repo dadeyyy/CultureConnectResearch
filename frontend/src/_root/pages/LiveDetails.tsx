@@ -1,35 +1,34 @@
-import VideoCard from "@/components/shared/VideoCard";
-import { Button } from "@/components/ui/button";
+import VideoCard from '@/components/shared/VideoCard';
+import { Button } from '@/components/ui/button';
 // import { io } from 'socket.io-client';
-import { Card } from "@/components/ui/card";
+import { Card } from '@/components/ui/card';
 
-import { Input } from "@/components/ui/input";
-import { useUserContext } from "@/context/AuthContext";
-import { filterInappropriateWords } from "@/lib/CaptionFilter";
-import { FormEvent, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { pastLiveStreamTypes } from "@/lib/livestream/liveStreamTypes";
-import { io } from "socket.io-client";
-import { formatDateString, multiFormatDateString } from "@/lib/utils";
-
-
+import { Input } from '@/components/ui/input';
+import { useUserContext } from '@/context/AuthContext';
+import { filterInappropriateWords } from '@/lib/CaptionFilter';
+import { FormEvent, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { pastLiveStreamTypes } from '@/lib/livestream/liveStreamTypes';
+import { io } from 'socket.io-client';
+import { formatDateString, multiFormatDateString } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const colors = [
-  "#FF0000",
-  "#0000FF",
-  "#008000",
-  "#FFFF00",
-  "#800080",
-  "#FFA500",
-  "#FFC0CB",
-  "#40E0D0",
-  "#A52A2A",
-  "#FFD700",
-  "#C0C0C0",
-  "#00FFFF",
-  "#FF00FF",
-  "#00FF00",
-  "#4B0082",
+  '#FF0000',
+  '#0000FF',
+  '#008000',
+  '#FFFF00',
+  '#800080',
+  '#FFA500',
+  '#FFC0CB',
+  '#40E0D0',
+  '#A52A2A',
+  '#FFD700',
+  '#C0C0C0',
+  '#00FFFF',
+  '#FF00FF',
+  '#00FF00',
+  '#4B0082',
 ];
 
 const idColor = (id: number) => {
@@ -38,7 +37,7 @@ const idColor = (id: number) => {
   return color;
 };
 
-const socket = io("http://localhost:8000");
+const socket = io('http://localhost:8000');
 type commentResponse = {
   id: number;
   content: string;
@@ -59,23 +58,23 @@ const LiveDetails = () => {
   const { id } = useParams();
   const { user } = useUserContext();
   const [liveDetails, setLiveDetails] = useState({
-    username: "",
-    fullName: "",
-    title: "",
-    description: "",
-    createdAt: ""
+    username: '',
+    fullName: '',
+    title: '',
+    description: '',
+    createdAt: '',
   });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [liveChats, setLiveChats] = useState<Comment[]>([]);
   const [availableLiveStreams, setAvailableLiveStreams] =
     useState<pastLiveStreamTypes>([]);
   const [isPastLiveStream, setIsPastLiveStream] = useState(false);
   useEffect(() => {
     //Join room
-    socket.emit("joinRoom", user.username, id, user.id);
+    socket.emit('joinRoom', user.username, id, user.id);
 
     //message from server
-    socket.on("message", (message: Comment) => {
+    socket.on('message', (message: Comment) => {
       setLiveChats((prevChats) => {
         return [...prevChats, message];
       });
@@ -84,16 +83,15 @@ const LiveDetails = () => {
     // Listens for the socket when user joins
 
     const fetchOngoingLiveStream = async () => {
-      const live = await fetch(`http://localhost:8000/livestream/${id}`,{
-        credentials: 'include'
+      const live = await fetch(`http://localhost:8000/livestream/${id}`, {
+        credentials: 'include',
       });
       const liveData = await live.json();
-
 
       if (live.ok) {
         // Sends to the server that a user joins the livestream
 
-        if (liveData.status.state === "ready") {
+        if (liveData.status.state === 'ready') {
           setIsPastLiveStream(true);
           socket.disconnect();
         }
@@ -111,7 +109,7 @@ const LiveDetails = () => {
     fetchOngoingLiveStream();
 
     return () => {
-      socket.off("message");
+      socket.off('message');
     };
   }, [id, user.username, user.id]);
 
@@ -119,8 +117,9 @@ const LiveDetails = () => {
   useEffect(() => {
     const lives = async () => {
       const fetchLiveStream = await fetch(
-        `http://localhost:8000/fetchLiveStreams/${id}`,{
-          credentials: 'include'
+        `http://localhost:8000/fetchLiveStreams/${id}`,
+        {
+          credentials: 'include',
         }
       );
 
@@ -128,7 +127,7 @@ const LiveDetails = () => {
         throw new Error('Failed to get livestream data!');
       }
       const fetchLiveStreamData = await fetchLiveStream.json();
-      setAvailableLiveStreams(fetchLiveStreamData)
+      setAvailableLiveStreams(fetchLiveStreamData);
     };
 
     lives();
@@ -136,7 +135,12 @@ const LiveDetails = () => {
 
   useEffect(() => {
     const fetchLiveStreamComments = async () => {
-      const comments = await fetch(`http://localhost:8000/liveStream/${id}/comments`);
+      const comments = await fetch(
+        `http://localhost:8000/liveStream/${id}/comments`,
+        {
+          credentials: 'include',
+        }
+      );
       const commentsData = (await comments.json()) as commentResponse[];
       const formattedComments = commentsData.map((comment) => ({
         username: comment.username,
@@ -154,8 +158,8 @@ const LiveDetails = () => {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent form submission
-    socket.emit("chatMessage", user.username, message, id, user.id);
-    setMessage("");
+    socket.emit('chatMessage', user.username, message, id, user.id);
+    setMessage('');
   };
 
   return (
@@ -175,14 +179,22 @@ const LiveDetails = () => {
               <div className="p-2">
                 <Card className="flex flex-col w-full p-2 ">
                   <span className="flex flex-row text-center items-center gap-4 my-3">
-                    <img
-                      src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
-                      width={75}
-                      className="rounded-full"
-                    />
+                    <Avatar>
+                      {/* <AvatarImage
+                                src={userProfile.imageUrl}
+                                alt={`profile-pictre`}
+                              /> */}
+                      <AvatarFallback>
+                        {liveDetails.fullName.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
                     <span className="flex flex-col">
-                      <span className="text-xl font-bold text-center">{liveDetails.fullName}</span>
-                      <span className="text-md text-start">@{liveDetails.username}</span>
+                      <span className="text-xl font-bold text-center">
+                        {liveDetails.fullName}
+                      </span>
+                      <span className="text-md text-start">
+                        @{liveDetails.username}
+                      </span>
                     </span>
                   </span>
                   <h1>
@@ -200,12 +212,12 @@ const LiveDetails = () => {
                 <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-2 xs:grid-cols-1">
                   {availableLiveStreams.map((data, index) => (
                     <a key={index} href={`/live-streams/${data.uid}`}>
-                    <VideoCard
-                      title={data.meta.name}
-                      creator={data.creator}
-                      dateCreate={formatDateString(data.created)}
-                      thumbnail={data.thumbnail}
-                    />
+                      <VideoCard
+                        title={data.meta.name}
+                        creator={data.creator}
+                        dateCreate={formatDateString(data.created)}
+                        thumbnail={data.thumbnail}
+                      />
                     </a>
                   ))}
                 </div>
@@ -217,21 +229,29 @@ const LiveDetails = () => {
                 <hr className="border w-full border-gray-500" />
                 <div className="p-2 flex flex-col gap-2 overflow-auto max-h-[600px] custom-scrollbar">
                   {liveChats.map((data, index) => (
-                    <div key={index} className="text-dark-1 flex flex-row gap-2 ">
+                    <div
+                      key={index}
+                      className="text-dark-1 flex flex-row gap-2 "
+                    >
                       <img
-                        src={"/assets/icons/profile-placeholder.svg"}
+                        src={'/assets/icons/profile-placeholder.svg'}
                         alt="profile picture"
                         className="h-6 w-6 rounded-full bg-cover"
                       />
                       <div className="flex-row flex items-center gap-2">
-                        <span className={`font-bold text-base`} style={{ color: idColor(0) }}>
-                          {data.username}{" "}
+                        <span
+                          className={`font-bold text-base`}
+                          style={{ color: idColor(0) }}
+                        >
+                          {data.username}{' '}
                         </span>
                         <span className="text-sm font-light text-start">
                           <b>{filterInappropriateWords(data.message)}</b>
                         </span>
 
-                        <p className="text-xs ">{multiFormatDateString(data.timeStamp)}</p>
+                        <p className="text-xs ">
+                          {multiFormatDateString(data.timeStamp)}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -265,5 +285,3 @@ const LiveDetails = () => {
 };
 
 export default LiveDetails;
-
-

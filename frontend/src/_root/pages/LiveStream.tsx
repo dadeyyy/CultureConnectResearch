@@ -40,6 +40,7 @@ import {
   pastLiveStreamTypes,
   streamState,
 } from '@/lib/livestream/liveStreamTypes';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -189,6 +190,12 @@ const LiveStream = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigate = useNavigate();
 
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : '';
+    const lastInitial = lastName ? lastName.charAt(0) : '';
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
+
   return (
     <div className="w-full flex xl:flex-row xs:flex-col">
       <div className="w-full flex flex-col custom-scrollbar overflow-auto">
@@ -331,11 +338,15 @@ const LiveStream = () => {
 
                         <div className="flex flex-col w-1/2">
                           <span className="flex flex-row text-center items-center gap-4 my-5">
-                            <img
-                              src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQwiLBJBdBtEKcMeSH__f1L0CdeqX1yyYsq3uF53SLESM0_qkA7QPTCN8TtEuyIpJygRsed"
-                              width={75}
-                              className="rounded-full"
-                            />
+                            <Avatar>
+                              {/* <AvatarImage
+                                src={userProfile.imageUrl}
+                                alt={`profile-pictre`}
+                              /> */}
+                              <AvatarFallback>
+                                {data.meta.fullName.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
                             <span className="flex flex-col">
                               <span className="text-xl font-bold text-center">
                                 {data.meta.fullName}
