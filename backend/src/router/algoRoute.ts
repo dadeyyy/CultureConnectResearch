@@ -62,30 +62,63 @@ algoRoute.get("/algorithm", isAuthenticated, async (req, res) => {
           _count: "desc",
         },
       },
-      take: 10,
+      take: 5,
       include: {
         user: true,
         photos: true,
       },
     });
 
-    res.status(200).json(suggestedPosts);
+    const user = await db.user.findUnique({
+      where: { id: currentUser },
+      select: { interest: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userInterests = user.interest || [];
+
+    const recommendedPosts = await db.post.findMany({
+      where: {
+        OR: userInterests.flatMap((interest) => [
+          { tags: { has: interest } },
+          { caption: { contains: interest, mode: "insensitive" } },
+          { province: { contains: interest, mode: "insensitive" } },
+          { municipality: { contains: interest, mode: "insensitive" } },
+        ]),
+        id: {
+          notIn: filteredUserLikesId,
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: {
+        photos: true,
+        user: true,
+      },
+      distinct: ["id"],
+    });
+
+    res.status(200).json({ like: suggestedPosts, interest: recommendedPosts });
   } catch (error) {
     console.error("Error in algorithm route:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 algoRoute.get("/search", async (req, res) => {
   const { query } = req.query;
+  const queryString = query as string;
   try {
     const searchResults = await db.$transaction([
       db.post.findMany({
         where: {
           OR: [
-            { caption: { contains: query as string, mode: "insensitive" } },
-            { province: { contains: query as string, mode: "insensitive" } },
-            { municipality: { contains: query as string, mode: "insensitive" } },
+            { caption: { contains: queryString, mode: "insensitive" } },
+            { province: { contains: queryString, mode: "insensitive" } },
+            { municipality: { contains: queryString, mode: "insensitive" } },
+            { tags: { has: queryString } },
           ],
         },
         include: {
@@ -99,29 +132,35 @@ algoRoute.get("/search", async (req, res) => {
       db.user.findMany({
         where: {
           OR: [
-            { username: { contains: query as string, mode: "insensitive" } },
-            { firstName: { contains: query as string, mode: "insensitive" } },
-            { lastName: { contains: query as string, mode: "insensitive" } },
+            { username: { contains: queryString, mode: "insensitive" } },
+            { firstName: { contains: queryString.split(" ")[0], mode: "insensitive" } }, // Search for firstName
+            { lastName: { contains: queryString.split(" ")[1], mode: "insensitive" } }, // Search for lastName
+            {
+              AND: [
+                { firstName: { contains: queryString.split(" ")[0], mode: "insensitive" } },
+                { lastName: { contains: queryString.split(" ")[1], mode: "insensitive" } },
+              ],
+            },
           ],
         },
       }),
       db.archive.findMany({
         where: {
           OR: [
-            { title: { contains: query as string, mode: "insensitive" } },
-            { description: { contains: query as string, mode: "insensitive" } },
-            { province: { contains: query as string, mode: "insensitive" } },
-            { municipality: { contains: query as string, mode: "insensitive" } },
+            { title: { contains: queryString, mode: "insensitive" } },
+            { description: { contains: queryString, mode: "insensitive" } },
+            { province: { contains: queryString, mode: "insensitive" } },
+            { municipality: { contains: queryString, mode: "insensitive" } },
           ],
         },
       }),
       db.calendar.findMany({
         where: {
           OR: [
-            { title: { contains: query as string, mode: "insensitive" } },
-            { details: { contains: query as string, mode: "insensitive" } },
-            { municipality: { contains: query as string, mode: "insensitive" } },
-            { provinceId: { contains: query as string, mode: "insensitive" } },
+            { title: { contains: queryString, mode: "insensitive" } },
+            { details: { contains: queryString, mode: "insensitive" } },
+            { municipality: { contains: queryString, mode: "insensitive" } },
+            { provinceId: { contains: queryString, mode: "insensitive" } },
           ],
         },
       }),
@@ -139,4 +178,47 @@ algoRoute.get("/search", async (req, res) => {
   }
 });
 
+algoRoute.get("/recommended", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: "User ID not found in session" });
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { interest: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userInterests = user.interest || [];
+
+    const recommendedPosts = await db.post.findMany({
+      where: {
+        OR: userInterests.flatMap((interest) => [
+          { tags: { has: interest } },
+          { caption: { contains: interest, mode: "insensitive" } },
+          { province: { contains: interest, mode: "insensitive" } },
+          { municipality: { contains: interest, mode: "insensitive" } },
+        ]),
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      include: {
+        photos: true,
+        user: true,
+      },
+      distinct: ["id"],
+    });
+
+    res.status(200).json({ recommendedPosts });
+  } catch (error) {
+    console.error("Error fetching recommended posts:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 export default algoRoute;

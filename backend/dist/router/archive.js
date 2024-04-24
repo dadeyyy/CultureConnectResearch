@@ -128,6 +128,7 @@ archiveRoute.put("/archive/:province/:archiveId", isAuthenticated, isProvinceAdm
         const archiveId = parseInt(req.params.archiveId);
         const data = req.body;
         const files = req.files;
+        console.log(data);
         const dataWithoutFiles = {
             title: data.title,
             description: data.description,

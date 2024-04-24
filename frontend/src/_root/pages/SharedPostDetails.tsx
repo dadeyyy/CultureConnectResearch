@@ -11,12 +11,28 @@ import Loader from "@/components/shared/Loader";
 import Carousel from "@/components/shared/Carousel";
 import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+
+const formSchema = z.object({
+  caption: z.string().min(0, {
+    message: "You cannot create a post without a caption.",
+  }),
+});
 
 const SharedPostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, isLoading } = useUserContext();
   const [sharedPost, setSharedPost] = useState<ISharedPost>();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      caption: "",
+    },
+  });
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -30,9 +46,7 @@ const SharedPostDetails = () => {
         }
 
         const postData = await response.json();
-        console.log(postData);
         setSharedPost(postData);
-        console.log(sharedPost);
       } catch (error) {
         console.error("Error fetching post:", error);
       }
@@ -56,6 +70,12 @@ const SharedPostDetails = () => {
       console.log("FAILED", data);
     }
   }
+
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
 
   return (
     <div className="w-full lg:px-5 xs:p-0">
@@ -84,11 +104,12 @@ const SharedPostDetails = () => {
               <div className="flex flex-col gap-2">
                 <Link to={`/profile/${sharedPost.userId}`}>
                   <div className="flex items-center gap-3">
-                    <img
-                      src={sharedPost.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
-                      alt="user"
-                      className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
-                    />
+                    <Avatar>
+                      <AvatarImage src={sharedPost.user.avatarUrl} alt={`profile-pictre`} />
+                      <AvatarFallback>
+                        {getInitials(sharedPost.user.firstName, sharedPost.user.lastName)}
+                      </AvatarFallback>
+                    </Avatar>
 
                     <div className="flex flex-col">
                       <div className="flex flex-row text-center gap-2">
@@ -115,6 +136,7 @@ const SharedPostDetails = () => {
                   </div>
                 </Link>
               </div>
+
               <Button
                 onClick={handleDeletePost}
                 variant="ghost"
@@ -124,24 +146,23 @@ const SharedPostDetails = () => {
               </Button>
             </div>
 
-            <div className="grid lg:grid-cols-5 xs:grid-cols-1 rounded-xl w-full mx-auto p-2 border">
+            <div className="grid lg:grid-cols-5 xs:grid-cols-1 rounded-xl w-full mx-auto border">
               <div className="w-full col-span-3">
-                <div className="post_details-info w-full ">
-                  <Carousel photos={sharedPost.post.photos || []} />
-                </div>
+                <Carousel photos={sharedPost.post.photos || []} />
               </div>
 
               <div className="post_details-info border border-transparent border-l-slate-500 col-span-2">
                 <Link to={`/profile/${sharedPost.post.userId}`} className="flex items-center gap-3">
-                  <img
-                    src={sharedPost.post.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
-                    alt="user"
-                    className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
-                  />
+                  <Avatar>
+                    <AvatarImage src={sharedPost.post.user.avatarUrl} alt={`profile-pictre`} />
+                    <AvatarFallback>
+                      {getInitials(sharedPost.post.user.firstName, sharedPost.post.user.lastName)}
+                    </AvatarFallback>
+                  </Avatar>
 
-                  <div className="flex gap-1 flex-col">
-                    <div className="flex flex-row text-center gap-2">
-                      <p className="base-medium lg:text-base capitalize text-dark-1">
+                  <div className="flex gap-0 flex-col">
+                    <div className="flex flex-row text-center gap-0">
+                      <p className="font-semibold lg:text-lg capitalize text-dark-1">
                         {sharedPost.post.user.firstName} {sharedPost.post.user.lastName}
                       </p>
                       {sharedPost.post.user.role === `ADMIN` && (

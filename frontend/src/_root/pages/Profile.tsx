@@ -1,26 +1,11 @@
-import {
-  Route,
-  Routes,
-  Link,
-  Outlet,
-  useParams,
-  useLocation,
-} from "react-router-dom";
+import { Route, Routes, Link, Outlet, useParams, useLocation } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 // import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
 import Loader from "@/components/shared/Loader";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GridPostList from "@/components/shared/GridPostList";
 import { useEffect, useState } from "react";
@@ -32,7 +17,7 @@ interface StabBlockProps {
 }
 
 interface userProfile {
-  imageUrl: string | null;
+  imageUrl: string;
   bio: string | null;
   createdAt: string;
   email: string;
@@ -60,7 +45,7 @@ type IPost = {
   reportCount: number;
   updatedAt: string;
   user: {
-    avatarUrl: string | null;
+    avatarUrl: string;
     firstName: string;
     id: number;
     lastName: string;
@@ -122,12 +107,9 @@ const Profile = () => {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/get-shared-post/${id}`,
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`http://localhost:8000/get-shared-post/${id}`, {
+          credentials: "include",
+        });
         const data = await response.json();
 
         if (response.ok) {
@@ -146,7 +128,7 @@ const Profile = () => {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/user/likes`, {
+        const response = await fetch(`http://localhost:8000/user/likes/${id}`, {
           credentials: "include",
         });
         const data = await response.json();
@@ -167,9 +149,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchFollowingCount = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/following-count/${id}`
-        );
+        const response = await fetch(`http://localhost:8000/following-count/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -184,9 +164,7 @@ const Profile = () => {
 
     const fetchFollowersCount = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/followers-count/${id}`
-        );
+        const response = await fetch(`http://localhost:8000/followers-count/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -227,9 +205,7 @@ const Profile = () => {
   useEffect(() => {
     const checkIfFollowing = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/is-following/${id}`
-        );
+        const response = await fetch(`http://localhost:8000/is-following/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -297,17 +273,29 @@ const Profile = () => {
     }
   };
 
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
+
+  console.log(likedPost);
+
   return (
     <div className="profile-container">
       <div className="profile-inner_container">
         <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7 p-5">
-          <img
-            src={
-              currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"
-            }
+          <Avatar className="w-28 h-28 lg:h-40 lg:w-40 object-cover rounded-full">
+            <AvatarImage src={currentUser.imageUrl} alt={`profile-pictre`} />
+            <AvatarFallback className="text-[50px]">
+              {getInitials(currentUser.firstName, currentUser.lastName)}
+            </AvatarFallback>
+          </Avatar>
+          {/* <img
+            src={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
             alt="profile"
             className="w-28 h-28 lg:h-40 lg:w-40 object-cover rounded-full"
-          />
+          /> */}
           <div className="flex flex-col flex-1 justify-between md:mt-2">
             <div className="flex flex-col w-full">
               <h1 className="text-center xl:text-left h3-bold md:h1-semibold w-full capitalize">
@@ -337,15 +325,8 @@ const Profile = () => {
                   user.id !== currentUser.id && "hidden"
                 }`}
               >
-                <img
-                  src={"/assets/icons/edit.svg"}
-                  alt="edit"
-                  width={20}
-                  height={20}
-                />
-                <p className="flex whitespace-nowrap small-medium">
-                  Edit Profile
-                </p>
+                <img src={"/assets/icons/edit.svg"} alt="edit" width={20} height={20} />
+                <p className="flex whitespace-nowrap small-medium">Edit Profile</p>
               </Link>
             </div>
             <div className={`${user.id === currentUser.id && "hidden"}`}>
@@ -376,11 +357,7 @@ const Profile = () => {
           <TabsContent value="post">
             <Card className="pt-5">
               <CardContent className="justify-center flex">
-                {!posts ? (
-                  <div>The user has not posted yet.</div>
-                ) : (
-                  <GridPostList posts={posts} />
-                )}
+                {!posts ? <div>The user has not posted yet.</div> : <GridPostList posts={posts} />}
               </CardContent>
             </Card>
           </TabsContent>
@@ -396,10 +373,7 @@ const Profile = () => {
                   <ul className="grid-container">
                     {sharedPost.map((post) => (
                       <li key={post.post.id} className="relative min-w-80 h-80">
-                        <Link
-                          to={`/shared-post/${post.id}`}
-                          className="grid-post_link"
-                        >
+                        <Link to={`/shared-post/${post.id}`} className="grid-post_link">
                           <img
                             src={post.post.photos[0].url}
                             alt="post"
@@ -411,15 +385,13 @@ const Profile = () => {
                           <div className="flex items-center justify-start gap-2 flex-1">
                             <img
                               src={
-                                post.post.user.avatarUrl ||
-                                "/assets/icons/profile-placeholder.svg"
+                                post.post.user.avatarUrl || "/assets/icons/profile-placeholder.svg"
                               }
                               alt="creator"
                               className="w-8 h-8 rounded-full"
                             />
                             <p className="line-clamp-1 capitalize">
-                              {post.post.user.firstName}{" "}
-                              {post.post.user.lastName}
+                              {post.post.user.firstName} {post.post.user.lastName}
                             </p>
                           </div>
                         </div>
@@ -442,10 +414,7 @@ const Profile = () => {
                   <ul className="grid-container">
                     {likedPost.map((like) => (
                       <li key={like.post.id} className="relative min-w-80 h-80">
-                        <Link
-                          to={`/posts/${like.post.id}`}
-                          className="grid-post_link"
-                        >
+                        <Link to={`/posts/${like.post.id}`} className="grid-post_link">
                           <img
                             src={like.post.photos[0].url}
                             alt="post"
@@ -457,15 +426,13 @@ const Profile = () => {
                           <div className="flex items-center justify-start gap-2 flex-1">
                             <img
                               src={
-                                like.post.user.avatarUrl ||
-                                "/assets/icons/profile-placeholder.svg"
+                                like.post.user.avatarUrl || "/assets/icons/profile-placeholder.svg"
                               }
                               alt="creator"
                               className="w-8 h-8 rounded-full"
                             />
                             <p className="line-clamp-1 capitalize">
-                              {like.post.user.firstName}{" "}
-                              {like.post.user.lastName}
+                              {like.post.user.firstName} {like.post.user.lastName}
                             </p>
                           </div>
                         </div>

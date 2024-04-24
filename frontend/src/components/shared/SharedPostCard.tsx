@@ -4,12 +4,13 @@ import { useUserContext } from "@/context/AuthContext";
 import Carousel from "./Carousel";
 import { filterInappropriateWords } from "@/lib/CaptionFilter";
 import Comments from "./Comments";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { municipalities, provincesTest } from "@/lib/provinces";
 import ReportForm from "../forms/ReportForm";
 import { Badge } from "../ui/badge";
 import { useEffect, useState } from "react";
 import PostStats from "./PostStats";
+import Loader from "./Loader";
 
 interface PostProps {
   id: number;
@@ -22,14 +23,14 @@ interface PostProps {
 }
 
 interface userProps {
-  avatarUrl: string | null;
+  avatarUrl: string;
   createdAt: string;
   firstName: string;
   id: number;
   lastName: string;
   role: string;
   username: string;
-  province?: string;
+  province: string;
 }
 
 const SharedPostCard = ({ id, caption, userId, createdAt, postId, author }: PostProps) => {
@@ -75,26 +76,31 @@ const SharedPostCard = ({ id, caption, userId, createdAt, postId, author }: Post
   }, [id]);
   if (!post?.user) return null;
 
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
+
   return (
     <div className="w-full">
       <div className="post-card">
         <div>
           <Link to={`/profile/${userId}`}>
             <div className="flex items-center gap-2">
-              <img
-                src={author.avatarUrl || "/assets/icons/profile-placeholder.svg"}
-                alt="user"
-                className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
-              />
+              <Avatar>
+                <AvatarImage src={author.avatarUrl} alt={`profile-pictre`} />
+                <AvatarFallback>{getInitials(author.firstName, author.lastName)}</AvatarFallback>
+              </Avatar>
 
               <div className="flex flex-col">
                 <div className="flex flex-row text-center gap-2">
-                  <p className="base-medium lg:body-bold text-dark-1">
+                  <p className="base-medium lg:body-bold text-dark-1 capitalize">
                     {author.firstName} {author.lastName}
                   </p>
                   {author.role === `ADMIN` && (
                     <Badge className="bg-green-300 font-semibold text-xs border text-gray-600 capitalize border-gray-300">
-                      {user?.province}
+                      {author.province}
                     </Badge>
                   )}
                 </div>
@@ -131,22 +137,24 @@ const SharedPostCard = ({ id, caption, userId, createdAt, postId, author }: Post
         </div>
         <div className="border-2 border-gray-300 rounded-xl p-2">
           <div className="flex-between pt-2">
-            <Link to={`/profile/${post?.user.id}`}>
+            {!post && <Loader />}
+            <Link to={`/profile/${post.user.id}`}>
               <div className="flex items-center gap-3">
-                <img
-                  src={post.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
-                  alt="user"
-                  className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
-                />
+                <Avatar>
+                  <AvatarImage src={post.user.avatarUrl} alt={`profile-pictre`} />
+                  <AvatarFallback>
+                    {getInitials(post.user.firstName, post.user.lastName)}
+                  </AvatarFallback>
+                </Avatar>
 
                 <div className="flex flex-col">
                   <div className="flex flex-row text-center gap-2">
-                    <p className="base-medium lg:body-bold text-dark-1">
-                      {post?.user.firstName} {post?.user.lastName}
+                    <p className="base-medium lg:body-bold text-dark-1 capitalize">
+                      {post.user.firstName} {post.user.lastName}
                     </p>
-                    {post?.user.role === `ADMIN` && (
+                    {post.user.role === `ADMIN` && (
                       <Badge className="bg-green-300 font-semibold text-xs border text-gray-600 capitalize border-gray-300">
-                        {user?.province}
+                        {post.user.province}
                       </Badge>
                     )}
                   </div>

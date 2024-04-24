@@ -29,6 +29,9 @@ import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
+import { IPost, multiFormatDateString } from "@/lib/utils";
+import ArchiveUploader from "../shared/ArchiveUploader";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   caption: z.string().min(0, {
@@ -46,6 +49,7 @@ const formSchema = z.object({
 
 type PostFormProps = {
   action: "Create" | "Update";
+  post?: IPost;
 };
 
 type PostProps = {
@@ -65,43 +69,21 @@ type PostProps = {
   tags: string[];
 };
 
-const PostForm = ({ action }: PostFormProps) => {
+const PostForm = ({ action, post }: PostFormProps) => {
   const { id } = useParams();
-  const [post, setPost] = useState<PostProps | null>(null);
+  // const [post, setPost] = useState<PostProps | null>(null);
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [selectedMunicipal, setSelectedMunicipal] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        // Check Action
-        if (action !== "Create") {
-          const response = await fetch(`http://localhost:8000/post/${id}`);
-          const data = await response.json();
-          if (response.ok) {
-            setPost(data);
-            console.log(data);
-          } else {
-            console.error("Error fetching post:", data);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      }
-    };
-
-    fetchPost();
-  }, [id, action]);
-
+  const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      caption: post ? post?.caption : "",
-      municipality: post ? post?.municipality : "",
-      province: post ? post?.province : "",
-      tags: post ? post.tags.join(",") : "",
+      caption: post?.caption || "",
+      municipality: post?.municipality || "",
+      province: post?.province || "",
+      tags: post?.tags.join(", ") || "",
     },
   });
 
@@ -125,15 +107,22 @@ const PostForm = ({ action }: PostFormProps) => {
         formData.append("caption", values.caption);
         formData.append("province", values.province);
         formData.append("municipality", values.municipality);
-
-        post?.photos.forEach((file) => {
-          formData.append("existingImages", file.url);
-        });
+        formData.append("tags", values.tags);
 
         if (values.image) {
           values.image.forEach((file) => {
-            formData.append("newImages", file);
+            formData.append("image", file);
           });
+        }
+
+        if (deletedFiles.length > 0) {
+          deletedFiles.forEach((fileName) => {
+            formData.append("deletedFiles[]", fileName);
+          });
+        }
+
+        for (const pair of formData.entries()) {
+          console.log(pair[0] + ": " + pair[1]);
         }
 
         const response = await fetch(`http://localhost:8000/post/${post?.id}`, {
@@ -142,20 +131,18 @@ const PostForm = ({ action }: PostFormProps) => {
           credentials: "include",
         });
 
-        const data = await response.json();
-
         if (response.ok) {
-          console.log("Update successful!");
+          toast.success("Update successful!");
           setIsLoading(false);
-          console.log(data);
           navigate("/home");
         } else {
-          console.error("Update failed");
+          toast.error("Update failed");
+          console.log(response);
           setIsLoading(false);
-          console.log(data);
         }
       } catch (error) {
-        console.error("Error updating post:", error);
+        toast.error("Error updating post:");
+        console.log(error);
       } finally {
         setIsLoading(false);
       }
@@ -176,7 +163,6 @@ const PostForm = ({ action }: PostFormProps) => {
           formData.append(`image`, file);
         });
       }
-      console.log("CREATEEE ");
       try {
         const response = await fetch("http://localhost:8000/post", {
           method: "POST",
@@ -188,11 +174,11 @@ const PostForm = ({ action }: PostFormProps) => {
           return;
         }
         const data = await response.json();
-        console.log("Posting successful!", data);
+        toast.success("Posting successful!");
         setIsLoading(false);
         navigate("/home");
       } catch (error) {
-        console.error("Error during POST request:", error);
+        toast.error("Error during POST request:");
         setIsLoading(false);
       } finally {
         setIsLoading(false);
@@ -200,28 +186,30 @@ const PostForm = ({ action }: PostFormProps) => {
     }
   };
 
-  console.log(selectedMunicipal);
+  const handleFilesRemoved = (removedFileNames: string[]) => {
+    setDeletedFiles((prevDeletedFiles) => [...prevDeletedFiles, ...removedFileNames]);
+  };
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="flex flex-col gap-5 w-full max-w-5xl"
+        className="flex flex-col gap-5 w-full max-w-5xl h-full overflow-auto custom-scrollbar"
         encType="multipart/form-data"
       >
-        <div className="flex lg:flex-row xs:flex-col w-full gap-2">
+        <div className="flex xs:flex-col w-full gap-2">
           <div className="w-full flex flex-col gap-3">
             <FormField
               control={form.control}
               name="caption"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="shad-form_label">Caption</FormLabel>
+                  <FormLabel className="shad-form_label">Title</FormLabel>
                   <FormControl>
                     <Textarea
                       className="shad-textarea custom-scrollbar"
-                      placeholder="Caption here"
+                      placeholder="Enter your caption here."
                       {...field}
-                      defaultValue={post?.caption}
                     />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
@@ -319,7 +307,7 @@ const PostForm = ({ action }: PostFormProps) => {
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="p-0">
-                        <Command className="bg-white w-screen">
+                        <Command className="bg-white">
                           <CommandInput placeholder="Search municipal..." />
                           <CommandEmpty>No municipal found.</CommandEmpty>
                           <CommandGroup className="max-h-[200px] overflow-y-auto">
@@ -367,7 +355,7 @@ const PostForm = ({ action }: PostFormProps) => {
               )}
             />
           </div>
-          <div className=" w-full">
+          <div className="w-full">
             <FormField
               control={form.control}
               name="image"
@@ -375,7 +363,12 @@ const PostForm = ({ action }: PostFormProps) => {
                 <FormItem>
                   <FormLabel className="shad-form_label">Add Photos</FormLabel>
                   <FormControl>
-                    <FileUploader fieldChange={field.onChange} photos={post?.photos} />
+                    <FileUploader
+                      fieldChange={field.onChange}
+                      action={action}
+                      photos={post?.photos}
+                      onFilesRemoved={handleFilesRemoved}
+                    />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
                 </FormItem>

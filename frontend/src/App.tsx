@@ -53,18 +53,12 @@ const App = () => {
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />
           <Route path="/posts/:id" element={<PostDetails />} />
+          <Route path="/shared-post/:id" element={<SharedPostDetails />} />
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
           <Route path="/archives/:province" element={<ArchiveProvince />} />
-          <Route
-            path="/archives/:province/:category"
-            element={<ArchiveCategory />}
-          />
-          <Route
-            path="/archives/:province/:category/:id"
-            element={<ArchiveDetails />}
-          />
-          <Route path="/shared-post/:id" element={<SharedPostDetails />} />
+          <Route path="/archives/:province/:category" element={<ArchiveCategory />} />
+          <Route path="/archives/:province/:category/:id" element={<ArchiveDetails />} />
         </Route>
 
         {/* SUPERADM IN ROUTE */}

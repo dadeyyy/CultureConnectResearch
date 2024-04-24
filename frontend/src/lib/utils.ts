@@ -80,7 +80,7 @@ export type IPost = {
   province: string;
   updatedAt: string;
   user: {
-    avatarUrl: string | null;
+    avatarUrl: string;
     bio: string | null;
     createdAt: string;
     email: string;
@@ -91,6 +91,7 @@ export type IPost = {
     role: string;
     updatedAt: string;
     username: string;
+    province: string;
   };
   userId: number;
   tags: string[];
@@ -103,7 +104,7 @@ export type ISharedPost = {
   userId: number;
   createdAt: string;
   user: {
-    avatarUrl: string | null;
+    avatarUrl: string;
     createdAt: string;
     firstName: string;
     id: number;
@@ -127,7 +128,7 @@ export type ISharedPost = {
     reportCount: number;
     updatedAt: string;
     user: {
-      avatarUrl: string | null;
+      avatarUrl: string;
       firstName: string;
       id: number;
       lastName: string;

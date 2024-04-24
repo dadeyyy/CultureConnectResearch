@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface userProfile {
   imageUrl: string | null;
@@ -22,7 +23,11 @@ const FollowCard = ({ userId }: { userId: string }) => {
   const [userProfile, setUserProfile] = useState<userProfile>();
   const [isFollowing, setIsFollowing] = useState(false);
 
-  console.log(isFollowing);
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -93,17 +98,14 @@ const FollowCard = ({ userId }: { userId: string }) => {
         <>
           <Link to={`/profile/${userId}`}>
             <div className="flex flex-row gap-2">
-              <img
-                src={
-                  isLoading
-                    ? "/assets/icons/profile-placeholder.svg"
-                    : userProfile?.imageUrl || "/assets/icons/profile-placeholder.svg"
-                }
-                alt="profile picture"
-                className="h-12 w-12 rounded-full bg-cover"
-              />
+              <Avatar>
+                <AvatarImage src={userProfile.imageUrl} alt={`profile-pictre`} />
+                <AvatarFallback>
+                  {getInitials(userProfile.firstName, userProfile.lastName)}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex flex-col ">
-                <span className="text-md font-bold">
+                <span className="text-md font-bold capitalize">
                   {userProfile.firstName} {userProfile.lastName}
                 </span>
                 <span>@{userProfile.username}</span>

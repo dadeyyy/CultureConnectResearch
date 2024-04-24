@@ -9,6 +9,7 @@ import { municipalities, provincesTest } from "@/lib/provinces";
 import ReportForm from "../forms/ReportForm";
 import { Badge } from "../ui/badge";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface PostCardProps {
   post: {
@@ -51,21 +52,28 @@ const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
 
   if (!post.user) return null;
-  console.log(post?.user?.province);
+
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0) : "";
+    const lastInitial = lastName ? lastName.charAt(0) : "";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
+
   return (
     <div className="post-card">
       <div className="flex-between">
         <Link to={`/profile/${post.user.id}`}>
           <div className="flex items-center gap-2">
-            <img
-              src={post?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
-              alt="user"
-              className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
-            />
+            <Avatar>
+              <AvatarImage src={post?.user.avatarUrl} alt={`profile-pictre`} />
+              <AvatarFallback>
+                {getInitials(post?.user.firstName, post?.user.lastName)}
+              </AvatarFallback>
+            </Avatar>
 
             <div className="flex flex-col">
               <div className="flex flex-row text-center gap-2">
-                <p className="base-medium lg:body-bold text-dark-1">
+                <p className="base-medium lg:body-bold text-dark-1 capitalize">
                   {post.user.firstName} {post.user.lastName}
                 </p>
                 {post?.user.role === `ADMIN` && (

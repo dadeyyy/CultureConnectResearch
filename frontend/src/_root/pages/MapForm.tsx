@@ -38,6 +38,7 @@ interface ArchivePoint {
   municipality: string;
   province: string;
   title: string;
+  category: string;
   location: {
     type: string;
     coordinates: [number, number];
@@ -58,6 +59,12 @@ interface HeritagePoint {
   createdAt: string;
 }
 
+type MapProps = {
+  archive: ArchivePoint[];
+  heritage: HeritagePoint[];
+  events: Point[];
+};
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
 
@@ -73,6 +80,7 @@ const MapForm: React.FC = () => {
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
   const [parameter, setParameter] = useState("locations");
   const navigate = useNavigate();
+  const [prevMarker, setPrevMarker] = useState(0);
 
   console.log(parameter);
   useEffect(() => {
@@ -83,6 +91,7 @@ const MapForm: React.FC = () => {
         });
 
         const data = await response.json();
+        console.log(data);
 
         if (response.ok) {
           setMapData(data);
@@ -115,6 +124,7 @@ const MapForm: React.FC = () => {
 
       map.on("load", () => {
         const markerList: mapboxgl.Marker[] = [];
+
         mapData.forEach((item) => {
           const el = document.createElement("div");
           el.className = "marker";
@@ -124,13 +134,52 @@ const MapForm: React.FC = () => {
             el.style.backgroundImage = `url("../public/assets/icons/archive-point.svg")`;
           }
 
+          el.style.width = "50px";
+          el.style.height = "50px";
+
           const marker = new mapboxgl.Marker(el).setLngLat(item.location.coordinates).addTo(map);
+          const popup = new mapboxgl.Popup({ offset: 25 });
+          const popupContent = document.createElement("div");
+          popupContent.innerHTML = `<span>${item.title}</span>`;
+          popup.setDOMContent(popupContent);
+
+          popup.addClassName(
+            "bg-white text-black text-sm m-0 font-semibold px-2 py-0 rounded-lg shadow-md"
+          );
+          marker.setPopup(popup);
+
           marker.getElement().addEventListener("click", () => {
+            // Reset previous marker size
+            markerList.forEach((m) => {
+              const markerEl = m.getElement();
+              markerEl.style.width = "50px";
+              markerEl.style.height = "50px";
+            });
+
+            // Set clicked marker size
+            el.style.width = "75px";
+            el.style.height = "75px";
+
             setSelectedMarker(item);
           });
+
+          el.addEventListener("mouseenter", () => {
+            marker.togglePopup();
+            el.style.width = "75px";
+            el.style.height = "75px";
+          });
+
+          el.addEventListener("mouseleave", () => {
+            marker.togglePopup();
+            el.style.width = "50px";
+            el.style.height = "50px";
+          });
+
+          markerList.push(marker);
         });
         setMarkers(markerList);
       });
+
       return () => map.remove();
     }
   }, [mapData]);
@@ -220,7 +269,7 @@ const MapForm: React.FC = () => {
 
       <div ref={mapContainer} className="h-full rounded-lg" />
       {selectedMarker && (
-        <div className="absolute bg-white px-5 py-10 xs:py-5 shadow-lg rounded-lg lg:top-0 lg:right-0 xs:bottom-0 xs:top-48 h-full w-[450px] xs:max-w-screen-sm opacity-70">
+        <div className="absolute bg-white px-5 py-10 xs:py-5 shadow-lg rounded-lg lg:top-0 lg:right-0 xs:bottom-0 xs:top-48 h-full w-[450px] xs:max-w-screen-sm opacity-90">
           <div className="flex">
             <span className="border border-white border-b-black w-[400px] px-2 mb-5">
               <h3 className="font-bold my-2 text-2xl">{selectedMarker.title}</h3>
@@ -250,14 +299,13 @@ const MapForm: React.FC = () => {
                 <p className="mt-5 overflow-auto h-3/4">{selectedMarker.details}</p>
               )}
             </>
-          ) : (
+          ) : parameter === "archives" ? (
             <>
               {"createdAt" in selectedMarker && selectedMarker.createdAt && (
                 <h2 className="font-regular mb-1">
                   Date Created: {formatDateToWord(selectedMarker.createdAt)}
                 </h2>
               )}
-
               <p className="font-semibold mb-1">
                 {"province" in selectedMarker && selectedMarker.province
                   ? `Municipality of ${
@@ -272,15 +320,15 @@ const MapForm: React.FC = () => {
                     }`
                   : ""}
               </p>
-              {selectedMarker && "province" in selectedMarker && (
+              {"category" in selectedMarker && "province" in selectedMarker && (
                 <span
                   onClick={() => {
                     const id = selectedMarker.id;
-                    navigate(`/explore/${selectedMarker.province}/archive/${id}`);
+                    navigate(
+                      `/archives/${selectedMarker.province}/${selectedMarker.category}/${id}`
+                    );
                   }}
-                  className={`flex underline hover:text-blue-500 hover:cursor-pointer${
-                    parameter === "heritages" ? "hidden" : ""
-                  }`}
+                  className={`flex underline hover:text-blue-500 hover:cursor-pointer`}
                 >
                   Go to archive page
                 </span>
@@ -289,6 +337,8 @@ const MapForm: React.FC = () => {
                 <p className="mt-5 overflow-auto h-3/4">{selectedMarker.description}</p>
               )}
             </>
+          ) : (
+            parameter === "heritages" && <>{/* Add the content for "heritages" here */}</>
           )}
         </div>
       )}

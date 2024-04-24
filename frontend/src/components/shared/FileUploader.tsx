@@ -4,23 +4,23 @@ import { Button } from "@/components/ui/button";
 
 type FileUploaderProps = {
   fieldChange: (files: File[]) => void;
+  action: "Create" | "Update";
   photos?:
     | {
-        id?: number;
         url: string;
         filename: string;
-        postId?: number;
       }[]
     | {
-        id?: number;
         url: string;
         filename: string;
-        postId?: number;
       };
+  onFilesRemoved: (removedFileNames: string[]) => void;
 };
 
-const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
+const FileUploader = ({ fieldChange, action, photos, onFilesRemoved }: FileUploaderProps) => {
   const [files, setFiles] = useState<File[]>([]);
+  const [removedFileNames, setRemovedFileNames] = useState<string[]>([]);
+
   useEffect(() => {
     if (photos) {
       if (Array.isArray(photos) && photos.length > 0) {
@@ -48,33 +48,51 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
       setFiles(updatedFiles);
       fieldChange(updatedFiles);
 
-      const updatedFileUrls = updatedFiles.map((file) => URL.createObjectURL(file));
+      const newFileUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
+      const updatedFileUrls = [...fileUrls, ...newFileUrls];
       setFileUrls(updatedFileUrls);
     },
-    [files]
+    [files, fieldChange, fileUrls]
   );
 
   const removeAllFiles = () => {
     setFiles([]);
     setFileUrls([]);
     fieldChange([]);
+
+    if (photos) {
+      const removedFileNames = Array.isArray(photos)
+        ? photos.map((photo) => photo.filename)
+        : [photos.filename];
+      setRemovedFileNames(removedFileNames);
+      onFilesRemoved(removedFileNames);
+    }
   };
 
   const removeFile = (index: number) => {
     const updatedFiles = [...files];
-    updatedFiles.splice(index, 1);
-
-    const updatedFileUrls = fileUrls.filter((url, i) => i !== index);
+    const removedFile = updatedFiles.splice(index, 1)[0]; // Remove the file from the array and get the removed file
+    const updatedFileUrls = [...fileUrls];
+    updatedFileUrls.splice(index, 1); // Remove the corresponding URL
 
     setFiles(updatedFiles);
     setFileUrls(updatedFileUrls);
     fieldChange(updatedFiles);
+
+    const removedFileName = getRemovedFileNames(index);
+
+    if (removedFileName) {
+      setRemovedFileNames((prevRemovedFileNames) => [...prevRemovedFileNames, removedFileName]);
+      onFilesRemoved([removedFileName]);
+    }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, acceptedFiles, getInputProps } = useDropzone({
     onDrop,
     accept: {
-      "image/*": [".png", ".jpeg", ".jpg"],
+      "image/jpeg": [],
+      "image/png": [],
+      "image/svg": [],
     },
     noClick: true,
   });
@@ -85,35 +103,70 @@ const FileUploader = ({ fieldChange, photos }: FileUploaderProps) => {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  const getRemovedFileNames = (index: number) => {
+    if (Array.isArray(photos) && photos.length > index) {
+      const removedFileName = photos[index]?.filename;
+      return removedFileName;
+    }
+    return null;
+  };
+
   return (
     <div
       {...getRootProps()}
-      className="flex flex-center flex-col rounded-xl cursor-pointer bg-red-200 h-[500px]"
+      className="flex flex-center flex-col bg-light-1 rounded-xl cursor-pointer overflow-auto w-full"
     >
       <input {...getInputProps()} className="cursor-pointer" ref={inputRef} />
 
       {fileUrls.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-1 max-h-screen justify-center overflow-y-auto gap-4 p-5 lg:p-10">
+          <div className="grid grid-cols-1 sm:grid-cols-1 max-h-[400px] justify-center overflow-y-auto gap-4 p-5 lg:p-10 w-full">
             {fileUrls.map((url, index) => (
               <div key={index} className="relative">
-                <img src={url} alt={`image-${index}`} className="file_uploader-img" />
-                <button
-                  onClick={() => removeFile(index)}
-                  className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
-                >
-                  X
-                </button>
+                {action === "Create" ? (
+                  <>
+                    <img
+                      src={url}
+                      alt={`file-${index}`}
+                      className="file_uploader-img aspect-square"
+                    />
+                    <button
+                      onClick={() => removeFile(index)}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      X
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src={url}
+                      alt={`file-${index}`}
+                      className="file_uploader-img aspect-square"
+                    />
+                    <button
+                      onClick={() => {
+                        removeFile(index);
+                        // setRemovedFileNames([...removedFileNames, getFilenameFromUrl(url, photos)]);
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      X
+                    </button>
+                  </>
+                )}
               </div>
             ))}
           </div>
-          <p className="file_uploader-label">Drag photos to replace</p>
+          <Button type="button" className="shad-button_primary" onClick={openFile}>
+            Click here to add more
+          </Button>
           <Button onClick={removeAllFiles} className="mt-4 bg-red-500">
-            Remove All Pictures
+            Remove All Files
           </Button>
         </>
       ) : (
-        <div className="file_uploader-box">
+        <div className="flex-center flex-col p-7 h-80 lg:h-[550px]">
           <img src="/assets/icons/file-upload.svg" width={96} height={77} alt="file upload" />
           <h3 className="base-medium text-dark-2 mb-2 mt-6">Drag photos here</h3>
           <p className="text-light-4 small-regular mb-6">SVG, PNG, JPG</p>
