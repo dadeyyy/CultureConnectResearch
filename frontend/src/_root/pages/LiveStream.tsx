@@ -200,7 +200,7 @@ const LiveStream = () => {
             <SheetTrigger asChild>
               <Button className="bg-red-500">Go Live</Button>
             </SheetTrigger>
-            <SheetContent className="min-w-[720px]">
+            <SheetContent className="lg:min-w-[720px] xs:w-full">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(handleSubmit)}

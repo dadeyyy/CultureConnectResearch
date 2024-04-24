@@ -404,6 +404,7 @@ postRoute.get("/post/reported/:province", isAuthenticated, async (req, res) => {
       },
     });
 
+
     res.status(200).json(reportedPosts);
   } catch (error) {
     console.log(error);
