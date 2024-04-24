@@ -12,8 +12,9 @@
     "build": "rimraf dist && tsc",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "prisma generate"
+    },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -58,9 +59,10 @@
     "prisma": "^5.10.2",
     "typescript": "^5.3.2"
   },
+
   "pre-commit": [
     "ts.check",
     "build",
     "add-build"
-  ]
+]
 }
