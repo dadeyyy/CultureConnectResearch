@@ -64,6 +64,9 @@ app.use(
 app.use(morgan("tiny"));
 
 //Routers
+app.get('/test',(req,res)=>{
+  res.json({message: "IT WORKS!"})
+})
 app.use("/", authRouter);
 app.use("/", postRoute);
 app.use("/", userRoute);
