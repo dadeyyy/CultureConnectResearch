@@ -10,7 +10,7 @@ import {
 } from "../middleware/middleware.js";
 import { uploadHeritage } from "../utils/cloudinary.js";
 import { heritageSchema, heritageTypeSchema } from "../utils/Schemas.js";
-import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
+import Geocoding from "@mapbox/mapbox-sdk/services/geocoding";
 
 const heritageRoute = express.Router();
 

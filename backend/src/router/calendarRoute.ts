@@ -4,7 +4,7 @@ import { calendarSchema, calendarTypeSchema } from "../utils/Schemas.js";
 import { db } from "../utils/db.server.js";
 import { provinces } from "./province.js";
 
-import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
+import Geocoding from "@mapbox/mapbox-sdk/services/geocoding";
 
 const mapboxToken = process.env.MAPBOX_TOKEN
 
