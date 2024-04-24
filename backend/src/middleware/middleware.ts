@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import * as z from 'zod';
 import { db } from '../utils/db.server.js';
+import ExpressError from './ExpressError.js';
 
 export const validate =
   (schema: z.ZodObject<any, any>) =>
@@ -11,20 +12,17 @@ export const validate =
     } catch (error) {
       if (error instanceof z.ZodError) {
         const zError = error.issues[0].message;
-        console.log(zError);
-        return res.status(500).json({ error: zError });
+        throw new ExpressError(zError, 500)
       }
-      return res.status(400).json({ message: 'Invalid Data', error: error });
+      throw new ExpressError('Invalid Data', 400);
     }
   };
 
 export function isAuthenticated(req: Request, res: Response, next: () => void) {
   if (req.session.user) {
-    console.log('AUTHENTICATED');
     next();
   } else {
-    console.log('User not authenticated!!!');
-    return res.status(401).json({ error: 'User not authenticated!' });
+    throw new ExpressError('Not authenticated', 401);
   }
 }
 
@@ -96,27 +94,30 @@ export const isCommentAuthor = async (
 };
 
 export const isAdmin = (req: Request, res: Response, next: () => void) => {
+  if (req.session.user?.role === 'ADMIN') {
+    console.log(req.session.user);
 
-  if(req.session.user?.role === "ADMIN"){
-    console.log(req.session.user)
-    
-    next()
+    next();
+  } else {
+    return res.status(401).json({ error: 'NOT AN ADMIN!!' });
   }
-  else{
-    return res.status(401).json({error: "NOT AN ADMIN!!"})
-  }
-
 };
 
-export const isProvinceAdmin = (req: Request, res: Response, next: () => void) => {
-  const {province} = req.params;
+export const isProvinceAdmin = (
+  req: Request,
+  res: Response,
+  next: () => void
+) => {
+  const { province } = req.params;
 
-  if(req.session.user?.role === "ADMIN" && req.session.user.province === province){
-    next()
+  if (
+    req.session.user?.role === 'ADMIN' &&
+    req.session.user.province === province
+  ) {
+    next();
+  } else {
+    return res
+      .status(401)
+      .json({ error: `Not an admin of province ${province}` });
   }
-  else{
-    return res.status(401).json({error: `Not an admin of province ${province}`})
-  }
-
 };
-

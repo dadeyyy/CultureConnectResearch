@@ -6,8 +6,7 @@ import { provinces } from "./province.js";
 
 import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
 
-const mapboxToken =
-  "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
+const mapboxToken = process.env.MAPBOX_TOKEN
 
 const geocoder = Geocoding({ accessToken: mapboxToken as string });
 

@@ -16,18 +16,19 @@ import liveStreamRoute from "./router/liveStream.js";
 import { createServer } from "node:http";
 import socket from "./socket.js";
 import shareRoute from "./router/shareRoute.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import helmet from "helmet";
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
 
-const PORT: number = parseInt(process.env.PORT as string, 10);
+
+
 const app = express();
+// app.use(helmet())
 const server = createServer(app);
 
-if (!process.env.PORT) {
-  process.exit(1);
-}
 
 socket(server);
 
@@ -78,6 +79,9 @@ app.use("/", liveStreamRoute);
 app.use("/", followRouter);
 app.use("/", shareRoute);
 
-server.listen(PORT, () => {
-  console.log(`LISTENING ON PORT ${PORT}`);
+//Error Handler:
+app.use(errorHandler);
+const port = process.env.PORT || 8000
+server.listen(port, () => {
+  console.log(`LISTENING ON PORT ${port}`);
 });

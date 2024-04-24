@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { db } from '../utils/db.server.js';
+import ExpressError from './ExpressError.js';
 export const validate = (schema) => (req, res, next) => {
     try {
         schema.parse(req.body);
@@ -8,20 +9,17 @@ export const validate = (schema) => (req, res, next) => {
     catch (error) {
         if (error instanceof z.ZodError) {
             const zError = error.issues[0].message;
-            console.log(zError);
-            return res.status(500).json({ error: zError });
+            throw new ExpressError(zError, 500);
         }
-        return res.status(400).json({ message: 'Invalid Data', error: error });
+        throw new ExpressError('Invalid Data', 400);
     }
 };
 export function isAuthenticated(req, res, next) {
     if (req.session.user) {
-        console.log('AUTHENTICATED');
         next();
     }
     else {
-        console.log('User not authenticated!!!');
-        return res.status(401).json({ error: 'User not authenticated!' });
+        throw new ExpressError('Not authenticated', 401);
     }
 }
 export const isAuthor = async (req, res, next) => {
@@ -82,21 +80,24 @@ export const isCommentAuthor = async (req, res, next) => {
     }
 };
 export const isAdmin = (req, res, next) => {
-    if (req.session.user?.role === "ADMIN") {
+    if (req.session.user?.role === 'ADMIN') {
         console.log(req.session.user);
         next();
     }
     else {
-        return res.status(401).json({ error: "NOT AN ADMIN!!" });
+        return res.status(401).json({ error: 'NOT AN ADMIN!!' });
     }
 };
 export const isProvinceAdmin = (req, res, next) => {
     const { province } = req.params;
-    if (req.session.user?.role === "ADMIN" && req.session.user.province === province) {
+    if (req.session.user?.role === 'ADMIN' &&
+        req.session.user.province === province) {
         next();
     }
     else {
-        return res.status(401).json({ error: `Not an admin of province ${province}` });
+        return res
+            .status(401)
+            .json({ error: `Not an admin of province ${province}` });
     }
 };
 //# sourceMappingURL=middleware.js.map

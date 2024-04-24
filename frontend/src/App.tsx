@@ -26,6 +26,7 @@ import LiveDetails from "./_root/pages/LiveDetails";
 import SharedPostDetails from "./_root/pages/SharedPostDetails";
 import SupaAdmin from "./_root/SupaAdmin";
 
+
 const App = () => {
   return (
     <main className="flex h-screen">

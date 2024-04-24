@@ -16,15 +16,13 @@ import liveStreamRoute from "./router/liveStream.js";
 import { createServer } from "node:http";
 import socket from "./socket.js";
 import shareRoute from "./router/shareRoute.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
-const PORT = parseInt(process.env.PORT, 10);
 const app = express();
+// app.use(helmet())
 const server = createServer(app);
-if (!process.env.PORT) {
-    process.exit(1);
-}
 socket(server);
 app.use(express.json());
 app.use(cors({
@@ -54,7 +52,10 @@ app.use("/", archiveRoute);
 app.use("/", liveStreamRoute);
 app.use("/", followRouter);
 app.use("/", shareRoute);
-server.listen(PORT, () => {
-    console.log(`LISTENING ON PORT ${PORT}`);
+//Error Handler:
+app.use(errorHandler);
+const port = process.env.PORT || 8000;
+server.listen(port, () => {
+    console.log(`LISTENING ON PORT ${port}`);
 });
 //# sourceMappingURL=index.js.map

@@ -35,6 +35,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { formatDateString } from '@/lib/utils';
+import {
+  pastLiveStreamTypes,
+  streamState,
+} from '@/lib/livestream/liveStreamTypes';
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -44,73 +49,6 @@ const formSchema = z.object({
     required_error: 'Add a description.',
   }),
 });
-
-export type pastLiveStreamTypes = {
-  uid: string;
-  creator: string;
-  thumbnail: string;
-  thumbnailTimestampPct: number;
-  readyToStream: boolean;
-  readyToStreamAt: string;
-  status: {
-    state: string;
-    pctComplete: string;
-    errorReasonCode: string;
-    errorReasonText: string;
-  };
-  meta: {
-    name: string;
-  };
-  created: string;
-  modified: string;
-  scheduledDeletion: unknown;
-  size: number;
-  preview: string;
-  allowedOrigins: string[];
-  requireSignedURLs: boolean;
-  uploaded: string;
-  uploadExpiry: unknown;
-  maxSizeBytes: number | null;
-  maxDurationSeconds: number | null;
-  duration: number;
-  input: {
-    width: number;
-    height: number;
-  };
-  playback: {
-    hls: string;
-    dash: string;
-  };
-  watermark: unknown;
-  liveInput: string;
-  clippedFrom: unknown;
-  publicDetails: {
-    title: string | null;
-    share_link: string | null;
-    channel_link: string | null;
-    logo: string | null;
-  };
-}[];
-
-// export type pastLiveStreamApiResponse = {
-//   result: pastLiveStreamTypes[];
-//   success: boolean;
-//   errors: unknown[];
-//   messages: unknown[];
-// };
-
-type streamState = {
-  created: string;
-  deleteRecordingAfterDays: number;
-  meta: {
-    name: string;
-    description: string;
-    fullName: string;
-    username: string;
-  };
-  modified: string;
-  uid: string;
-}[];
 
 const LiveStream = () => {
   const [availableLivestreams, setAvailableLivestreams] = useState<streamState>(
@@ -126,7 +64,7 @@ const LiveStream = () => {
   const [url, setUrl] = useState('');
   const [streamKey, setStreamKey] = useState('');
   const [videoUID, setVideoUID] = useState('');
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -135,14 +73,74 @@ const LiveStream = () => {
     },
   });
 
+  useEffect(() => {
+    const fetchLiveStreamData = async () => {
+      const liveStreamResponse = await fetch(
+        'http://localhost:8000/getLiveStreams',
+        { credentials: 'include' }
+      );
+
+      const liveStreamResponseData = await liveStreamResponse.json();
+
+      if (!liveStreamResponse.ok && liveStreamResponseData.error) {
+        toast.error(liveStreamResponseData.error);
+        return;
+      }
+
+      setAvailableLivestreams(liveStreamResponseData);
+    };
+
+    fetchLiveStreamData();
+  }, []);
+
+  useEffect(() => {
+    const fetchPastLiveStreamData = async () => {
+      const pastLiveStreamResponse = await fetch(
+        'http://localhost:8000/pastLiveStreams',
+        { credentials: 'include' }
+      );
+
+      const pastLiveStreamResponseData = await pastLiveStreamResponse.json();
+
+      if (!pastLiveStreamResponse.ok && pastLiveStreamResponseData.error) {
+        toast.error(pastLiveStreamResponseData.error);
+        return;
+      }
+
+      setPastLiveStream(pastLiveStreamResponseData);
+    };
+
+    fetchPastLiveStreamData();
+  }, []);
+
+  useEffect(() => {
+    const fetchUrlStreamKey = async () => {
+      const getUrlStreamKey = await fetch(
+        'http://localhost:8000/getUrlStreamKey',
+        {
+          credentials: 'include',
+        }
+      );
+      const data = await getUrlStreamKey.json();
+      if (!getUrlStreamKey.ok && data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setUrl(data.url);
+      setStreamKey(data.streamKey);
+      setVideoUID(data.videoUID);
+    };
+
+    fetchUrlStreamKey();
+  }, []);
+
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     const valuesWithUID = {
       title: values.title,
       description: values.description,
       uid: videoUID,
     };
-
-    console.log(valuesWithUID);
 
     const response = await fetch('http://localhost:8000/startLiveStream', {
       body: JSON.stringify(valuesWithUID),
@@ -153,7 +151,7 @@ const LiveStream = () => {
       },
     });
     const data = await response.json();
-    console.log(data);
+
     if (response.ok) {
       setLiveDetails({
         title: data.meta.name,
@@ -164,7 +162,7 @@ const LiveStream = () => {
       toast.success('Created LiveStream!');
       return;
     }
-    toast.error(`${data.message}`);
+    toast.error(data.error);
   };
 
   const copyToClipboard = () => {
@@ -189,100 +187,7 @@ const LiveStream = () => {
       });
   };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchLiveStreamData = async () => {
-      try {
-        const liveStreamResponse = await fetch(
-          'http://localhost:8000/getLiveStreams'
-        );
-
-        if (!liveStreamResponse.ok) {
-          throw new Error('Failed to get livestream data!');
-        }
-
-        const data1 = await liveStreamResponse.json();
-        setAvailableLivestreams(data1);
-
-        const pastLiveStreamResponse = await fetch(
-          'http://localhost:8000/pastLiveStreams'
-        );
-
-        if (!pastLiveStreamResponse.ok) {
-          throw new Error('No past livestreams');
-        }
-
-        const data2 = await pastLiveStreamResponse.json();
-        setPastLiveStream(data2);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(error);
-        } else {
-          setError(new Error('An unknown error occurred.'));
-        }
-      }
-    };
-
-    fetchLiveStreamData();
-  }, []);
-
-  useEffect(() => {
-    const fetchPastLiveStreamData = async () => {
-      try {
-        const pastLiveStreamResponse = await fetch(
-          'http://localhost:8000/pastLiveStreams'
-        );
-
-        if (!pastLiveStreamResponse.ok) {
-          throw new Error('No past livestreams');
-        }
-
-        const data2 = await pastLiveStreamResponse.json();
-        setPastLiveStream(data2);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(error);
-        } else {
-          setError(new Error('An unknown error occurred.'));
-        }
-      }
-    };
-
-    fetchPastLiveStreamData();
-  }, []);
-
-  useEffect(() => {
-    const fetchUrlStreamKey = async () => {
-      try {
-        const getUrlStreamKey = await fetch(
-          'http://localhost:8000/getUrlStreamKey',
-          {
-            credentials: 'include',
-          }
-        );
-
-        if (!getUrlStreamKey.ok) {
-          throw new Error('Error fetching url & streamKey');
-        }
-
-        const data: { url: string; streamKey: string; videoUID: string } =
-          await getUrlStreamKey.json();
-        setUrl(data.url);
-        setStreamKey(data.streamKey);
-        setVideoUID(data.videoUID);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(error);
-        } else {
-          setError(new Error('An unknown error occurred.'));
-        }
-      }
-    };
-
-    fetchUrlStreamKey();
-  }, []);
 
   return (
     <div className="w-full flex xl:flex-row xs:flex-col">
@@ -464,13 +369,14 @@ const LiveStream = () => {
           </span>
           <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-3 xs:grid-cols-1">
             {pastLiveStream.map((data, index) => (
-              <VideoCard
-                key={index}
-                title={data.meta.name}
-                creator={data.creator}
-                dateCreate={data.created}
-                thumbnail={data.thumbnail}
-              />
+              <a key={index} href={`/live-streams/${data.uid}`}>
+                <VideoCard
+                  title={data.meta.name}
+                  creator={data.creator}
+                  dateCreate={formatDateString(data.created)}
+                  thumbnail={data.thumbnail}
+                />
+              </a>
             ))}
           </div>
         </div>

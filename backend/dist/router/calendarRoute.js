@@ -4,7 +4,7 @@ import { calendarSchema } from "../utils/Schemas.js";
 import { db } from "../utils/db.server.js";
 import { provinces } from "./province.js";
 import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
-const mapboxToken = "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
+const mapboxToken = process.env.MAPBOX_TOKEN;
 const geocoder = Geocoding({ accessToken: mapboxToken });
 const calendarRoute = express.Router();
 calendarRoute.get("/province/:provinceId", async (req, res) => {

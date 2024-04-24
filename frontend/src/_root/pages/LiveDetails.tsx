@@ -26,7 +26,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@radix-ui/react-label';
-import { multiFormatDateString } from '@/lib/utils';
+import { formatDateString, multiFormatDateString } from '@/lib/utils';
+import { pastLiveStreamTypes } from '@/lib/livestream/liveStreamTypes';
 
 const sources = [
   {
@@ -282,10 +283,13 @@ const LiveDetails = () => {
     fullName: '',
     title: '',
     description: '',
+    createdAt: '',
   });
   const [message, setMessage] = useState('');
   const [liveChats, setLiveChats] = useState<Comment[]>([]);
-  const [isPastLiveStream,setIsPastLiveStream] = useState(false)
+  const [availableLiveStreams, setAvailableLiveStreams] =
+    useState<pastLiveStreamTypes>([]);
+  const [isPastLiveStream, setIsPastLiveStream] = useState(false);
   useEffect(() => {
     //Join room
     socket.emit('joinRoom', user.username, id, user.id);
@@ -300,25 +304,27 @@ const LiveDetails = () => {
     // Listens for the socket when user joins
 
     const fetchOngoingLiveStream = async () => {
-      const live = await fetch(`http://localhost:8000/livestream/${id}`);
+      const live = await fetch(`http://localhost:8000/livestream/${id}`,{
+        credentials: 'include'
+      });
+      const liveData = await live.json();
+
+
       if (live.ok) {
         // Sends to the server that a user joins the livestream
-
-        const liveData = await live.json();
-        if(liveData.status.state === "ready"){
-          setIsPastLiveStream(true)
+        if (liveData.status.state === 'ready') {
+          setIsPastLiveStream(true);
           socket.disconnect();
         }
         const { meta } = liveData;
-        console.log(meta);
         setLiveDetails({
           username: meta.username,
           fullName: meta.fullName,
           title: meta.title,
           description: meta.description,
+          createdAt: liveData.created,
         });
       }
-
     };
 
     fetchOngoingLiveStream();
@@ -328,10 +334,30 @@ const LiveDetails = () => {
     };
   }, [id, user.username, user.id]);
 
+  //Fetch all the livestream inprogress or past without the current selectedLivestream
+  useEffect(() => {
+    const lives = async () => {
+      const fetchLiveStream = await fetch(
+        `http://localhost:8000/fetchLiveStreams/${id}`,{
+          credentials: 'include'
+        }
+      );
+
+      if (!fetchLiveStream.ok) {
+        throw new Error('Failed to get livestream data!');
+      }
+      const fetchLiveStreamData = await fetchLiveStream.json();
+      setAvailableLiveStreams(fetchLiveStreamData)
+    };
+
+    lives();
+  }, [id]);
+
   useEffect(() => {
     const fetchLiveStreamComments = async () => {
       const comments = await fetch(
-        `http://localhost:8000/liveStream/${id}/comments`
+        `http://localhost:8000/liveStream/${id}/comments`,
+        {credentials: 'include'}
       );
       const commentsData = (await comments.json()) as commentResponse[];
       const formattedComments = commentsData.map((comment) => ({
@@ -339,11 +365,10 @@ const LiveDetails = () => {
         message: comment.content,
         timeStamp: comment.createdAt,
       }));
-      console.log(formattedComments);
       setLiveChats(formattedComments);
     };
     fetchLiveStreamComments();
-  }, []);
+  }, [id]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
@@ -378,11 +403,14 @@ const LiveDetails = () => {
                       className="rounded-full"
                     />
                     <span className="flex flex-col">
-                      <span className="text-xl font-bold text-center">
+                      <span className="text-xl font-bold text-start">
                         {liveDetails.fullName}
                       </span>
                       <span className="text-md text-start">
                         @{liveDetails.username}
+                      </span>
+                      <span className="text-md text-start">
+                        {formatDateString(liveDetails.createdAt)}
                       </span>
                     </span>
                   </span>
@@ -399,14 +427,15 @@ const LiveDetails = () => {
                   More Live Streams
                 </span>
                 <div className="px-5 pb-2 gap-2 w-full grid xl:grid-cols-2 xs:grid-cols-1">
-                  {sources.map((source, index) => (
+                  {availableLiveStreams.map((data, index) => (
+                    <a key={index} href={`/live-streams/${data.uid}`}>
                     <VideoCard
-                      key={index}
-                      title={source.title}
-                      creator={source.creator}
-                      dateCreate={source.dateCreate}
-                      thumbnail={source.thumbnail}
+                      title={data.meta.name}
+                      creator={data.creator}
+                      dateCreate={formatDateString(data.created)}
+                      thumbnail={data.thumbnail}
                     />
+                    </a>
                   ))}
                 </div>
               </div>
@@ -434,14 +463,12 @@ const LiveDetails = () => {
                           {data.username}{' '}
                         </span>
                         <span className="text-sm text-start">
-                          <b>
-                          {filterInappropriateWords(data.message)}
-                          </b>
+                          <b>{filterInappropriateWords(data.message)}</b>
                         </span>
 
                         <p className="text-regular lg:text-sm ">
-                      {multiFormatDateString(data.timeStamp)}
-                    </p>
+                          {multiFormatDateString(data.timeStamp)}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -457,7 +484,11 @@ const LiveDetails = () => {
                     onChange={handleChange}
                     disabled={isPastLiveStream}
                   />
-                  <Button disabled={isPastLiveStream} type="submit" className="w-1/2">
+                  <Button
+                    disabled={isPastLiveStream}
+                    type="submit"
+                    className="w-1/2"
+                  >
                     Send Chat
                   </Button>
                 </form>
