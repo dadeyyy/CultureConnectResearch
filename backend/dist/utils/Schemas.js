@@ -39,5 +39,6 @@ export const heritageSchema = z.object({
     name: z.string({ required_error: "name is required" }),
     description: z.string({ required_error: "description is required" }),
     municipality: z.string({ required_error: "municipality is required" }),
+    province: z.string({ required_error: "province is required" }),
 });
 //# sourceMappingURL=Schemas.js.map

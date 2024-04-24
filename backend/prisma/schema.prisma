@@ -154,7 +154,7 @@ model Files {
   id         Int       @id @default(autoincrement())
   url        String
   filename   String
-  archiveId  Int
+  archiveId  Int?
   heritageId Int? // Adding a foreign key to associate files with Heritage
   heritage   Heritage? @relation(fields: [heritageId], references: [id])
   archive    Archive?  @relation(fields: [archiveId], references: [id], onDelete: Cascade)

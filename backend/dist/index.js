@@ -17,6 +17,7 @@ import { createServer } from "node:http";
 import socket from "./socket.js";
 import shareRoute from "./router/shareRoute.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import heritageRoute from "./router/heritage.js";
 if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
@@ -52,6 +53,7 @@ app.use("/", archiveRoute);
 app.use("/", liveStreamRoute);
 app.use("/", followRouter);
 app.use("/", shareRoute);
+app.use("/", heritageRoute);
 //Error Handler:
 app.use(errorHandler);
 const port = process.env.PORT || 8000;
