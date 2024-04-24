@@ -6,9 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl         = env("DIRECT_URL")
 }
 
 enum Role {
@@ -60,9 +60,9 @@ model LiveStream {
 model LiveStreamComment {
   id           Int        @id @default(autoincrement())
   content      String
-  username String
+  username     String
   userId       Int
-  liveStreamId String     // Change the type to String to match uid
+  liveStreamId String // Change the type to String to match uid
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   user         User       @relation(fields: [userId], references: [id])

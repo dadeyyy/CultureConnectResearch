@@ -23,11 +23,17 @@ const Carousel: React.FC<CarouselProps> = ({ photos }) => {
   };
 
   const prevImage = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length);
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + photos.length) % photos.length
+    );
   };
 
   return (
-    <div id="default-carousel" className="relative w-full" data-carousel="slide">
+    <div
+      id="default-carousel"
+      className="relative w-full"
+      data-carousel="slide"
+    >
       <div className="relative aspect-square overflow-hidden rounded-lg">
         {photos.map((photo, index) => (
           <div
