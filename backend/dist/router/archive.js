@@ -1,17 +1,17 @@
-import express from "express";
-import { db } from "../utils/db.server.js";
-import { isAuthenticated, isProvinceAdmin, validate } from "../middleware/middleware.js";
-import { archiveSchema } from "../utils/Schemas.js";
-import { cloudinary, uploadArchive } from "../utils/cloudinary.js";
-import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
-const mapboxToken = "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
+import express from 'express';
+import { db } from '../utils/db.server.js';
+import { isAuthenticated, isProvinceAdmin, validate, } from '../middleware/middleware.js';
+import { archiveSchema } from '../utils/Schemas.js';
+import { cloudinary, uploadArchive } from '../utils/cloudinary.js';
+import Geocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
+const mapboxToken = 'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';
 const geocoder = Geocoding({ accessToken: mapboxToken });
 const archiveRoute = express.Router();
 function generateRandomId() {
     return Math.floor(Math.random() * 90000) + 10000;
 }
 //Get specific archive
-archiveRoute.get("/archive/:province/:archiveId", isAuthenticated, async (req, res) => {
+archiveRoute.get('/archive/:province/:archiveId', isAuthenticated, async (req, res) => {
     try {
         const archiveId = parseInt(req.params.archiveId);
         const province = req.params.province;
@@ -25,7 +25,7 @@ archiveRoute.get("/archive/:province/:archiveId", isAuthenticated, async (req, r
             },
         });
         if (!archive) {
-            return res.status(404).json({ message: "Archive not found" });
+            return res.status(404).json({ message: 'Archive not found' });
         }
         const extractedData = {
             id: archive.id,
@@ -44,11 +44,11 @@ archiveRoute.get("/archive/:province/:archiveId", isAuthenticated, async (req, r
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal Server Error", error });
+        res.status(500).json({ message: 'Internal Server Error', error });
     }
 });
 //Viewing of archives;
-archiveRoute.get("/archive/:province", isAuthenticated, async (req, res) => {
+archiveRoute.get('/archive/:province', isAuthenticated, async (req, res) => {
     try {
         const data = req.params.province;
         const provinceArchives = await db.archive.findMany({
@@ -74,15 +74,15 @@ archiveRoute.get("/archive/:province", isAuthenticated, async (req, res) => {
             }));
             return res.status(200).json({ data: extractedData });
         }
-        return res.status(404).json({ message: "No archives found!" });
+        return res.status(404).json({ message: 'No archives found!' });
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Internal Server Error", error });
+        res.status(500).json({ message: 'Internal Server Error', error });
     }
 });
 //Creation of archives
-archiveRoute.post("/archive/:province", isAuthenticated, isProvinceAdmin, uploadArchive.array("archive"), validate(archiveSchema), async (req, res) => {
+archiveRoute.post('/archive/:province', isAuthenticated, isProvinceAdmin, uploadArchive.array('archive'), validate(archiveSchema), async (req, res) => {
     try {
         const data = req.body;
         const files = req.files;
@@ -92,7 +92,7 @@ archiveRoute.post("/archive/:province", isAuthenticated, isProvinceAdmin, upload
         }));
         const geoData = await geocoder
             .forwardGeocode({
-            query: `${data.municipality}, ${req.session.user?.province ?? ""}`,
+            query: `${data.municipality}, ${req.session.user?.province ?? ''}`,
             limit: 1,
         })
             .send();
@@ -100,7 +100,7 @@ archiveRoute.post("/archive/:province", isAuthenticated, isProvinceAdmin, upload
         const newArchive = await db.archive.create({
             data: {
                 ...data,
-                province: req.session.user?.province ?? "",
+                province: req.session.user?.province ?? '',
                 location: location,
                 userId: req.session.user?.id,
                 files: {
@@ -113,17 +113,17 @@ archiveRoute.post("/archive/:province", isAuthenticated, isProvinceAdmin, upload
             },
         });
         res.status(201).json({
-            message: "Successfully created new archive",
+            message: 'Successfully created new archive',
             data: newArchive,
         });
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Cannot create new archive", error });
+        res.status(500).json({ message: 'Cannot create new archive', error });
     }
 });
 // Edit archive
-archiveRoute.put("/archive/:province/:archiveId", isAuthenticated, isProvinceAdmin, uploadArchive.array("archive"), validate(archiveSchema), async (req, res) => {
+archiveRoute.put('/archive/:province/:archiveId', isAuthenticated, isProvinceAdmin, uploadArchive.array('archive'), validate(archiveSchema), async (req, res) => {
     try {
         const archiveId = parseInt(req.params.archiveId);
         const data = req.body;
@@ -186,11 +186,11 @@ archiveRoute.put("/archive/:province/:archiveId", isAuthenticated, isProvinceAdm
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal Server Error", error });
+        res.status(500).json({ message: 'Internal Server Error', error });
     }
 });
 // Delete archive
-archiveRoute.delete("/archive/:province/:archiveId", isAuthenticated, isProvinceAdmin, async (req, res) => {
+archiveRoute.delete('/archive/:province/:archiveId', isAuthenticated, isProvinceAdmin, async (req, res) => {
     try {
         const archiveId = parseInt(req.params.archiveId);
         const archive = await db.archive.findUnique({
@@ -202,7 +202,7 @@ archiveRoute.delete("/archive/:province/:archiveId", isAuthenticated, isProvince
             },
         });
         if (!archive) {
-            return res.status(404).json({ message: "Archive not found" });
+            return res.status(404).json({ message: 'Archive not found' });
         }
         // Delete the archive
         await db.archive.delete({
@@ -210,23 +210,23 @@ archiveRoute.delete("/archive/:province/:archiveId", isAuthenticated, isProvince
                 id: archiveId,
             },
         });
-        res.status(200).json({ message: "Archive deleted successfully" });
+        res.status(200).json({ message: 'Archive deleted successfully' });
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal Server Error", error });
+        res.status(500).json({ message: 'Internal Server Error', error });
     }
 });
-archiveRoute.get("/archives", isAuthenticated, async (req, res) => {
+archiveRoute.get('/archives', isAuthenticated, async (req, res) => {
     const archives = await db.archive.findMany({});
     // const locations = calendars.map((calendar) => calendar.location);
     if (archives) {
         return res.status(200).json(archives);
     }
-    return res.status(404).json({ error: "No locations found!" });
+    return res.status(404).json({ error: 'No locations found!' });
 });
 //document-archives
-archiveRoute.get("/archives/:province/:category", isAuthenticated, async (req, res) => {
+archiveRoute.get('/archives/:province/:category', isAuthenticated, async (req, res) => {
     const province = req.params.province;
     const category = req.params.category;
     const archives = await db.archive.findMany({
@@ -239,39 +239,39 @@ archiveRoute.get("/archives/:province/:category", isAuthenticated, async (req, r
     if (archives) {
         return res.status(200).json(archives);
     }
-    return res.status(404).json({ error: "No locations found!" });
+    return res.status(404).json({ error: 'No locations found!' });
 });
 //document-count
-archiveRoute.get("/archive-count/:province", async (req, res) => {
+archiveRoute.get('/archive-count/:province', async (req, res) => {
     try {
         const province = req.params.province;
         const documentCount = await db.archive.count({
             where: {
-                category: "document",
+                category: 'document',
                 province: province,
             },
         });
         const artifactCount = await db.archive.count({
             where: {
-                category: "artifact",
+                category: 'artifact',
                 province: province,
             },
         });
         const monumentCount = await db.archive.count({
             where: {
-                category: "monument",
+                category: 'monument',
                 province: province,
             },
         });
         res.status(200).json({ documentCount, artifactCount, monumentCount });
     }
     catch (error) {
-        console.error("Error fetching document count:", error);
-        res.status(500).json({ error: "Internal server error" });
+        console.error('Error fetching document count:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 //recent
-archiveRoute.get("/recent/:province", isAuthenticated, async (req, res) => {
+archiveRoute.get('/recent/:province', isAuthenticated, async (req, res) => {
     try {
         const data = req.params.province;
         const provinceArchives = await db.archive.findMany({
@@ -282,7 +282,7 @@ archiveRoute.get("/recent/:province", isAuthenticated, async (req, res) => {
                 files: true,
             },
             orderBy: {
-                createdAt: "desc",
+                createdAt: 'desc',
             },
             take: 5,
         });
@@ -298,11 +298,11 @@ archiveRoute.get("/recent/:province", isAuthenticated, async (req, res) => {
             }));
             return res.status(200).json({ data: extractedData });
         }
-        return res.status(404).json({ message: "No archives found!" });
+        return res.status(404).json({ message: 'No archives found!' });
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Internal Server Error", error });
+        res.status(500).json({ message: 'Internal Server Error', error });
     }
 });
 export default archiveRoute;
