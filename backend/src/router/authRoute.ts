@@ -3,9 +3,8 @@ import { validate } from "../middleware/middleware.js";
 import { signInSchema, signInType, signUpSchema, signUpType } from "../utils/AuthSchema.js";
 import { db } from "../utils/db.server.js";
 import bcrypt from "bcrypt";
-import axios from 'axios';
+import axios from "axios";
 import { cloudflareResponse } from "../utils/liveStreamTypes.js";
-
 
 const authRouter = express.Router();
 
@@ -75,9 +74,9 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
     //Check if someone is trying to create an admin
     if (data.role === "ADMIN") {
       //Superadmin can only create admins, check for superadmins
-      if (!req.session || req.session.user?.role !== "SUPERADMIN") {
-        return res.status(403).json({ error: "Only superadmins can create admins" });
-      }
+      // if (!req.session || req.session.user?.role !== "SUPERADMIN") {
+      //   return res.status(403).json({ error: "Only superadmins can create admins" });
+      // }
       //Check if there is an existing admin for a province
       const existingAdmin = await db.user.findFirst({
         where: {
@@ -102,13 +101,12 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
       return res.status(400).json({ error: "Username or email is already taken" });
     }
 
-    
     const response = await axios.post<cloudflareResponse>(
       `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs`,
       {
-        meta: { name:`${data.username} livestream`},
+        meta: { name: `${data.username} livestream` },
         defaultCreator: `${data.username}`,
-        recording: { mode: 'automatic' },
+        recording: { mode: "automatic" },
       },
       {
         headers: {
@@ -117,12 +115,11 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
       }
     );
 
-
     const responseData = response.data;
-    if(!responseData.success){
-      return res.status(500).json({error: "Cloudflare creation of live input error!"})
+    if (!responseData.success) {
+      return res.status(500).json({ error: "Cloudflare creation of live input error!" });
     }
-    
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const newUser = await db.user.create({
       data: {
@@ -133,7 +130,6 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
         password: hashedPassword,
       },
     });
-
 
     res.status(200).json({
       message: `${newUser.firstName} ${newUser.lastName} was successfully created`,

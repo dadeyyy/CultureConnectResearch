@@ -65,32 +65,39 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       provinceId: province,
-      title: "",
-      details: "",
-      municipality: "",
-      repeat: "once",
-      startDate: new Date(),
-      ...calendarDetails,
+      title: calendarDetails?.title || "",
+      details: calendarDetails?.details || "",
+      municipality: calendarDetails?.municipality || "",
+      repeat: calendarDetails?.repeat || "once",
+      startDate: calendarDetails?.startDate ? new Date(calendarDetails.startDate) : new Date(),
+      endDate: calendarDetails?.endDate ? new Date(calendarDetails.endDate) : undefined,
     },
   });
 
   //consts
   const [repeatValue, setRepeatValue] = useState(calendarDetails?.repeat || "once");
   const [isLoading, setIsLoading] = useState(false);
+  const [start, setStart] = useState();
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
+    const startDateUtcPlus8 = new Date(data.startDate.getTime() + 480 * 60 * 1000).toISOString();
+    const endDateIsoString = data.endDate?.toISOString() ?? new Date().toISOString();
+    const endDateUtcPlus8 = new Date(endDateIsoString).getTime() + 8 * 60 * 60 * 1000;
+    const endDateUtcPlus8Iso = new Date(endDateUtcPlus8).toISOString();
+
+    console.log(startDateUtcPlus8);
     if (action === "create") {
       const formData = {
         title: data.title,
         details: data.details,
         provinceId: data.provinceId,
         repeat: data.repeat,
-        startDate: data.startDate,
-        endDate: data.endDate,
+        startDate: startDateUtcPlus8,
+        endDate: data.endDate ? endDateUtcPlus8Iso : undefined,
         municipality: data.municipality,
       };
-
+      console.log(formData.startDate);
       try {
         const response = await fetch("http://localhost:8000/create-calendar", {
           method: "POST",
@@ -117,8 +124,8 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
         details: data.details,
         provinceId: data.provinceId,
         repeat: data.repeat,
-        startDate: data.startDate,
-        endDate: data.endDate,
+        startDate: startDateUtcPlus8,
+        endDate: data.endDate ? endDateUtcPlus8Iso : undefined,
         municipality: data.municipality,
       };
 
@@ -148,6 +155,11 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
     }
   }
 
+  const isPastDate = (date: Date) => {
+    const today = new Date();
+    return date < today;
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 relative">
@@ -158,39 +170,39 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
             </Box>
           </div>
         )}
-        <div className="grid grid-cols-2 gap-2">
-          <FormField
-            control={form.control}
-            name="provinceId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Province</FormLabel>
-                <FormControl>
-                  <Input {...field} type="text" readOnly />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="municipality"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Municipality</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="text"
-                    placeholder="Enter Municipality"
-                    className="col-span-3"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+
+        <FormField
+          control={form.control}
+          name="provinceId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Province</FormLabel>
+              <FormControl>
+                <Input {...field} type="text" readOnly />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="municipality"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location (Barangay, Municipality or Municipality Only)</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="text"
+                  placeholder="Barangay, Municipality or Municipality only"
+                  className="col-span-3"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="title"
@@ -275,6 +287,7 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
                       selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
+                      disabled={isPastDate}
                     />
                   </PopoverContent>
                 </Popover>
@@ -310,6 +323,7 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        disabled={isPastDate}
                       />
                     </PopoverContent>
                   </Popover>

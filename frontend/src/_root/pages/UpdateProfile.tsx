@@ -13,12 +13,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Loader from "@/components/shared/Loader";
 import ProfileUploader from "@/components/shared/ProfileUploader";
-
 import { useUserContext } from "@/context/AuthContext";
-import { getUserById, DummyUser } from "@/dummy/dummy";
+import Box from "@mui/material/Box";
+import LinearProgress from "@mui/material/LinearProgress";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const ProfileValidation = z.object({
   file: z.custom<File[]>(),
@@ -32,8 +32,8 @@ const ProfileValidation = z.object({
 const UpdateProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { user, setUser } = useUserContext();
-  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useUserContext();
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof ProfileValidation>>({
     resolver: zodResolver(ProfileValidation),
     defaultValues: {
@@ -46,42 +46,51 @@ const UpdateProfile = () => {
     },
   });
 
-  const [currentUser, setUserData] = useState<DummyUser | undefined>(undefined);
-  console.log(id);
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const fetchedUserData = await getUserById(id);
-        setUserData(fetchedUserData);
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Handler
+  const handleUpdate = async (values: z.infer<typeof ProfileValidation>) => {
+    setIsLoading(true); // Set loading to true when update starts
+    try {
+      const formData = new FormData();
 
-    if (id) {
-      fetchPost();
-    } else {
+      formData.append("firstName", values.firstName);
+      formData.append("lastName", values.lastName);
+      formData.append("username", values.userName);
+      formData.append("bio", values.bio);
+      // Append file only if it exists
+      if (values.file[0]) {
+        formData.append("file", values.file[0]);
+      }
+
+      const response = await fetch(`http://localhost:8000/profile/${user.id}`, {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        toast.success("Update successful!");
+        navigate("/home");
+      } else {
+        toast.error("Update failed");
+      }
+    } catch (error) {
+      toast.error("Error updating profile");
+      console.error(error);
+    } finally {
       setIsLoading(false);
     }
-  }, [id]);
-
-  if (!currentUser)
-    return (
-      <div className="flex-center w-full h-full">
-        <Loader />
-      </div>
-    );
-
-  // Handler
-  const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
-    return navigate(`/profile/${id}`);
   };
 
   return (
     <div className="flex flex-1">
       <div className="common-container">
+        {isLoading && (
+          <div className="w-full ">
+            <Box sx={{ width: "100%" }}>
+              <LinearProgress />
+            </Box>
+          </div>
+        )}
         <div className="flex-start gap-3 justify-start w-full max-w-5xl">
           <img
             src="/assets/icons/edit.svg"
@@ -97,6 +106,7 @@ const UpdateProfile = () => {
           <form
             onSubmit={form.handleSubmit(handleUpdate)}
             className="flex flex-col gap-7 w-full mt-4 max-w-5xl"
+            encType="multipart/form-data"
           >
             <FormField
               control={form.control}
@@ -104,7 +114,7 @@ const UpdateProfile = () => {
               render={({ field }) => (
                 <FormItem className="flex">
                   <FormControl>
-                    <ProfileUploader fieldChange={field.onChange} mediaUrl={currentUser.imageUrl} />
+                    <ProfileUploader fieldChange={field.onChange} mediaUrl={user.imageUrl} />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
                 </FormItem>
@@ -152,7 +162,7 @@ const UpdateProfile = () => {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
@@ -164,7 +174,7 @@ const UpdateProfile = () => {
                   <FormMessage className="shad-form_message" />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}

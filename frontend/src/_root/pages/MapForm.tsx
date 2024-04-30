@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl, { Marker } from 'mapbox-gl';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
-import { municipalities, provincesTest } from '@/lib/provinces';
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl, { Marker } from "mapbox-gl";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { municipalities, provincesTest } from "@/lib/provinces";
 import {
   Sheet,
   SheetClose,
@@ -14,11 +14,11 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import { useUserContext } from '@/context/AuthContext';
-import HeritageForm from '@/components/forms/HeritageForm';
-import Carousel from '@/components/shared/Carousel';
-import toast from 'react-hot-toast';
+} from "@/components/ui/sheet";
+import { useUserContext } from "@/context/AuthContext";
+import HeritageForm from "@/components/forms/HeritageForm";
+import Carousel from "@/components/shared/Carousel";
+import toast from "react-hot-toast";
 
 interface Point {
   id: number;
@@ -74,20 +74,19 @@ type MapProps = {
 };
 
 mapboxgl.accessToken =
-  'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';
+  "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
 
 const MapForm: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const [mapData, setMapData] = useState<Point[]>([]);
   type SelectedMarkerType = Point | ArchivePoint | HeritagePoint | null;
 
-  const [selectedMarker, setSelectedMarker] =
-    useState<SelectedMarkerType>(null);
+  const [selectedMarker, setSelectedMarker] = useState<SelectedMarkerType>(null);
   const [lng, setLng] = useState<number>(-70.9);
   const [lat, setLat] = useState<number>(42.35);
   const [zoom, setZoom] = useState<number>(9);
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
-  const [parameter, setParameter] = useState('locations');
+  const [parameter, setParameter] = useState("locations");
   const navigate = useNavigate();
   const { user } = useUserContext();
 
@@ -96,7 +95,7 @@ const MapForm: React.FC = () => {
     const fetchLocations = async () => {
       try {
         const response = await fetch(`http://localhost:8000/${parameter}`, {
-          credentials: 'include',
+          credentials: "include",
         });
 
         const data = await response.json();
@@ -119,70 +118,68 @@ const MapForm: React.FC = () => {
     if (mapContainer.current) {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v9',
+        style: "mapbox://styles/mapbox/streets-v9",
         center: [121.774, 12.8797],
         zoom: 5.1,
         accessToken: mapboxgl.accessToken,
       });
 
-      map.on('move', () => {
+      map.on("move", () => {
         setLng(parseFloat(map.getCenter().lng.toFixed(4)));
         setLat(parseFloat(map.getCenter().lat.toFixed(4)));
         setZoom(parseFloat(map.getZoom().toFixed(2)));
       });
 
-      map.on('load', () => {
+      map.on("load", () => {
         const markerList: mapboxgl.Marker[] = [];
 
         mapData.forEach((item) => {
-          const el = document.createElement('div');
-          el.className = 'marker';
-          if (parameter === 'locations') {
+          const el = document.createElement("div");
+          el.className = "marker";
+          if (parameter === "locations") {
             el.style.backgroundImage = `url("../public/assets/icons/event-point.svg")`;
-          } else if (parameter === 'archives') {
+          } else if (parameter === "archives") {
             el.style.backgroundImage = `url("../public/assets/icons/archive-point.svg")`;
-          } else if (parameter === 'heritages') {
+          } else if (parameter === "heritages") {
             el.style.backgroundImage = `url(${item.files[0].url})`;
           }
 
-          el.style.width = '50px';
-          el.style.height = '50px';
+          el.style.width = "50px";
+          el.style.height = "50px";
 
-          const marker = new mapboxgl.Marker(el)
-            .setLngLat(item.location.coordinates)
-            .addTo(map);
+          const marker = new mapboxgl.Marker(el).setLngLat(item.location.coordinates).addTo(map);
           const popup = new mapboxgl.Popup({ offset: 25 });
-          const popupContent = document.createElement('div');
+          const popupContent = document.createElement("div");
           popupContent.innerHTML = `<span>${item.title}</span>`;
           popup.setDOMContent(popupContent);
 
           popup.addClassName(
-            'bg-white text-black text-sm m-0 font-semibold px-2 py-0 rounded-lg shadow-md'
+            "bg-white text-black text-sm m-0 font-semibold px-2 py-0 rounded-lg shadow-md"
           );
 
-          marker.getElement().addEventListener('click', () => {
+          marker.getElement().addEventListener("click", () => {
             // Reset previous marker size
             markerList.forEach((m) => {
               const markerEl = m.getElement();
-              markerEl.style.width = '50px';
-              markerEl.style.height = '50px';
+              markerEl.style.width = "50px";
+              markerEl.style.height = "50px";
             });
 
             // Set clicked marker size
-            el.style.width = '75px';
-            el.style.height = '75px';
+            el.style.width = "75px";
+            el.style.height = "75px";
 
             setSelectedMarker(item);
           });
 
-          el.addEventListener('mouseenter', () => {
-            el.style.width = '75px';
-            el.style.height = '75px';
+          el.addEventListener("mouseenter", () => {
+            el.style.width = "75px";
+            el.style.height = "75px";
           });
 
-          el.addEventListener('mouseleave', () => {
-            el.style.width = '50px';
-            el.style.height = '50px';
+          el.addEventListener("mouseleave", () => {
+            el.style.width = "50px";
+            el.style.height = "50px";
           });
 
           markerList.push(marker);
@@ -196,29 +193,26 @@ const MapForm: React.FC = () => {
 
   const formatDateToWord = (dateString: string): string => {
     const options: Intl.DateTimeFormatOptions = {
-      month: 'long',
-      day: 'numeric',
+      month: "long",
+      day: "numeric",
     };
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString("en-US", options);
   };
 
   async function handleDeletePost(province: string, id: number) {
-    const response = await fetch(
-      `http://localhost:8000/heritage/${province}/${id}`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-      }
-    );
+    const response = await fetch(`http://localhost:8000/heritage/${province}/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
 
     const data = await response.json();
 
     if (response.ok) {
-      toast.success('Deleted Successfully');
+      toast.success("Deleted Successfully");
       return navigate(0);
     } else {
-      toast.error('Failed to delete');
+      toast.error("Failed to delete");
     }
   }
 
@@ -227,33 +221,27 @@ const MapForm: React.FC = () => {
       <div className="lg:w-1/2 xs:w-full absolute gap-2 flex items-center z-10  flex-col p-5">
         <div className="grid grid-cols-3 gap-2 w-full">
           <Button
-            className={`h-full ${
-              parameter === 'locations' && 'bg-blue-900 text-white'
-            }`}
+            className={`h-full ${parameter === "locations" && "bg-blue-900 text-white"}`}
             onClick={() => {
-              setParameter('locations');
+              setParameter("locations");
               setSelectedMarker(null);
             }}
           >
             Events
           </Button>
           <Button
-            className={`h-full ${
-              parameter === 'heritages' && 'bg-blue-900 text-white'
-            }`}
+            className={`h-full ${parameter === "heritages" && "bg-blue-900 text-white"}`}
             onClick={() => {
-              setParameter('heritages');
+              setParameter("heritages");
               setSelectedMarker(null);
             }}
           >
             Heritages
           </Button>
           <Button
-            className={`h-full ${
-              parameter === 'archives' && 'bg-blue-900 text-white'
-            }`}
+            className={`h-full ${parameter === "archives" && "bg-blue-900 text-white"}`}
             onClick={() => {
-              setParameter('archives');
+              setParameter("archives");
               setSelectedMarker(null);
             }}
           >
@@ -265,7 +253,7 @@ const MapForm: React.FC = () => {
         </div>
         <Sheet>
           <SheetTrigger asChild>
-            {user.role === 'ADMIN' && parameter === 'heritages' && (
+            {user.role === "ADMIN" && parameter === "heritages" && (
               <Button className="bg-red-200 border border-gray-300 hover:bg-blue-800">
                 Add a heritage
               </Button>
@@ -275,8 +263,7 @@ const MapForm: React.FC = () => {
             <SheetHeader>
               <SheetTitle>Add a heritage</SheetTitle>
               <SheetDescription>
-                Add a cultural heritage based on the location you are
-                administering.
+                Add a cultural heritage based on the location you are administering.
               </SheetDescription>
             </SheetHeader>
             <HeritageForm provinceData={user.province} action="Create" />
@@ -289,68 +276,60 @@ const MapForm: React.FC = () => {
         <div className="absolute bg-white px-5 py-10 xs:py-5 shadow-lg rounded-lg lg:top-0 lg:right-0 xs:bottom-0 xs:top-48 h-full w-[450px] xs:max-w-screen-sm opacity-90">
           <div className="flex">
             <span className="border border-white border-b-black w-[400px] px-2 mb-5">
-              {'title' in selectedMarker && (
-                <h3 className="font-bold my-2 text-2xl">
-                  {selectedMarker.title}
-                </h3>
+              {"title" in selectedMarker && (
+                <h3 className="font-bold my-2 text-2xl">{selectedMarker.title}</h3>
               )}
-              {'name' in selectedMarker && (
-                <h3 className="font-bold my-2 text-2xl">
-                  {selectedMarker.name}
-                </h3>
+              {"name" in selectedMarker && (
+                <h3 className="font-bold my-2 text-2xl">{selectedMarker.name}</h3>
               )}
             </span>
             <button
               onClick={() => setSelectedMarker(null)}
               className="absolute lg:top-8 lg:right-8 xs:right-10 xs:top-8"
             >
-              <img src={'/assets/icons/close.svg'} />
+              <img src={"/assets/icons/close.svg"} />
             </button>
           </div>
 
-          {parameter === 'locations' ? (
+          {parameter === "locations" ? (
             <>
-              {'date' in selectedMarker && selectedMarker.date && (
+              {"date" in selectedMarker && selectedMarker.date && (
                 <h2 className="font-semibold mb-1">
                   Date: {formatDateToWord(selectedMarker.date)}
                 </h2>
               )}
               <p className="font-semibold mb-1">
                 {selectedMarker.municipality}
-                {'provinceId' in selectedMarker && selectedMarker.provinceId
+                {"provinceId" in selectedMarker && selectedMarker.provinceId
                   ? ` at ${selectedMarker.provinceId}`
-                  : ''}
+                  : ""}
               </p>
-              {selectedMarker && 'details' in selectedMarker && (
-                <p className="mt-5 overflow-auto h-3/4">
-                  {selectedMarker.details}
-                </p>
+              {selectedMarker && "details" in selectedMarker && (
+                <p className="mt-5 overflow-auto h-3/4">{selectedMarker.details}</p>
               )}
             </>
-          ) : parameter === 'archives' ? (
+          ) : parameter === "archives" ? (
             <>
-              {'createdAt' in selectedMarker && selectedMarker.createdAt && (
+              {"createdAt" in selectedMarker && selectedMarker.createdAt && (
                 <h2 className="font-regular mb-1">
                   Date Created: {formatDateToWord(selectedMarker.createdAt)}
                 </h2>
               )}
               <p className="font-semibold mb-1">
-                {'province' in selectedMarker && selectedMarker.province
+                {"province" in selectedMarker && selectedMarker.province
                   ? `Municipality of ${
                       selectedMarker.municipality &&
                       municipalities[selectedMarker.province]?.find(
-                        (municipal) =>
-                          municipal.value === selectedMarker.municipality
+                        (municipal) => municipal.value === selectedMarker.municipality
                       )?.label
                     } in ${
                       selectedMarker.province &&
-                      provincesTest.find(
-                        (province) => province.value === selectedMarker.province
-                      )?.label
+                      provincesTest.find((province) => province.value === selectedMarker.province)
+                        ?.label
                     }`
-                  : ''}
+                  : ""}
               </p>
-              {'category' in selectedMarker && 'province' in selectedMarker && (
+              {"category" in selectedMarker && "province" in selectedMarker && (
                 <span
                   onClick={() => {
                     const id = selectedMarker.id;
@@ -363,37 +342,33 @@ const MapForm: React.FC = () => {
                   Go to archive page
                 </span>
               )}
-              {selectedMarker && 'description' in selectedMarker && (
-                <p className="mt-5 overflow-auto h-3/4">
-                  {selectedMarker.description}
-                </p>
+              {selectedMarker && "description" in selectedMarker && (
+                <p className="mt-5 overflow-auto h-3/4">{selectedMarker.description}</p>
               )}
             </>
           ) : (
-            parameter === 'heritages' && (
+            parameter === "heritages" && (
               <>
-                {'createdAt' in selectedMarker && selectedMarker.createdAt && (
+                {"createdAt" in selectedMarker && selectedMarker.createdAt && (
                   <h2 className="font-semibold mb-1">
                     Date: {formatDateToWord(selectedMarker.createdAt)}
                   </h2>
                 )}
                 <p className="font-semibold mb-1">
                   {selectedMarker.municipality}
-                  {'province' in selectedMarker && selectedMarker.province
+                  {"province" in selectedMarker && selectedMarker.province
                     ? ` at ${selectedMarker.province}`
-                    : ''}
+                    : ""}
                 </p>
-                {selectedMarker && 'description' in selectedMarker && (
-                  <p className="mt-3 overflow-auto h-16">
-                    {selectedMarker.description}
-                  </p>
+                {selectedMarker && "description" in selectedMarker && (
+                  <p className="my-3 overflow-auto h-28">{selectedMarker.description}</p>
                 )}
 
                 <div className="flex flex-col gap-2">
-                  {selectedMarker && 'files' in selectedMarker && (
+                  {selectedMarker && "files" in selectedMarker && (
                     <>
                       {selectedMarker.files.map((photo) =>
-                        typeof photo === 'string' ? (
+                        typeof photo === "string" ? (
                           <img key={photo} src={photo} alt="Image" />
                         ) : (
                           <img key={photo.id} src={photo.url} alt="Image" />
@@ -401,18 +376,13 @@ const MapForm: React.FC = () => {
                       )}
                     </>
                   )}
-                  {selectedMarker && 'province' in selectedMarker && (
+                  {selectedMarker && "province" in selectedMarker && (
                     <Button
                       onClick={() => {
-                        handleDeletePost(
-                          selectedMarker.province,
-                          selectedMarker.id
-                        );
+                        handleDeletePost(selectedMarker.province, selectedMarker.id);
                       }}
                       variant="ghost"
-                      className={`bg-red-200 w-full ${
-                        user.role === 'ADMIN' ? '' : 'hidden'
-                      }`}
+                      className={`bg-red-200 w-full ${user.role === "ADMIN" ? "" : "hidden"}`}
                     >
                       Delete
                     </Button>

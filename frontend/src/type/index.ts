@@ -37,6 +37,20 @@ export type IUser = {
   province?: string;
 };
 
+export interface userProfile {
+  imageUrl: string;
+  bio: string | null;
+  createdAt: string;
+  email: string;
+  firstName: string;
+  id: number;
+  lastName: string;
+  password: string;
+  role: string;
+  updatedAt: string;
+  username: string;
+}
+
 export type INewUser = {
   firstName: number;
   lastName: string;

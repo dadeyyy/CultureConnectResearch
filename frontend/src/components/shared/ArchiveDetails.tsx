@@ -64,6 +64,7 @@ const ArchiveDetails: React.FC = () => {
         }
         const data = await response.json();
         setArchiveData(data.data);
+        console.log(archiveData);
       } catch (error: any) {
         console.error(error);
         setError(error.message || "Failed to fetch archive data");
@@ -264,25 +265,42 @@ const ArchiveDetails: React.FC = () => {
                 </a>
               )}
 
-              {file.url.endsWith(".jpg") ||
-                (file.url.endsWith(".png") && (
-                  <div
-                    className="flex items-center border-2 p-2 gap-2 w-full rounded-xl border-white hover:border-red-200"
+              {file.url.endsWith(".jpg") && (
+                <div
+                  className="flex items-center border-2 p-2 gap-2 w-full rounded-xl border-white hover:border-red-200"
+                  onClick={() => handleOpenLightbox()}
+                >
+                  <img
+                    src={file.url}
+                    alt="PDF Icon"
+                    height={100}
+                    width={100}
+                    className="aspect-square"
                     onClick={() => handleOpenLightbox()}
-                  >
-                    <img
-                      src={file.url}
-                      alt="PDF Icon"
-                      height={100}
-                      width={100}
-                      className="aspect-square"
-                      onClick={() => handleOpenLightbox()}
-                    />
-                    <div className="text-center flex-col flex">
-                      <span className="font-normal"> - Click to view or open image</span>
-                    </div>
+                  />
+                  <div className="text-center flex-col flex">
+                    <span className="font-normal"> - Click to view or open image</span>
                   </div>
-                ))}
+                </div>
+              )}
+              {file.url.endsWith(".png") && (
+                <div
+                  className="flex items-center border-2 p-2 gap-2 w-full rounded-xl border-white hover:border-red-200"
+                  onClick={() => handleOpenLightbox()}
+                >
+                  <img
+                    src={file.url}
+                    alt="PDF Icon"
+                    height={100}
+                    width={100}
+                    className="aspect-square"
+                    onClick={() => handleOpenLightbox()}
+                  />
+                  <div className="text-center flex-col flex">
+                    <span className="font-normal"> - Click to view or open image</span>
+                  </div>
+                </div>
+              )}
 
               {file.url.endsWith(".mp4") && (
                 <div>

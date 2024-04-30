@@ -18,6 +18,7 @@ import socket from "./socket.js";
 import shareRoute from "./router/shareRoute.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import heritageRoute from "./router/heritage.js";
+import profileRoute from "./router/profileRoute.js";
 if (process.env.NODE_ENV !== "production") {
     dotenv.config();
 }
@@ -26,7 +27,7 @@ const server = createServer(app);
 socket(server);
 app.use(express.json());
 app.use(cors({
-    origin: "*",
+    origin: `http://localhost:5173`,
     credentials: true, // Enable credentials (including cookies)
 }));
 app.use(session({
@@ -41,7 +42,7 @@ app.use(session({
 }));
 app.use(morgan("tiny"));
 //Routers
-app.get('/test', (req, res) => {
+app.get("/test", (req, res) => {
     res.json({ message: "IT WORKS!" });
 });
 app.use("/", authRouter);
@@ -56,6 +57,7 @@ app.use("/", liveStreamRoute);
 app.use("/", followRouter);
 app.use("/", shareRoute);
 app.use("/", heritageRoute);
+app.use("/", profileRoute);
 //Error Handler:
 app.use(errorHandler);
 const port = process.env.PORT || 8000;

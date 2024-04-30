@@ -35,63 +35,44 @@ type IContextType = {
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const USER_STORAGE_KEY = "currentUser";
+  // const USER_STORAGE_KEY = "currentUser";
   const navigate = useNavigate();
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Change to true initially
+  const [isLoading, setIsLoading] = useState(false);
+  const cooki = localStorage.getItem("currentUserId");
 
-  const checkAuthUser = useCallback(async () => {
+  const checkAuthUser = async () => {
+    setIsLoading(true);
     try {
-      const cookieFallback = localStorage.getItem(USER_STORAGE_KEY);
-
-      if (
-        !cookieFallback ||
-        cookieFallback === "[]" ||
-        cookieFallback === null ||
-        cookieFallback === undefined
-      ) {
-        navigate("/signin");
-        return false;
-      }
-
-      const storedUser = JSON.parse(cookieFallback);
-
-      if (storedUser) {
-        setUser({
-          id: storedUser.id,
-          firstName: storedUser.firstName,
-          lastName: storedUser.lastName,
-          username: storedUser.username,
-          email: storedUser.email,
-          imageUrl: storedUser.imageUrl,
-          bio: storedUser.bio,
-          role: storedUser.role,
-          province: storedUser.province,
-        });
+      const response = await fetch(`http://localhost:8000/user/${cooki}`);
+      const data = await response.json();
+      if (response.ok) {
+        setUser(data.user);
         setIsAuthenticated(true);
         return true;
       }
-
       return false;
     } catch (error) {
       console.error("Error checking authentication:", error);
-      throw error; // Re-throw the error after logging
+      return false;
     } finally {
       setIsLoading(false);
     }
-  }, [navigate, setUser, setIsAuthenticated, setIsLoading]);
+  };
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      await checkAuthUser();
-      setIsLoading(false);
-    };
-
-    if (isLoading) {
-      initializeAuth();
+    const cookieFallback = localStorage.getItem("currentUserId");
+    if (cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) {
+      navigate("/signin");
     }
-  }, []);
+
+    checkAuthUser();
+  }, [cooki]);
+
+  // useEffect(() => {
+  //   checkAuthUser();
+  // }, [navigate, setUser, setIsAuthenticated, setIsLoading]);
 
   const value = {
     user,

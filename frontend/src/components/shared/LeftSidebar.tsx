@@ -12,11 +12,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import PostForm from "../forms/PostForm";
+import { Skeleton } from "../ui/skeleton";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { user, checkAuthUser } = useUserContext();
+  const { user, checkAuthUser, isLoading } = useUserContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,7 +79,6 @@ const LeftSidebar = () => {
     },
   ].filter(Boolean);
 
-  console.log(user.imageUrl);
   const handleLogout = async () => {
     const response = await fetch("http://localhost:8000/logout", {
       method: "POST",
@@ -86,9 +86,9 @@ const LeftSidebar = () => {
     });
     const data = await response.json();
     console.log(data);
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentUserId");
 
-    return navigate("/");
+    return navigate("/signin");
   };
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -123,19 +123,40 @@ const LeftSidebar = () => {
                     {!isCreate && (
                       <>
                         {link.label === "Profile" ? (
-                          <Avatar>
-                            <AvatarImage src={link.imgURL} alt={link.label} />
-                            <AvatarFallback>
-                              {getInitials(user.firstName, user.lastName)}
-                            </AvatarFallback>
-                          </Avatar>
+                          <>
+                            {isLoading ? (
+                              <div className="flex items-center space-x-4">
+                                <Skeleton className="h-12 w-12 rounded-full bg-gray-400" />
+                                <div className="space-y-2">
+                                  <Skeleton className="h-4 w-[250px] bg-gray-400" />
+                                  <Skeleton className="h-4 w-[200px] bg-gray-400" />
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <Avatar>
+                                  <AvatarImage src={link.imgURL} alt={link.label} />
+                                  <AvatarFallback>
+                                    {getInitials(user.firstName, user.lastName)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="flex flex-col">
+                                  <span className="capitalize">
+                                    {user.firstName + " " + user.lastName}
+                                  </span>
+                                  <span className="text-xs text-gray-500">@{user.username}</span>
+                                </span>
+                              </>
+                            )}
+                          </>
                         ) : (
-                          <img src={link.imgURL} alt={link.label} className={`h-5 w-5`} />
+                          <>
+                            <img src={link.imgURL} alt={link.label} className={`h-5 w-5`} />
+                            {link.label}
+                          </>
                         )}
                       </>
                     )}
-
-                    {link.label}
                   </NavLink>
                 </div>
               </li>

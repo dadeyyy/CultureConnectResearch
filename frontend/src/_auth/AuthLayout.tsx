@@ -1,7 +1,9 @@
+import { useUserContext } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
 
 const AuthLayout = () => {
+  // const isAuthenticated = useUserContext();
   const isAuthenticated = false;
   const location = useLocation();
   const [image, setImage] = useState("");
@@ -18,7 +20,7 @@ const AuthLayout = () => {
   return (
     <>
       {isAuthenticated ? (
-        <Navigate to="/" />
+        <Navigate to="/signin" />
       ) : (
         <>
           <div className="hidden xl:block h-screen w-1/2 object-cover">

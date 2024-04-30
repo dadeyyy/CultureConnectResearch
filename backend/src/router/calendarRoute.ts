@@ -6,7 +6,7 @@ import { provinces } from "./province.js";
 
 import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
 
-const mapboxToken = process.env.MAPBOX_TOKEN
+const mapboxToken = process.env.MAPBOX_TOKEN;
 
 const geocoder = Geocoding({ accessToken: mapboxToken as string });
 
@@ -25,6 +25,7 @@ calendarRoute.get("/province/:provinceId", async (req, res) => {
       where: { name: provinceId },
       include: {
         calendars: {
+          where: { startDate: { gte: new Date() } },
           orderBy: {
             startDate: "asc", // Sorting by date in ascending order
           },
@@ -55,7 +56,11 @@ calendarRoute.post(
       const { startDate } = data;
       const { endDate } = data;
       const { repeat } = data;
-      const parsedStartDate = new Date(startDate);
+
+      // const parsedStartDate = new Date(startDate);
+      // const utcStartDate = new Date(
+      //   parsedStartDate.getTime() + parsedStartDate.getTimezoneOffset() * 60000
+      // );
 
       const geoData = await geocoder
         .forwardGeocode({
@@ -65,13 +70,13 @@ calendarRoute.post(
         .send();
 
       const location: GeoJsonPoint = geoData.body.features[0].geometry;
-
+      console.log(startDate);
       const newCalendar = await db.calendar.create({
         data: {
           ...data,
           provinceId: data.provinceId,
           location: location,
-          startDate: parsedStartDate,
+          startDate: startDate,
           repeat: repeat,
           endDate: endDate || null,
         },

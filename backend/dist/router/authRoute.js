@@ -3,7 +3,7 @@ import { validate } from "../middleware/middleware.js";
 import { signInSchema, signUpSchema } from "../utils/AuthSchema.js";
 import { db } from "../utils/db.server.js";
 import bcrypt from "bcrypt";
-import axios from 'axios';
+import axios from "axios";
 const authRouter = express.Router();
 authRouter.post("/signin", validate(signInSchema), async (req, res) => {
     try {
@@ -69,9 +69,9 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
         //Check if someone is trying to create an admin
         if (data.role === "ADMIN") {
             //Superadmin can only create admins, check for superadmins
-            if (!req.session || req.session.user?.role !== "SUPERADMIN") {
-                return res.status(403).json({ error: "Only superadmins can create admins" });
-            }
+            // if (!req.session || req.session.user?.role !== "SUPERADMIN") {
+            //   return res.status(403).json({ error: "Only superadmins can create admins" });
+            // }
             //Check if there is an existing admin for a province
             const existingAdmin = await db.user.findFirst({
                 where: {
@@ -95,7 +95,7 @@ authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
         const response = await axios.post(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs`, {
             meta: { name: `${data.username} livestream` },
             defaultCreator: `${data.username}`,
-            recording: { mode: 'automatic' },
+            recording: { mode: "automatic" },
         }, {
             headers: {
                 Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
