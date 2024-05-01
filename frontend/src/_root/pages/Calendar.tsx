@@ -178,26 +178,71 @@ const Calendar = () => {
     }
   };
 
+  // const INITIAL_EVENTS: EventInput[] =
+  //   calendar?.calendars.map((event: IEvent) => {
+  //     const eventInput: EventInput = {
+  //       id: event.id,
+  //       title: event.title,
+  //       start: new Date(event.startDate).toISOString().replace(/T.*$/, ""),
+  //       // end: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
+  //       color: getEventColor(event.repeat),
+  //     };
+
+  //     if (event.repeat !== "once") {
+  //       eventInput.rrule = {
+  //         dtstart: new Date(event.startDate).toISOString().replace(/T.*$/, ""),
+  //         until: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
+  //         freq: event.repeat,
+  //       };
+  //     }
+
+  //     return eventInput;
+  //   }) || [];
+
   const INITIAL_EVENTS: EventInput[] =
     calendar?.calendars.map((event: IEvent) => {
       const eventInput: EventInput = {
         id: event.id,
         title: event.title,
-        start: new Date(event.startDate).toISOString().replace(/T.*$/, ""),
+        start: new Date(event.startDate).toISOString().slice(0, 10).replace(/T.*$/, ""),
         // end: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
         color: getEventColor(event.repeat),
       };
 
       if (event.repeat !== "once") {
         eventInput.rrule = {
-          dtstart: new Date(event.startDate).toISOString().replace(/T.*$/, ""),
-          until: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
+          dtstart: new Date(event.startDate).toISOString().slice(0, 10).replace(/T.*$/, ""),
+          until: new Date(event.endDate).toISOString().slice(0, 10).replace(/T.*$/, ""),
           freq: event.repeat,
         };
       }
 
       return eventInput;
     }) || [];
+
+  // const INITIAL_EVENTS: EventInput[] =
+  //   calendar?.calendars.map((event: IEvent) => {
+  //     const startDate = new Date(event.startDate);
+  //     const endDate = new Date(event.endDate);
+
+  //     const eventInput: EventInput = {
+  //       id: event.id,
+  //       title: event.title,
+  //       start: startDate.toISOString().slice(0, 10),
+  //       // end: endDate.toISOString().slice(0, 10),
+  //       color: getEventColor(event.repeat),
+  //     };
+
+  //     if (event.repeat !== "once") {
+  //       eventInput.rrule = {
+  //         dtstart: startDate.toISOString().slice(0, 10),
+  //         until: endDate.toISOString().slice(0, 10),
+  //         freq: event.repeat,
+  //       };
+  //     }
+
+  //     return eventInput;
+  //   }) || [];
 
   const formatDateToWord = (dateString: string): string => {
     const options: Intl.DateTimeFormatOptions = { month: "long", day: "numeric" };

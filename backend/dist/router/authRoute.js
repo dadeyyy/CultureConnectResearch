@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from 'express';
 import { validate } from '../middleware/middleware.js';
 import { signInSchema, signUpSchema, } from '../utils/AuthSchema.js';
@@ -12,6 +13,14 @@ import ExpressError from '../middleware/ExpressError.js';
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
 }
+=======
+import express from "express";
+import { validate } from "../middleware/middleware.js";
+import { signInSchema, signUpSchema } from "../utils/AuthSchema.js";
+import { db } from "../utils/db.server.js";
+import bcrypt from "bcrypt";
+import axios from "axios";
+>>>>>>> 6ad2b41808e07d053f46e78b43e6a8026ddc67cb
 const authRouter = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 authRouter.post('/signin', validate(signInSchema), catchAsync(async (req, res) => {
@@ -80,6 +89,7 @@ authRouter.post('/signin', validate(signInSchema), catchAsync(async (req, res) =
     else {
         throw new ExpressError('Invalid Username or Password', 401);
     }
+<<<<<<< HEAD
 }));
 authRouter.post('/signup', validate(signUpSchema), catchAsync(async (req, res) => {
     const data = req.body;
@@ -92,6 +102,28 @@ authRouter.post('/signup', validate(signUpSchema), catchAsync(async (req, res) =
             return res
                 .status(403)
                 .json({ error: 'Only superadmins can create admins' });
+=======
+});
+authRouter.post("/signup", validate(signUpSchema), async (req, res) => {
+    try {
+        const data = req.body;
+        //Check if someone is trying to create an admin
+        if (data.role === "ADMIN") {
+            //Superadmin can only create admins, check for superadmins
+            // if (!req.session || req.session.user?.role !== "SUPERADMIN") {
+            //   return res.status(403).json({ error: "Only superadmins can create admins" });
+            // }
+            //Check if there is an existing admin for a province
+            const existingAdmin = await db.user.findFirst({
+                where: {
+                    role: "ADMIN",
+                    province: data.province,
+                },
+            });
+            if (existingAdmin) {
+                return res.status(400).json({ error: `An admin for ${data.province} already exists` });
+            }
+>>>>>>> 6ad2b41808e07d053f46e78b43e6a8026ddc67cb
         }
         //Check if there is an existing admin for a province
         const existingAdmin = await db.user.findFirst({
@@ -105,6 +137,7 @@ authRouter.post('/signup', validate(signUpSchema), catchAsync(async (req, res) =
                 .status(400)
                 .json({ error: `An admin for ${data.province} already exists` });
         }
+<<<<<<< HEAD
     }
     //Check for existing user
     const existingUser = await db.user.findFirst({
@@ -153,6 +186,33 @@ authRouter.post('/signup', validate(signUpSchema), catchAsync(async (req, res) =
         await sgMail.send(msg);
         return res.status(200).json({
             message: `${newUser.firstName} ${newUser.lastName} was successfully created. Confirmation email sent.`,
+=======
+        const response = await axios.post(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/live_inputs`, {
+            meta: { name: `${data.username} livestream` },
+            defaultCreator: `${data.username}`,
+            recording: { mode: "automatic" },
+        }, {
+            headers: {
+                Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
+            },
+        });
+        const responseData = response.data;
+        if (!responseData.success) {
+            return res.status(500).json({ error: "Cloudflare creation of live input error!" });
+        }
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const newUser = await db.user.create({
+            data: {
+                ...req.body,
+                url: responseData.result.rtmps.url,
+                streamKey: responseData.result.rtmps.streamKey,
+                videoUID: responseData.result.uid,
+                password: hashedPassword,
+            },
+        });
+        res.status(200).json({
+            message: `${newUser.firstName} ${newUser.lastName} was successfully created`,
+>>>>>>> 6ad2b41808e07d053f46e78b43e6a8026ddc67cb
         });
     }
     throw new ExpressError('Failed to create new user', 400);

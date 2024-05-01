@@ -28,6 +28,9 @@ import ConfirmEmail from "./_root/pages/ConfirmEmail";
 // import SupaAdmin from "./_superadmin/pages/SupaAdmin";
 // import SuperAdminLayout from "./_superadmin/SuperAdminLayout";
 // import Admins from "./_superadmin/pages/Admins";
+import SupaAdmin from "./_superadmin/pages/SupaAdmin";
+import SuperAdminLayout from "./_superadmin/SuperAdminLayout";
+import Admins from "./_superadmin/pages/Admins";
 
 const App = () => {
   return (
@@ -64,10 +67,10 @@ const App = () => {
         </Route>
 
         {/* SUPERADM IN ROUTE */}
-        {/* <Route element={<SuperAdminLayout />}>
+        <Route element={<SuperAdminLayout />}>
           <Route path="/superadmin" element={<SupaAdmin />} />
           <Route path="/admins" element={<Admins />} />
-        </Route> */}
+        </Route>
       </Routes>
 
       <Toaster position="top-center" reverseOrder={false} />

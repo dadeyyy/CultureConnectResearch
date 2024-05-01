@@ -70,29 +70,69 @@ profileRoute.post('/userInfo', isAuthenticated, async (req, res) => {
   if (updatedUserInfo) {
     return res.status(200).json(updatedUserInfo);
   }
-  throw new ExpressError('Failed to edit user info', 400);
+  throw new ExpressError("Failed to edit user info", 400);
 });
 
-
-
-profileRoute.post('/changePassword', isAuthenticated, async (req, res) => {
+profileRoute.post("/changePassword", isAuthenticated, async (req, res) => {
   const sessionId = req.session.user?.id;
   const password: string = req.body.password;
- 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const updatedPassword = await db.user.update({
-      where: {
-        id: sessionId,
-      },
-      data: {
-        password: hashedPassword,
-      },
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const updatedPassword = await db.user.update({
+    where: {
+      id: sessionId,
+    },
+    data: {
+      password: hashedPassword,
+    },
+  });
+
+  if (updatedPassword) {
+    return res.status(200).json(updatedPassword);
+  }
+  throw new ExpressError("Failed to edit password", 400);
+});
+
+profileRoute.put(
+  "/profile/:id",
+  isAuthenticated,
+  uploadProfile.single("file"),
+  async (req, res) => {
+    const sessionId = req.session.user?.id;
+    const data: userInfo = req.body;
+    const file = req.file as Express.Multer.File;
+
+    // If a file is uploaded, update profile picture
+    if (file) {
+      const userWithProfile = await db.user.update({
+        where: { id: sessionId },
+        data: { avatarUrl: file.path },
+      });
+      if (userWithProfile) {
+        return res.status(200).json({ url: userWithProfile.avatarUrl });
+      }
+      throw new ExpressError("Failed to update profile picture", 400);
+    }
+
+    // If no file uploaded, edit user info
+    const existingUser = await db.user.findFirst({
+      where: { OR: [{ username: data.username }] },
     });
 
-    if (updatedPassword) {
-      return res.status(200).json(updatedPassword);
+    if (existingUser) {
+      throw new ExpressError("Username already exists", 409);
     }
-    throw new ExpressError('Failed to edit password', 400)
-});
+
+    const updatedUserInfo = await db.user.update({
+      where: { id: sessionId },
+      data: { ...data },
+    });
+
+    if (updatedUserInfo) {
+      return res.status(200).json(updatedUserInfo);
+    }
+    throw new ExpressError("Failed to edit user info", 400);
+  }
+);
 
 export default profileRoute;

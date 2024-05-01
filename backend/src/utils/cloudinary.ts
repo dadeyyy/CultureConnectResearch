@@ -1,7 +1,7 @@
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
-import { v2 as cloudinary } from 'cloudinary';
-import multer from 'multer';
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -12,8 +12,8 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'uploads',
-    allowedFormats: ['jpg', 'png', 'mp4'],
+    folder: "uploads",
+    allowedFormats: ["jpg", "png", "mp4"],
   } as any,
 });
 
@@ -22,35 +22,43 @@ const upload = multer({ storage });
 const archiveStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'archives',
-    allowedFormats: ['jpg', 'png', 'jpeg', 'pdf', 'mp4'],
-    resource_type: 'auto',
-    access_mode : 'public'
+    folder: "archives",
+    allowedFormats: ["jpg", "png", "jpeg", "pdf", "mp4"],
+    resource_type: "auto",
+    access_mode: "public",
   } as any,
 });
 
 const uploadArchive = multer({ storage: archiveStorage });
 
-
 const heritageStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params:{
-    folder: 'heritage',
-    allowedFormats: ['jpg', 'png', 'jpeg'],
-  }as any
-})
+  params: {
+    folder: "heritage",
+    allowedFormats: ["jpg", "png", "jpeg"],
+  } as any,
+});
 
-const uploadHeritage = multer({storage: heritageStorage})
-
+const uploadHeritage = multer({ storage: heritageStorage });
 
 const profileStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'User Profiles',
-    allowedFormats: ['jpg', 'png', 'jpeg'],
-  } as any
-})
+    folder: "User Profiles",
+    allowedFormats: ["jpg", "png", "jpeg"],
+  } as any,
+});
 
-const uploadProfile = multer({storage: profileStorage})
+const uploadProfile = multer({ storage: profileStorage });
 
-export { cloudinary, storage, upload, uploadArchive, archiveStorage, heritageStorage, uploadHeritage , profileStorage, uploadProfile};
+export {
+  cloudinary,
+  storage,
+  upload,
+  uploadArchive,
+  archiveStorage,
+  heritageStorage,
+  uploadHeritage,
+  profileStorage,
+  uploadProfile,
+};

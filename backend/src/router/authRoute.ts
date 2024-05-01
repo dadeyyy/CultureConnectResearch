@@ -107,11 +107,9 @@ authRouter.post(
     //Check if someone is trying to create an admin
     if (data.role === 'ADMIN') {
       //Superadmin can only create admins, check for superadmins
-      if (!req.session || req.session.user?.role !== 'SUPERADMIN') {
-        return res
-          .status(403)
-          .json({ error: 'Only superadmins can create admins' });
-      }
+      // if (!req.session || req.session.user?.role !== "SUPERADMIN") {
+      //   return res.status(403).json({ error: "Only superadmins can create admins" });
+      // }
       //Check if there is an existing admin for a province
       const existingAdmin = await db.user.findFirst({
         where: {
@@ -146,7 +144,7 @@ authRouter.post(
       {
         meta: { name: `${data.username} livestream` },
         defaultCreator: `${data.username}`,
-        recording: { mode: 'automatic' },
+        recording: { mode: "automatic" },
       },
       {
         headers: {

@@ -7,6 +7,7 @@ import Geocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
 import { catchAsync } from '../middleware/errorHandler.js';
 import ExpressError from '../middleware/ExpressError.js';
 const calendarRoute = express.Router();
+<<<<<<< HEAD
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
 }
@@ -19,6 +20,19 @@ calendarRoute.get('/province/:provinceId', catchAsync(async (req, res) => {
             calendars: {
                 orderBy: {
                     startDate: 'asc', // Sorting by date in ascending order
+=======
+calendarRoute.get("/province/:provinceId", async (req, res) => {
+    try {
+        const provinceId = req.params.provinceId;
+        const provinceWithCalendars = await db.province.findUnique({
+            where: { name: provinceId },
+            include: {
+                calendars: {
+                    where: { startDate: { gte: new Date() } },
+                    orderBy: {
+                        startDate: "asc", // Sorting by date in ascending order
+                    },
+>>>>>>> 6ad2b41808e07d053f46e78b43e6a8026ddc67cb
                 },
             },
         },
@@ -26,6 +40,7 @@ calendarRoute.get('/province/:provinceId', catchAsync(async (req, res) => {
     if (!provinceWithCalendars) {
         throw new ExpressError('Province not found', 404);
     }
+<<<<<<< HEAD
     return res.status(200).json(provinceWithCalendars);
 }));
 calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calendarSchema), catchAsync(async (req, res) => {
@@ -50,6 +65,42 @@ calendarRoute.post('/create-calendar', isAuthenticated, isAdmin, validate(calend
         },
     });
     if (newCalendar) {
+=======
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!!" });
+    }
+});
+calendarRoute.post("/create-calendar", isAuthenticated, isAdmin, validate(calendarSchema), async (req, res) => {
+    try {
+        const data = req.body;
+        const { municipality, provinceId } = data;
+        const { startDate } = data;
+        const { endDate } = data;
+        const { repeat } = data;
+        // const parsedStartDate = new Date(startDate);
+        // const utcStartDate = new Date(
+        //   parsedStartDate.getTime() + parsedStartDate.getTimezoneOffset() * 60000
+        // );
+        const geoData = await geocoder
+            .forwardGeocode({
+            query: `${municipality}, ${provinceId}`,
+            limit: 1,
+        })
+            .send();
+        const location = geoData.body.features[0].geometry;
+        console.log(startDate);
+        const newCalendar = await db.calendar.create({
+            data: {
+                ...data,
+                provinceId: data.provinceId,
+                location: location,
+                startDate: startDate,
+                repeat: repeat,
+                endDate: endDate || null,
+            },
+        });
+>>>>>>> 6ad2b41808e07d053f46e78b43e6a8026ddc67cb
         return res.status(200).json(newCalendar);
     }
     throw new ExpressError('Failed to create calendar', 400);

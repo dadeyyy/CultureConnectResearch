@@ -1,5 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -16,27 +16,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { registration } from '@/lib/validation';
-import { z } from 'zod';
-import toast from 'react-hot-toast';
-import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { registration } from "@/lib/validation";
+import { z } from "zod";
+import toast from "react-hot-toast";
+import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof registration>>({
     resolver: zodResolver(registration),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
   const [page, setPage] = useState(1);
@@ -48,9 +48,7 @@ const RegisterForm = () => {
     if (event.target.checked) {
       setCheckedInterests((prevInterests) => [...prevInterests, id]);
     } else {
-      setCheckedInterests((prevInterests) =>
-        prevInterests.filter((interest) => interest !== id)
-      );
+      setCheckedInterests((prevInterests) => prevInterests.filter((interest) => interest !== id));
     }
   };
 
@@ -68,10 +66,10 @@ const RegisterForm = () => {
       };
 
       try {
-        const response = await fetch('http://localhost:8000/signup', {
-          method: 'POST',
+        const response = await fetch("http://localhost:8000/signup", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(updatedValues),
         });
@@ -79,13 +77,13 @@ const RegisterForm = () => {
         if (response.ok) {
           toast.success('Confirmation email sent. Please check your email');
           setPage(1);
-          return navigate('/signin');
+          return navigate("/signin");
         } else {
           toast.error(`${data.error}`);
         }
       } catch (error) {
-        toast.error('Failed to sign-up');
-        return navigate('/signup');
+        toast.error("Failed to sign-up");
+        return navigate("/signup");
       }
     }
   };
@@ -93,16 +91,10 @@ const RegisterForm = () => {
   return (
     <div className="sm:w-420 items-center flex-col">
       <div className="flex justify-center items-center">
-        <img
-          src="/assets/images/logo-2.svg"
-          alt="logo"
-          className="h-20 w-100"
-        />
+        <img src="/assets/images/logo-2.svg" alt="logo" className="h-20 w-100" />
       </div>
       <div className="text-center sm:text-center sm:w-100 text-xl ">
-        <p className="font-bold h-5 text-blue-800">
-          Connecting different cultures
-        </p>
+        <p className="font-bold h-5 text-blue-800">Connecting different cultures</p>
         <p className="font-bold text-red-700">in the Philippines</p>
       </div>
       <h2 className="font-bold pt-5 sm:py-5">Sign up to CultureConnect</h2>
@@ -140,11 +132,7 @@ const RegisterForm = () => {
                             <FormItem>
                               <FormLabel>First Name</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="text"
-                                  placeholder="Juan"
-                                  {...field}
-                                />
+                                <Input type="text" placeholder="Juan" {...field} />
                               </FormControl>
                               <FormMessage className="shad-form_message" />
                             </FormItem>
@@ -157,11 +145,7 @@ const RegisterForm = () => {
                             <FormItem>
                               <FormLabel>Last Name</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="text"
-                                  placeholder="Dela Cruz"
-                                  {...field}
-                                />
+                                <Input type="text" placeholder="Dela Cruz" {...field} />
                               </FormControl>
                               <FormMessage className="shad-form_message" />
                             </FormItem>
@@ -175,11 +159,7 @@ const RegisterForm = () => {
                           <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                              <Input
-                                type="text"
-                                placeholder="juandelacruz1"
-                                {...field}
-                              />
+                              <Input type="text" placeholder="juandelacruz1" {...field} />
                             </FormControl>
                             <FormMessage className="shad-form_message" />
                           </FormItem>
@@ -192,11 +172,7 @@ const RegisterForm = () => {
                           <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                              <Input
-                                type="email"
-                                placeholder="example@test.com"
-                                {...field}
-                              />
+                              <Input type="email" placeholder="example@test.com" {...field} />
                             </FormControl>
                             <FormMessage className="shad-form_message" />
                           </FormItem>
@@ -248,8 +224,8 @@ const RegisterForm = () => {
                             key={interest.value}
                             className={`flex gap-2 py-1 px-5 rounded-xl border ${
                               checkedInterests.includes(interest.value)
-                                ? 'border-blue-500'
-                                : 'border-gray-300'
+                                ? "border-blue-500"
+                                : "border-gray-300"
                             }`}
                           >
                             <input
@@ -257,10 +233,7 @@ const RegisterForm = () => {
                               id={interest.value}
                               onChange={handleCheckboxChange}
                             />
-                            <label
-                              htmlFor={interest.value}
-                              className="text-base font-medium"
-                            >
+                            <label htmlFor={interest.value} className="text-base font-medium">
                               {interest.label}
                             </label>
                           </div>
@@ -272,7 +245,7 @@ const RegisterForm = () => {
                   <DialogFooter>
                     <Button
                       type="button"
-                      className={`my-5 ${page === 1 ? 'hidden' : 'block'}`}
+                      className={`my-5 ${page === 1 ? "hidden" : "block"}`}
                       onClick={() => {
                         setPage(page - 1);
                       }}
@@ -280,7 +253,7 @@ const RegisterForm = () => {
                       Back
                     </Button>
                     <Button type="submit" className="my-5">
-                      {page === 1 ? 'Next' : 'Submit'}
+                      {page === 1 ? "Next" : "Submit"}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -293,8 +266,8 @@ const RegisterForm = () => {
       <div className="flex flex-col gap-1 w-full mt-1">
         <div className="flex items-center space-x-2 my-5">
           <p className="text-xs">
-            By creating an account, you agree to the Terms of Service and <br />{' '}
-            Privacy Policy, including Cookie Use.
+            By creating an account, you agree to the Terms of Service and <br /> Privacy Policy,
+            including Cookie Use.
           </p>
         </div>
         <p className="text-center text-small-regular mt-5">
@@ -309,19 +282,19 @@ const RegisterForm = () => {
 };
 
 const interests = [
-  { label: 'Culture', value: 'culture' },
-  { label: 'Festivals', value: 'festivals' },
-  { label: 'Fiesta', value: 'fiesta' },
-  { label: 'Art', value: 'art' },
-  { label: 'Music', value: 'music' },
-  { label: 'Food', value: 'food' },
-  { label: 'History', value: 'history' },
-  { label: 'People', value: 'People' },
-  { label: 'Language', value: 'language' },
-  { label: 'Traditions', value: 'traditions' },
-  { label: 'Religion', value: 'religion' },
-  { label: 'Dance', value: 'dance' },
-  { label: 'Architecture', value: 'architecture' },
+  { label: "Culture", value: "culture" },
+  { label: "Festivals", value: "festivals" },
+  { label: "Fiesta", value: "fiesta" },
+  { label: "Art", value: "art" },
+  { label: "Music", value: "music" },
+  { label: "Food", value: "food" },
+  { label: "History", value: "history" },
+  { label: "People", value: "People" },
+  { label: "Language", value: "language" },
+  { label: "Traditions", value: "traditions" },
+  { label: "Religion", value: "religion" },
+  { label: "Dance", value: "dance" },
+  { label: "Architecture", value: "architecture" },
 ];
 
 export default RegisterForm;

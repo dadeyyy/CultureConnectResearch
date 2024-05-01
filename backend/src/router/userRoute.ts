@@ -19,6 +19,43 @@ userRoute.get(
   })
 );
 
+//getCurrentUser
+userRoute.get("/user-current", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+
+    if (!userId) {
+      return res.status(403).json({ error: "no user session" });
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (user) {
+      return res.status(200).json({
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          province: user.province,
+          imageUrl: user.avatarUrl,
+          bio: user.bio,
+        },
+      });
+    }
+    return res.status(404).json({ error: "Can't find user" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 //GET USER BY ID
 userRoute.get(
   '/user/:userId',
@@ -87,5 +124,28 @@ userRoute.get(
 
 //   console.log(data);
 // })
+
+userRoute.get("/admins-users", async (req, res) => {
+  try {
+    const userRole = String(req.session.user?.role); // Convert userId to string
+
+    // if (userRole !== "SUPERADMIN") {
+    //   return res.status(401).json({ error: "User needs to be superdamin" });
+    // }
+
+    const people = await db.user.findMany({
+      where: {
+        role: "ADMIN",
+      },
+      orderBy: {
+        province: "asc", // or "desc" for descending order
+      },
+    });
+
+    res.status(200).json({ people });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default userRoute;

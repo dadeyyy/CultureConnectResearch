@@ -34,6 +34,7 @@ calendarRoute.get(
       where: { name: provinceId },
       include: {
         calendars: {
+          where: { startDate: { gte: new Date() } },
           orderBy: {
             startDate: 'asc', // Sorting by date in ascending order
           },
