@@ -26,11 +26,6 @@ import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://thtnjmmhcbvokonvsfsr.supabase.co';
-const supabaseAnonKey =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRodG5qbW1oY2J2b2tvbnZzZnNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4OTUxMDAsImV4cCI6MjAyMDQ3MTEwMH0.GON_tySFWBpm6MZtN-_XnzC6vbb9E2SuMwbxcHfBip4';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 const RegisterForm = () => {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof registration>>({
@@ -59,32 +54,11 @@ const RegisterForm = () => {
     }
   };
 
-  // const sendOTP = async (email: string, password: string) => {
-  //   try {
-  //     const { data, error } = await supabase.auth.signUp({
-  //       email: email,
-  //       password: password,
-  //       options: {
-  //         emailRedirectTo: 'https://example.com/welcome',
-  //       },
-  //     });
-  //     console.log(data);
-  //     if (error) {
-  //       console.error('Error sending OTP:', error.message);
-  //     } else {
-  //       console.log('OTP sent successfully');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error sending OTP:');
-  //   }
-  // };
-
   // BACKEND SERVER SUBMISSION
   const onSubmit = async (values: z.infer<typeof registration>) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
     if (page === 1) {
-      // sendOTP(values.email, values.password);
       setPage(2);
     } else if (page === 2) {
       const { confirmPassword, ...signUpValues } = values;
@@ -103,7 +77,7 @@ const RegisterForm = () => {
         });
         const data = await response.json();
         if (response.ok) {
-          toast.success('Successfully created user!');
+          toast.success('Confirmation email sent. Please check your email');
           setPage(1);
           return navigate('/signin');
         } else {

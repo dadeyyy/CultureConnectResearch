@@ -184,7 +184,9 @@ const Profile = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/user/${id}`);
+        const response = await fetch(`http://localhost:8000/user/${id}`,
+          {credentials:'include'}
+        );
         const data = await response.json();
         if (response.ok) {
           setCurrentUser((prevUser) => ({

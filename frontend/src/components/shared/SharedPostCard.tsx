@@ -187,7 +187,7 @@ const SharedPostCard = ({ id, caption, userId, createdAt, postId, author }: Post
                   filterInappropriateWords(post?.caption)
                 ) : (
                   <>
-                    {filterInappropriateWords(truncatedCaption)}
+                    {filterInappropriateWords(truncatedCaption || '')}
                     {caption.length > 156 && (
                       <>
                         <span> </span> {/* Add a space for visual separation */}

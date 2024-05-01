@@ -36,9 +36,9 @@ const LoginForm = () => {
         body: JSON.stringify(values),
         credentials: "include",
       });
-
-      if (response.ok) {
-        const { user } = await response.json();
+      const { user, error } = await response.json();
+      if (response.ok && !error) {
+        
         toast.success("Successfully logged in");
 
         // Update the AuthContext with the user information from the login response
@@ -64,11 +64,12 @@ const LoginForm = () => {
         }
       } else {
         console.error("Login failed");
-        toast.error("Failed to sign in");
+        toast.error(error);
         return navigate("/signin");
       }
     } catch (error) {
       console.error("Error submitting login:", error);
+      toast.error('Failed to login')
     }
   };
 

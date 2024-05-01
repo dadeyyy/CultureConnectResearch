@@ -202,8 +202,9 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
       </div>
       <a
         onClick={() => {
-          navigate(`/${type === "regular" ? "posts" : "shared"}/${postId}`);
+          navigate(`/${type === "regular" ? "posts" : "shared-post"}/${postId}`);
         }}
+
         className={`hover:cursor-pointer focus:outline-none  ${showComments ? "hidden" : ""}`}
       >
         <div className="flex flex-row gap-1">

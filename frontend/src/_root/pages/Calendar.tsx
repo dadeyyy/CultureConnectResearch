@@ -30,8 +30,7 @@ import CalendarForm from "@/components/forms/CalendarForm";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import Loader from "@/components/shared/Loader";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
+mapboxgl.accessToken ="pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
 
 interface IEvent {
   id: string;
@@ -252,7 +251,7 @@ const Calendar = () => {
           <Dialog>
             <DialogTrigger asChild>
               {user.role === "ADMIN" &&
-              user.province.toLowerCase() === selectedProvince.toLowerCase() ? (
+              user.province?.toLowerCase() === selectedProvince.toLowerCase() ? (
                 <Button className="xs:hidden lg:flex w-full my-5">Add Event</Button>
               ) : (
                 <></>

@@ -24,15 +24,17 @@ import Explore from "./_root/pages/Explore";
 import ArchiveCategory from "./_root/pages/ArchiveCategory";
 import LiveDetails from "./_root/pages/LiveDetails";
 import SharedPostDetails from "./_root/pages/SharedPostDetails";
-import SupaAdmin from "./_root/SupaAdmin";
-
+import ConfirmEmail from "./_root/pages/ConfirmEmail";
+// import SupaAdmin from "./_superadmin/pages/SupaAdmin";
+// import SuperAdminLayout from "./_superadmin/SuperAdminLayout";
+// import Admins from "./_superadmin/pages/Admins";
 
 const App = () => {
   return (
     <main className="flex h-screen">
       <Routes>
         <Route index element={<LandingPage />} />
-
+        <Route element={<ConfirmEmail/>}/>
         {/* Login/ Register routes */}
         <Route element={<AuthLayout />}>
           <Route path="/signup" element={<RegisterForm />} />
@@ -62,7 +64,10 @@ const App = () => {
         </Route>
 
         {/* SUPERADM IN ROUTE */}
-        <Route path="/superadmin" element={<SupaAdmin />} />
+        {/* <Route element={<SuperAdminLayout />}>
+          <Route path="/superadmin" element={<SupaAdmin />} />
+          <Route path="/admins" element={<Admins />} />
+        </Route> */}
       </Routes>
 
       <Toaster position="top-center" reverseOrder={false} />
