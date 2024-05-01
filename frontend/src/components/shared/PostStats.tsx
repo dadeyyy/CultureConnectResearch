@@ -202,7 +202,7 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
       </div>
       <a
         onClick={() => {
-          navigate(`/${type === "regular" ? "posts" : "shared"}/${postId}`);
+          navigate(`/${type === "regular" ? `posts/${postId}` : `shared-post/${shareId}`}`);
         }}
         className={`hover:cursor-pointer focus:outline-none  ${showComments ? "hidden" : ""}`}
       >

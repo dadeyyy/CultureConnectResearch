@@ -27,6 +27,7 @@ import SharedPostDetails from "./_root/pages/SharedPostDetails";
 import SupaAdmin from "./_superadmin/pages/SupaAdmin";
 import SuperAdminLayout from "./_superadmin/SuperAdminLayout";
 import Admins from "./_superadmin/pages/Admins";
+import Notifications from "./_root/pages/Notifications";
 
 const App = () => {
   return (
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/archives" element={<Archives />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/map" element={<MapForm />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/reports" element={<Reports />} />

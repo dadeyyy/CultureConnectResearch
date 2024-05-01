@@ -30,11 +30,6 @@ const Bottombar = () => {
       label: "Live Streams",
     },
     {
-      imgURL: "/assets/icons/notification.svg",
-      route: "/notifications",
-      label: "Notifications",
-    },
-    {
       imgURL: "/assets/icons/create.svg",
       route: "/create-post",
       label: "Post",
