@@ -1,101 +1,97 @@
-import express from "express";
-import { db } from "../utils/db.server.js";
-import { catchAsync } from "../middleware/errorHandler.js";
-import { Request, Response } from "express";
-import ExpressError from "../middleware/ExpressError.js";
+import express from 'express';
+import { db } from '../utils/db.server.js';
+import { catchAsync } from '../middleware/errorHandler.js';
+import { Request, Response } from 'express';
+import ExpressError from '../middleware/ExpressError.js';
 import {
   isAuthenticated,
   isProvinceAdmin,
   validate,
-} from "../middleware/middleware.js";
-import { uploadHeritage } from "../utils/cloudinary.js";
-import { heritageSchema, heritageTypeSchema } from "../utils/Schemas.js";
-import Geocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
+} from '../middleware/middleware.js';
+import { uploadHeritage } from '../utils/cloudinary.js';
+import { heritageSchema, heritageTypeSchema } from '../utils/Schemas.js';
+import Geocoding from '@mapbox/mapbox-sdk/services/geocoding.js';
+import * as dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const heritageRoute = express.Router();
 
-const mapboxToken = process.env.MAPBOX_TOKEN;
-
-const geocoder = Geocoding({ accessToken: mapboxToken as string });
+const geocoder = Geocoding({ accessToken: process.env.MAPBOX_TOKEN as string });
 
 type GeoJsonPoint = {
-  type: "Point";
+  type: 'Point';
   coordinates: number[];
 };
 
 heritageRoute.get(
-  "/heritages",
+  '/heritages',
   isAuthenticated,
   catchAsync(async (req: Request, res: Response) => {
-    console.log("test");
+    console.log('test');
     const allHeritage = await db.heritage.findMany({
       include: { files: true },
     });
-
     if (allHeritage) {
       return res.status(200).json(allHeritage);
     }
-
-    throw new ExpressError("No heritage", 404);
   })
 );
 
 heritageRoute.post(
-  "/heritage/:province",
+  '/heritage/:province',
   isAuthenticated,
   isProvinceAdmin,
-  uploadHeritage.array("heritage"),
+  uploadHeritage.array('heritage'),
   validate(heritageSchema),
   catchAsync(async (req: Request, res: Response) => {
-    try {
-      const data: heritageTypeSchema = req.body;
-      console.log("Data", data);
-      const files = req.files as Express.Multer.File[];
-      const heritageFile = files.map((file) => ({
-        url: file.path,
-        filename: file.filename,
-      }));
+    const data: heritageTypeSchema = req.body;
+    console.log('Data', data);
+    const files = req.files as Express.Multer.File[];
+    const heritageFile = files.map((file) => ({
+      url: file.path,
+      filename: file.filename,
+    }));
 
-      const geoData = await geocoder
-        .forwardGeocode({
-          query: `${data.municipality}, ${req.session.user?.province ?? ""}`,
-          limit: 1,
-        })
-        .send();
+    const geoData = await geocoder
+      .forwardGeocode({
+        query: `${data.municipality}, ${req.session.user?.province ?? ''}`,
+        limit: 1,
+      })
+      .send();
 
-      const location: GeoJsonPoint = geoData.body.features[0].geometry;
+    const location: GeoJsonPoint = geoData.body.features[0].geometry;
 
-      const newHeritage = await db.heritage.create({
-        data: {
-          ...data,
-          location: location,
-          userId: req.session.user?.id,
+    const newHeritage = await db.heritage.create({
+      data: {
+        ...data,
+        location: location,
+        userId: req.session.user?.id,
 
-          files: {
-            create: heritageFile,
-          },
+        files: {
+          create: heritageFile,
         },
-        include: {
-          files: true,
-          user: true,
-        },
+      },
+      include: {
+        files: true,
+        user: true,
+      },
+    });
+
+    if (newHeritage) {
+      return res.status(201).json({
+        message: 'Successfully created new heritage',
+        data: newHeritage,
       });
-
-      console.log(newHeritage);
-      if (newHeritage) {
-        return res.status(201).json({
-          message: "Successfully created new heritage",
-          data: newHeritage,
-        });
-      }
-    } catch (err) {
-      console.log(err);
     }
+    throw new ExpressError('Failed to create new heritage',400)
   })
 );
 
 heritageRoute.delete(
-  "/heritage/:province/:heritageId",
+  '/heritage/:province/:heritageId',
   isAuthenticated,
   isProvinceAdmin,
   catchAsync(async (req: Request, res: Response) => {
@@ -111,7 +107,7 @@ heritageRoute.delete(
     });
 
     if (!heritage) {
-      throw new ExpressError("No heritage", 404);
+      throw new ExpressError('No heritage', 404);
     }
 
     const deletedHeritage = await db.heritage.delete({
@@ -121,17 +117,10 @@ heritageRoute.delete(
     });
 
     if (deletedHeritage) {
-      return res.status(200).json({ message: "Heritage deleted succesfully" });
+      return res.status(200).json({ message: 'Heritage deleted succesfully' });
     }
 
-    throw new ExpressError("Failed to delete heritage", 400);
+    throw new ExpressError('Failed to delete heritage', 400);
   })
 );
-
-heritageRoute.get("/deleteHeritage", async (req, res) => {
-  const deletedHeritage = await db.heritage.deleteMany();
-
-  res.json(deletedHeritage);
-});
-
 export default heritageRoute;

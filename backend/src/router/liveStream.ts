@@ -9,6 +9,13 @@ import { db } from '../utils/db.server.js';
 import { isAuthenticated } from '../middleware/middleware.js';
 import { catchAsync } from '../middleware/errorHandler.js';
 import ExpressError from '../middleware/ExpressError.js';
+import * as dotenv from 'dotenv'
+import { liveStream, selectedLiveStream } from '../utils/cloudflare.js';
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
+
 const liveStreamRoute = express.Router();
 
 //GET ongoing livestream
@@ -16,16 +23,7 @@ liveStreamRoute.get(
   '/getLiveStreams',
   // isAuthenticated,
   catchAsync(async (req: Request, res: Response) => {
-    const onGoingLive = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream?status=live-inprogress`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-          Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        },
-      }
-    );
+    const onGoingLive = await liveStream('live-inprogress')
 
     const onGoingLiveData =
       (await onGoingLive.json()) as pastLiveStreamApiResponse;
@@ -42,23 +40,11 @@ liveStreamRoute.get(
 liveStreamRoute.get(
   '/pastLiveStreams',
   catchAsync(async (req: Request, res: Response) => {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream?status=ready`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-          Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        },
-      }
-    );
-
-    const data = (await response.json()) as pastLiveStreamApiResponse;
-
+    const pastLiveStreams = await liveStream('ready')
+    const data = (await pastLiveStreams.json()) as pastLiveStreamApiResponse;
     if (data.success) {
       return res.status(200).json(data.result);
     }
-
     throw new ExpressError('Past Livestream error', 400);
   })
 );
@@ -69,25 +55,15 @@ liveStreamRoute.get(
   isAuthenticated,
   catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const selectedLive = await selectedLiveStream(id);
 
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${id}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-          Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        },
-      }
-    );
-
-    const video = (await response.json()) as editVideoTypes;
+    const video = (await selectedLive.json()) as editVideoTypes;
 
     if (video.success) {
       return res.status(200).json(video.result);
     }
 
-    throw new ExpressError('Specific livestream error', 400);
+    throw new ExpressError('Selected livestream error', 400);
   })
 );
 
@@ -123,16 +99,7 @@ liveStreamRoute.post(
     const currentUser = await db.user.findUnique({ where: { id: user } });
 
     if (user && currentUser) {
-      const onGoingLive = await fetch(
-        `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream?status=live-inprogress`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-            Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-          },
-        }
-      );
+      const onGoingLive = await liveStream('live-inprogress')
 
       const onGoingLiveData =
         (await onGoingLive.json()) as pastLiveStreamApiResponse;
@@ -148,17 +115,8 @@ liveStreamRoute.post(
         const valueOfVideoUID = videoUID[0];
 
         //Retrieve the specific video
-        const videoDetails = await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${valueOfVideoUID}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-              Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-            },
-          }
-        );
-
+        const videoDetails = await selectedLiveStream(valueOfVideoUID)
+  
         const videoDetailsData = (await videoDetails.json()) as editVideoTypes;
 
         //Check if the video is already saved in the database
@@ -256,16 +214,7 @@ liveStreamRoute.get('/fetchLiveStreams/:id', catchAsync( async (req:Request, res
 
   const id = req.params.id;
 
-  const liveStreams = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-        Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-      },
-    }
-  );
+  const liveStreams = await liveStream();
 
   const liveStreamsData =
     (await liveStreams.json()) as pastLiveStreamApiResponse;

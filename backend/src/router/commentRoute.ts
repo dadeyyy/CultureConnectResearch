@@ -1,12 +1,22 @@
-import express from "express";
-import { db } from "../utils/db.server.js";
-import { isAuthenticated, validate, isCommentAuthor } from "../middleware/middleware.js";
-import { commentSchema, commentTypeSchema } from "../utils/Schemas.js";
+import express from 'express';
+import { db } from '../utils/db.server.js';
+import {
+  isAuthenticated,
+  validate,
+  isCommentAuthor,
+} from '../middleware/middleware.js';
+import { commentSchema, commentTypeSchema } from '../utils/Schemas.js';
+import { catchAsync } from '../middleware/errorHandler.js';
+import { Request, Response } from 'express';
+import ExpressError from '../middleware/ExpressError.js';
 
 const commentRoute = express.Router();
 
-commentRoute.get("/post/:postId/comments", isAuthenticated, async (req, res) => {
-  try {
+//Finding comments
+commentRoute.get(
+  '/post/:postId/comments',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const postId = req.params.postId;
 
     //find post with and its comment;
@@ -15,21 +25,18 @@ commentRoute.get("/post/:postId/comments", isAuthenticated, async (req, res) => 
         postId: +postId,
       },
     });
-
     if (comments) {
       return res.status(200).json({ comments });
     }
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
 commentRoute.post(
-  "/post/:postId/comment",
+  '/post/:postId/comment',
   isAuthenticated,
   validate(commentSchema),
-  async (req, res) => {
-    const postId = req.params.postId;
+  catchAsync(async (req: Request, res: Response) => {
+    const { postId } = req.params;
     const userId = req.session.user?.id;
     const data: commentTypeSchema = req.body;
 
@@ -52,97 +59,88 @@ commentRoute.post(
           },
         },
       });
-
-      console.log(comment);
-
       return res.status(201).json({ message: `Commented ${comment}`, comment });
-    } else {
-      console.log("No post found");
-      return res.status(404).json({ error: "Can't find post" });
     }
-  }
+    throw new ExpressError('No post found', 404);
+  })
 );
 
 commentRoute.put(
-  "/post/:postId/comment/:commentId",
+  '/post/:postId/comment/:commentId',
   isAuthenticated,
   isCommentAuthor,
   validate(commentSchema),
-  async (req, res) => {
-    try {
-      const commentId = req.params.commentId;
-      const data: commentTypeSchema = req.body;
+  catchAsync(async (req: Request, res: Response) => {
+    const { commentId } = req.params;
+    const data: commentTypeSchema = req.body;
 
-      const updateComment = await db.comment.update({
-        where: {
-          id: +commentId,
-        },
-        data: {
-          ...data,
-        },
-        include: {
-          user: true,
-        },
-      });
-
+    const updateComment = await db.comment.update({
+      where: {
+        id: +commentId,
+      },
+      data: {
+        ...data,
+      },
+      include: {
+        user: true,
+      },
+    });
+    if (updateComment) {
       return res.status(200).json({
-        message: "Successfully updated the comment!",
+        message: 'Successfully updated the comment!',
         data: updateComment,
       });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error, message: "INTERNAL SERVER ERROR" });
     }
-  }
+    throw new ExpressError('Failed to update comment', 400);
+  })
 );
 
 commentRoute.delete(
-  "/post/:postId/comment/:commentId",
+  '/post/:postId/comment/:commentId',
   isAuthenticated,
   isCommentAuthor,
-  async (req, res) => {
-    try {
-      const { commentId } = req.params;
+  catchAsync(async (req: Request, res: Response) => {
+    const { commentId } = req.params;
 
-      const deletedComment = await db.comment.delete({
-        where: {
-          id: +commentId,
-        },
-        include: {
-          user: true,
-        },
-      });
-
+    const deletedComment = await db.comment.delete({
+      where: {
+        id: +commentId,
+      },
+      include: {
+        user: true,
+      },
+    });
+    if (deletedComment) {
       return res.status(200).json({
-        message: "Successfully deleted comment",
+        message: 'Successfully deleted comment',
         data: deletedComment,
       });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
     }
-  }
+    throw new ExpressError('Failed to delete comment', 400);
+  })
 );
 
-commentRoute.get("/post/:postId/comments", isAuthenticated, async (req, res) => {
-  try {
-    const postId = req.params.postId;
+commentRoute.get(
+  '/post/:postId/comments',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
+    const { postId } = req.params;
 
     const commentCount = await db.comment.count({
       where: {
         postId: +postId,
       },
     });
+    if (commentCount) {
+      return res.status(200).json({ commentCount });
+    }
+  })
+);
 
-    return res.status(200).json({ commentCount });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-commentRoute.get("/shared-post/:postId/comments", isAuthenticated, async (req, res) => {
-  try {
+commentRoute.get(
+  '/shared-post/:postId/comments',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const postId = req.params.postId;
 
     // Find shared post and its comments
@@ -155,18 +153,15 @@ commentRoute.get("/shared-post/:postId/comments", isAuthenticated, async (req, r
     if (comments) {
       return res.status(200).json({ comments });
     }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+  })
+);
 
 commentRoute.post(
-  "/shared-post/:postId/comment",
+  '/shared-post/:postId/comment',
   isAuthenticated,
   validate(commentSchema),
-  async (req, res) => {
-    const postId = req.params.postId;
+  catchAsync(async (req: Request, res: Response) => {
+    const { postId } = req.params;
     const userId = req.session.user?.id;
     const data: commentTypeSchema = req.body;
 
@@ -190,92 +185,84 @@ commentRoute.post(
         },
       });
 
-      console.log(comment);
-
-      return res.status(201).json({ message: `Commented on Shared Post`, comment });
-    } else {
-      console.log("No shared post found");
-      return res.status(404).json({ error: "Can't find shared post" });
+      return res
+        .status(201)
+        .json({ message: `Commented on Shared Post`, comment });
     }
-  }
+    throw new ExpressError('No shared post found', 404);
+  })
 );
 
 commentRoute.put(
-  "/shared-post/:postId/comment/:commentId",
+  '/shared-post/:postId/comment/:commentId',
   isAuthenticated,
   isCommentAuthor,
   validate(commentSchema),
-  async (req, res) => {
-    try {
-      const commentId = req.params.commentId;
-      const data: commentTypeSchema = req.body;
+  catchAsync(async (req: Request, res: Response) => {
+    const { commentId } = req.params;
+    const data: commentTypeSchema = req.body;
 
-      const updateComment = await db.comment.update({
-        where: {
-          id: +commentId,
-        },
-        data: {
-          ...data,
-        },
-        include: {
-          user: true,
-        },
-      });
-
+    const updateComment = await db.comment.update({
+      where: {
+        id: +commentId,
+      },
+      data: {
+        ...data,
+      },
+      include: {
+        user: true,
+      },
+    });
+    if (updateComment) {
       return res.status(200).json({
-        message: "Successfully updated the comment!",
+        message: 'Successfully updated the comment!',
         data: updateComment,
       });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error, message: "INTERNAL SERVER ERROR" });
     }
-  }
+    throw new ExpressError('Failed to update comment', 404);
+  })
 );
 
 commentRoute.delete(
-  "/shared-post/:postId/comment/:commentId",
+  '/shared-post/:postId/comment/:commentId',
   isAuthenticated,
   isCommentAuthor,
-  async (req, res) => {
-    try {
-      const { commentId } = req.params;
-
-      const deletedComment = await db.comment.delete({
-        where: {
-          id: +commentId,
-        },
-        include: {
-          user: true,
-        },
-      });
-
+  catchAsync(async (req: Request, res: Response) => {
+    const { commentId } = req.params;
+    const deletedComment = await db.comment.delete({
+      where: {
+        id: +commentId,
+      },
+      include: {
+        user: true,
+      },
+    });
+    if (deletedComment) {
       return res.status(200).json({
-        message: "Successfully deleted comment",
+        message: 'Successfully deleted comment',
         data: deletedComment,
       });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
     }
-  }
+
+    throw new ExpressError('Failed to delete comment', 400);
+  })
 );
 
-commentRoute.get("/shared-post/:postId/comments-count", isAuthenticated, async (req, res) => {
-  try {
-    const postId = req.params.postId;
+commentRoute.get(
+  '/shared-post/:postId/comments-count',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
+    const { postId } = req.params;
 
     const commentCount = await db.comment.count({
       where: {
         sharedId: +postId,
       },
     });
-
-    return res.status(200).json({ commentCount });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+    if (commentCount) {
+      return res.status(200).json({ commentCount });
+    }
+  })
+);
 
 export default commentRoute;

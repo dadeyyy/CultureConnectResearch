@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import * as z from 'zod';
 import { db } from '../utils/db.server.js';
 import ExpressError from './ExpressError.js';
@@ -19,7 +19,7 @@ export const validate =
   };
 
 export function isAuthenticated(req: Request, res: Response, next: () => void) {
-  if (req.session.user) {
+  if (req.session && req.session.user) {
     next();
   } else {
     throw new ExpressError('Not authenticated', 401);
@@ -121,3 +121,5 @@ export const isProvinceAdmin = (
       .json({ error: `Not an admin of province ${province}` });
   }
 };
+
+

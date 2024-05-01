@@ -1,14 +1,26 @@
-import express from "express";
-import { isAuthenticated, isAuthor, validate } from "../middleware/middleware.js";
-import { db } from "../utils/db.server.js";
-import { upload, cloudinary } from "../utils/cloudinary.js";
-import { postSchema, postTypeSchema, sharedPostTypeSchema } from "../utils/Schemas.js";
-
+import express from 'express';
+import {
+  isAuthenticated,
+  isAuthor,
+  validate,
+} from '../middleware/middleware.js';
+import { db } from '../utils/db.server.js';
+import { upload, cloudinary } from '../utils/cloudinary.js';
+import {
+  postSchema,
+  postTypeSchema,
+  sharedPostTypeSchema,
+} from '../utils/Schemas.js';
+import ExpressError from '../middleware/ExpressError.js';
+import { Request, Response } from 'express';
+import { catchAsync } from '../middleware/errorHandler.js';
 const shareRoute = express.Router();
 
 // GET SPECIFIC SHARED POST
-shareRoute.get("/shared-post/:id", async (req, res) => {
-  try {
+shareRoute.get(
+  '/shared-post/:id',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     // Get parameter ID
     const sharedId = parseInt(req.params.id);
 
@@ -55,21 +67,20 @@ shareRoute.get("/shared-post/:id", async (req, res) => {
     }
 
     // If not, return not found
-    return res.status(404).json({ error: "Post not found!" });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
+    throw new ExpressError('Post not found', 404);
+  })
+);
 
 // Share a post
-shareRoute.post("/post/share/:postId", isAuthenticated, async (req, res) => {
-  try {
+shareRoute.post(
+  '/post/share/:postId',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const postId = parseInt(req.params.postId);
     const userId = req.session.user?.id;
     const data: sharedPostTypeSchema = req.body;
     if (!userId) {
-      return res.status(401).json({ error: "User not authenticated" });
+      throw new ExpressError('User not authenticated', 401);
     }
 
     const postToShare = await db.post.findUnique({
@@ -84,7 +95,7 @@ shareRoute.post("/post/share/:postId", isAuthenticated, async (req, res) => {
     });
 
     if (!postToShare) {
-      return res.status(404).json({ error: "Post not found" });
+      throw new ExpressError('Post not found', 404);
     }
 
     // Create a new shared post entry
@@ -99,17 +110,21 @@ shareRoute.post("/post/share/:postId", isAuthenticated, async (req, res) => {
         user: true,
       },
     });
+    if (sharedPost) {
+      return res
+        .status(201)
+        .json({ message: 'Post shared successfully', data: sharedPost });
+    }
 
-    return res.status(201).json({ message: "Post shared successfully", data: sharedPost });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
+    throw new ExpressError('Failed to share post', 400);
+  })
+);
 
 // Fetch shared posts
-shareRoute.get("/post/shared", async (req, res) => {
-  try {
+shareRoute.get(
+  '/post/shared',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const limit: number = parseInt(req.query.limit as string) || 1;
     const offset: number = parseInt(req.query.offset as string) || 0;
 
@@ -136,22 +151,20 @@ shareRoute.get("/post/shared", async (req, res) => {
       take: limit,
       skip: offset,
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     res.status(200).json(sharedPosts);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Cannot get the shared posts" });
-  }
-});
+  })
+);
 
 // DELETE sharedpost
-shareRoute.delete("/shared-post/:sharedId", isAuthenticated, async (req, res) => {
-  try {
+shareRoute.delete(
+  '/shared-post/:sharedId',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const sharedId = parseInt(req.params.sharedId);
-
     // Find shared post to delete
     const sharedPost = await db.sharedPost.findUnique({
       where: {
@@ -160,26 +173,30 @@ shareRoute.delete("/shared-post/:sharedId", isAuthenticated, async (req, res) =>
     });
 
     if (!sharedPost) {
-      return res.status(404).json({ error: "Can't find shared post!" });
+      throw new ExpressError("Can't find shared post", 404);
     }
 
     // Delete the shared post
-    await db.sharedPost.delete({
+    const deletedSharedPost = await db.sharedPost.delete({
       where: {
         id: sharedId,
       },
     });
 
-    return res.status(200).json({ message: `Successfully deleted shared post! #${sharedId}` });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error, message: "Internal Server Error!" });
-  }
-});
+    if (deletedSharedPost) {
+      return res
+        .status(200)
+        .json({ message: `Successfully deleted shared post! #${sharedId}` });
+    }
+    throw new ExpressError('Failed to delete shared post', 400);
+  })
+);
 
 // GET SPECIFIC SHARED POST
-shareRoute.get("/get-shared-post/:userId", async (req, res) => {
-  try {
+shareRoute.get(
+  '/get-shared-post/:userId',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     // Get parameter ID
     const userId = parseInt(req.params.userId);
 
@@ -205,8 +222,14 @@ shareRoute.get("/get-shared-post/:userId", async (req, res) => {
           include: {
             photos: true,
             user: {
-              select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true },
-            }, 
+              select: {
+                id: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+              },
+            },
           },
         },
       },
@@ -218,11 +241,8 @@ shareRoute.get("/get-shared-post/:userId", async (req, res) => {
     }
 
     // If not, return not found
-    return res.status(404).json({ error: "Post not found!" });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
+    throw new ExpressError('Post not found', 404)
+  })
+);
 
 export default shareRoute;

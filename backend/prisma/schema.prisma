@@ -28,6 +28,8 @@ model User {
   province           String?
   bio                String?
   avatarUrl          String?
+  confirmed          Boolean             @default(false)
+  confirmationToken  String?
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   posts              Post[]
@@ -46,6 +48,14 @@ model User {
   LiveStreamComments LiveStreamComment[]
   heritages          Heritage[]
 }
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt   DateTime
+}
+
 
 model Heritage {
   id           Int      @id @default(autoincrement())

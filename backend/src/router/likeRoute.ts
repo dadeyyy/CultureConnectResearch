@@ -1,12 +1,17 @@
-import express from "express";
-import { isAuthenticated } from "../middleware/middleware.js";
-import { db } from "../utils/db.server.js";
+import express from 'express';
+import { isAuthenticated } from '../middleware/middleware.js';
+import { db } from '../utils/db.server.js';
+import ExpressError from '../middleware/ExpressError.js';
+import { catchAsync } from '../middleware/errorHandler.js';
+import { Request, Response } from 'express';
 
 const likeRoute = express.Router();
 
 // Route to like/unlike a regular post
-likeRoute.post("/post/:postId/like", isAuthenticated, async (req, res) => {
-  try {
+likeRoute.post(
+  '/post/:postId/like',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const userId = req.session.user?.id;
     const { postId } = req.params;
 
@@ -31,7 +36,7 @@ likeRoute.post("/post/:postId/like", isAuthenticated, async (req, res) => {
         },
       });
 
-      res.status(200).json({ message: "Unliked successfully", count });
+      return res.status(200).json({ message: 'Unliked successfully', count });
     } else {
       // If like does not exist, create a new like for the post
       await db.like.create({
@@ -48,17 +53,16 @@ likeRoute.post("/post/:postId/like", isAuthenticated, async (req, res) => {
         },
       });
 
-      res.status(201).json({ message: "Liked successfully", count });
+      return res.status(201).json({ message: 'Liked successfully', count });
     }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
-  }
-});
+  })
+);
 
 // Route to get like status of a regular post
-likeRoute.get("/post/:postId/like-status", isAuthenticated, async (req, res) => {
-  try {
+likeRoute.get(
+  '/post/:postId/like-status',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const userId = req.session.user?.id;
     const { postId } = req.params;
 
@@ -77,16 +81,15 @@ likeRoute.get("/post/:postId/like-status", isAuthenticated, async (req, res) => 
       },
     });
 
-    res.status(200).json({ isLiked, count });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
-  }
-});
+    return res.status(200).json({ isLiked, count });
+  })
+);
 
 // Route to like/unlike a shared post
-likeRoute.post("/shared/:sharedId/like", isAuthenticated, async (req, res) => {
-  try {
+likeRoute.post(
+  '/shared/:sharedId/like',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
     const userId = req.session.user?.id;
     const { sharedId } = req.params;
 
@@ -111,7 +114,7 @@ likeRoute.post("/shared/:sharedId/like", isAuthenticated, async (req, res) => {
         },
       });
 
-      res.status(200).json({ message: "Unliked successfully", count });
+      res.status(200).json({ message: 'Unliked successfully', count });
     } else {
       // If like does not exist, create a new like for the shared post
       await db.like.create({
@@ -128,17 +131,17 @@ likeRoute.post("/shared/:sharedId/like", isAuthenticated, async (req, res) => {
         },
       });
 
-      res.status(201).json({ message: "Liked successfully", count });
+      res.status(201).json({ message: 'Liked successfully', count });
     }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
-  }
-});
+  })
+);
 
 // Route to get like status of a shared post
-likeRoute.get("/shared/:sharedId/like-status", isAuthenticated, async (req, res) => {
-  try {
+likeRoute.get(
+  '/shared/:sharedId/like-status',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
+    
     const userId = req.session.user?.id;
     const { sharedId } = req.params;
 
@@ -158,12 +161,7 @@ likeRoute.get("/shared/:sharedId/like-status", isAuthenticated, async (req, res)
     });
 
     res.status(200).json({ isLiked, count });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error, message: "INTERNAL SERVER ERROR!" });
-  }
-});
-
-
+  })
+);
 
 export default likeRoute;

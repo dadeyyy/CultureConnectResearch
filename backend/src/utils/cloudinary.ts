@@ -42,4 +42,15 @@ const heritageStorage = new CloudinaryStorage({
 
 const uploadHeritage = multer({storage: heritageStorage})
 
-export { cloudinary, storage, upload, uploadArchive, archiveStorage, heritageStorage, uploadHeritage };
+
+const profileStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'User Profiles',
+    allowedFormats: ['jpg', 'png', 'jpeg'],
+  } as any
+})
+
+const uploadProfile = multer({storage: profileStorage})
+
+export { cloudinary, storage, upload, uploadArchive, archiveStorage, heritageStorage, uploadHeritage , profileStorage, uploadProfile};

@@ -4,18 +4,17 @@ import { db } from '../utils/db.server.js';
 import { isAuthenticated } from '../middleware/middleware.js';
 import { catchAsync } from '../middleware/errorHandler.js';
 import ExpressError from '../middleware/ExpressError.js';
+import * as dotenv from 'dotenv';
+import { liveStream, selectedLiveStream } from '../utils/cloudflare.js';
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config();
+}
 const liveStreamRoute = express.Router();
 //GET ongoing livestream
 liveStreamRoute.get('/getLiveStreams', 
 // isAuthenticated,
 catchAsync(async (req, res) => {
-    const onGoingLive = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream?status=live-inprogress`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-            Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        },
-    });
+    const onGoingLive = await liveStream('live-inprogress');
     const onGoingLiveData = (await onGoingLive.json());
     if (onGoingLiveData.success) {
         return res.status(200).json(onGoingLiveData.result);
@@ -24,14 +23,8 @@ catchAsync(async (req, res) => {
 }));
 //Saved livestream videos
 liveStreamRoute.get('/pastLiveStreams', catchAsync(async (req, res) => {
-    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream?status=ready`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-            Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        },
-    });
-    const data = (await response.json());
+    const pastLiveStreams = await liveStream('ready');
+    const data = (await pastLiveStreams.json());
     if (data.success) {
         return res.status(200).json(data.result);
     }
@@ -40,18 +33,12 @@ liveStreamRoute.get('/pastLiveStreams', catchAsync(async (req, res) => {
 //Get specific livestream
 liveStreamRoute.get('/liveStream/:id', isAuthenticated, catchAsync(async (req, res) => {
     const { id } = req.params;
-    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${id}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-            Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        },
-    });
-    const video = (await response.json());
+    const selectedLive = await selectedLiveStream(id);
+    const video = (await selectedLive.json());
     if (video.success) {
         return res.status(200).json(video.result);
     }
-    throw new ExpressError('Specific livestream error', 400);
+    throw new ExpressError('Selected livestream error', 400);
 }));
 liveStreamRoute.get('/getUrlStreamKey', isAuthenticated, catchAsync(async (req, res) => {
     const sessionId = req.session.user?.id;
@@ -75,13 +62,7 @@ liveStreamRoute.post('/startLiveStream', isAuthenticated, catchAsync(async (req,
     const user = req.session.user?.id;
     const currentUser = await db.user.findUnique({ where: { id: user } });
     if (user && currentUser) {
-        const onGoingLive = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream?status=live-inprogress`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-                Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-            },
-        });
+        const onGoingLive = await liveStream('live-inprogress');
         const onGoingLiveData = (await onGoingLive.json());
         const liveInputValues = onGoingLiveData.result.map((stream) => stream.liveInput);
         const isLiveStreamOnGoing = liveInputValues.includes(body.uid);
@@ -90,13 +71,7 @@ liveStreamRoute.post('/startLiveStream', isAuthenticated, catchAsync(async (req,
             const videoUID = onGoingLiveData.result.map((stream) => stream.uid);
             const valueOfVideoUID = videoUID[0];
             //Retrieve the specific video
-            const videoDetails = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${valueOfVideoUID}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-                    Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-                },
-            });
+            const videoDetails = await selectedLiveStream(valueOfVideoUID);
             const videoDetailsData = (await videoDetails.json());
             //Check if the video is already saved in the database
             //Edit video Details:
@@ -172,13 +147,7 @@ liveStreamRoute.get('/liveStream/:id/comments', isAuthenticated, catchAsync(asyn
 //LiveDetails fetchLiveStreams
 liveStreamRoute.get('/fetchLiveStreams/:id', catchAsync(async (req, res) => {
     const id = req.params.id;
-    const liveStreams = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Email': `${process.env.CLOUDFLARE_EMAIL}`,
-            Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        },
-    });
+    const liveStreams = await liveStream();
     const liveStreamsData = (await liveStreams.json());
     if (liveStreamsData.success) {
         //getResults without the current id
