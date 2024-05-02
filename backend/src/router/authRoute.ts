@@ -213,7 +213,7 @@ authRouter.get('/confirm/:token', catchAsync( async (req:Request, res:Response) 
       },
     });
     if(updateStatus){
-      return res.redirect('http://localhost:5173/confirm-email?sucess=true');
+      return res.redirect('http://localhost:5173/confirm-email?success=true');
     }
     return res.redirect('http://localhost:5173/confirm-email?success=false');
 }))
@@ -236,5 +236,14 @@ authRouter.post('/logout', (req, res) => {
 
   res.status(404).json({ error: 'No active session to destroy' });
 });
+
+authRouter.get('/logout',(req,res)=>{
+  return req.session.destroy((err)=>{
+    if(err){
+      console.log('Error destroying the session');
+    }
+    res.send('Session destroyed')
+  })
+})
 
 export default authRouter;

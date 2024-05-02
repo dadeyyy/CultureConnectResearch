@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
-
+console.log()
 export const liveStream = async (state: string = '') => {
   return await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${
@@ -21,7 +21,7 @@ export const liveStream = async (state: string = '') => {
 };
 
 
-
+  
 export const selectedLiveStream = async (id: string) => {
   return await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${id}`,

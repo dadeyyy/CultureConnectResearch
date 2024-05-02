@@ -1,43 +1,43 @@
-import "./globals.css";
-import { Routes, Route } from "react-router-dom";
-import AuthLayout from "./_auth/AuthLayout";
-import LoginForm from "./_auth/forms/LoginForm";
-import RegisterForm from "./_auth/forms/RegisterForm";
-import RootLayout from "./_root/RootLayout";
-import { LandingPage } from "./_root/pages";
-import Archives from "./_root/pages/Archives";
-import MapForm from "./_root/pages/MapForm";
-import LiveStream from "./_root/pages/LiveStream";
-import ForYou from "./_root/pages/ForYou";
-import CreatePost from "./_root/pages/CreatePost";
-import EditPost from "./_root/pages/EditPost";
-import PostDetails from "./_root/pages/PostDetails";
-import Profile from "./_root/pages/Profile";
-import UpdateProfile from "./_root/pages/UpdateProfile";
-import Calendar from "./_root/pages/Calendar";
-import Home from "./_root/pages/Home";
-import { Toaster } from "react-hot-toast";
-import ArchiveProvince from "./_root/pages/ArchiveProvince";
-import ArchiveDetails from "./components/shared/ArchiveDetails";
-import Reports from "./_root/pages/Reports";
-import Explore from "./_root/pages/Explore";
-import ArchiveCategory from "./_root/pages/ArchiveCategory";
-import LiveDetails from "./_root/pages/LiveDetails";
-import SharedPostDetails from "./_root/pages/SharedPostDetails";
-import ConfirmEmail from "./_root/pages/ConfirmEmail";
+import './globals.css';
+import { Routes, Route } from 'react-router-dom';
+import AuthLayout from './_auth/AuthLayout';
+import LoginForm from './_auth/forms/LoginForm';
+import RegisterForm from './_auth/forms/RegisterForm';
+import RootLayout from './_root/RootLayout';
+import { LandingPage } from './_root/pages';
+import Archives from './_root/pages/Archives';
+import MapForm from './_root/pages/MapForm';
+import LiveStream from './_root/pages/LiveStream';
+import ForYou from './_root/pages/ForYou';
+import CreatePost from './_root/pages/CreatePost';
+import EditPost from './_root/pages/EditPost';
+import PostDetails from './_root/pages/PostDetails';
+import Profile from './_root/pages/Profile';
+import UpdateProfile from './_root/pages/UpdateProfile';
+import Calendar from './_root/pages/Calendar';
+import Home from './_root/pages/Home';
+import { Toaster } from 'react-hot-toast';
+import ArchiveProvince from './_root/pages/ArchiveProvince';
+import ArchiveDetails from './components/shared/ArchiveDetails';
+import Reports from './_root/pages/Reports';
+import Explore from './_root/pages/Explore';
+import ArchiveCategory from './_root/pages/ArchiveCategory';
+import LiveDetails from './_root/pages/LiveDetails';
+import SharedPostDetails from './_root/pages/SharedPostDetails';
+import ConfirmEmail from './_root/pages/ConfirmEmail';
 // import SupaAdmin from "./_superadmin/pages/SupaAdmin";
 // import SuperAdminLayout from "./_superadmin/SuperAdminLayout";
 // import Admins from "./_superadmin/pages/Admins";
-import SupaAdmin from "./_superadmin/pages/SupaAdmin";
-import SuperAdminLayout from "./_superadmin/SuperAdminLayout";
-import Admins from "./_superadmin/pages/Admins";
+import SupaAdmin from './_superadmin/pages/SupaAdmin';
+import SuperAdminLayout from './_superadmin/SuperAdminLayout';
+import Admins from './_superadmin/pages/Admins';
 
 const App = () => {
   return (
     <main className="flex h-screen">
       <Routes>
         <Route index element={<LandingPage />} />
-        <Route element={<ConfirmEmail/>}/>
+        <Route path="/confirm-email" element={<ConfirmEmail />} />
         {/* Login/ Register routes */}
         <Route element={<AuthLayout />}>
           <Route path="/signup" element={<RegisterForm />} />
@@ -62,8 +62,14 @@ const App = () => {
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
           <Route path="/archives/:province" element={<ArchiveProvince />} />
-          <Route path="/archives/:province/:category" element={<ArchiveCategory />} />
-          <Route path="/archives/:province/:category/:id" element={<ArchiveDetails />} />
+          <Route
+            path="/archives/:province/:category"
+            element={<ArchiveCategory />}
+          />
+          <Route
+            path="/archives/:province/:category/:id"
+            element={<ArchiveDetails />}
+          />
         </Route>
 
         {/* SUPERADM IN ROUTE */}

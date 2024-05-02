@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
 }
+console.log();
 export const liveStream = async (state = '') => {
     return await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream/${state ? `?status=${state}` : ''}`, {
         headers: {

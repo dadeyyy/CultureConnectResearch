@@ -20,7 +20,7 @@ userRoute.get(
 );
 
 //getCurrentUser
-userRoute.get("/user-current", async (req, res) => {
+userRoute.get("/user-current", isAuthenticated, async (req, res) => {
   try {
     const userId = req.session.user?.id;
 
@@ -58,7 +58,7 @@ userRoute.get("/user-current", async (req, res) => {
 
 //GET USER BY ID
 userRoute.get(
-  '/user/:userId',
+  '/user/:userId', isAuthenticated,
   catchAsync(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId);
     const user = await db.user.findUnique({
@@ -116,14 +116,6 @@ userRoute.get(
     }
   })
 );
-
-// userRoute.get('/Thingspeak', async(req,res)=>{
-//   const response  = await fetch('https://api.thingspeak.com/channels/2531063/status.json?api_key=PMW7A3RMANH5IGQV');
-
-//   const data = await response.json();
-
-//   console.log(data);
-// })
 
 userRoute.get("/admins-users", async (req, res) => {
   try {

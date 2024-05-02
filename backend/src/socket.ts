@@ -1,5 +1,4 @@
 import { Server } from 'socket.io';
-import { formatMessage } from './utils/messageFormatter.js';
 import { db } from './utils/db.server.js';
 
 function socket(server: any) {

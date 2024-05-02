@@ -35,19 +35,10 @@ const uploadHeritage = multer({ storage: heritageStorage });
 const profileStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-<<<<<<< HEAD
-        folder: 'User Profiles',
-        allowedFormats: ['jpg', 'png', 'jpeg'],
-    }
-});
-const uploadProfile = multer({ storage: profileStorage });
-export { cloudinary, storage, upload, uploadArchive, archiveStorage, heritageStorage, uploadHeritage, profileStorage, uploadProfile };
-=======
         folder: "User Profiles",
         allowedFormats: ["jpg", "png", "jpeg"],
     },
 });
 const uploadProfile = multer({ storage: profileStorage });
 export { cloudinary, storage, upload, uploadArchive, archiveStorage, heritageStorage, uploadHeritage, profileStorage, uploadProfile, };
->>>>>>> 6ad2b41808e07d053f46e78b43e6a8026ddc67cb
 //# sourceMappingURL=cloudinary.js.map

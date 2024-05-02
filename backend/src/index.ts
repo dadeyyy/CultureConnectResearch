@@ -86,6 +86,13 @@ app.use('/', shareRoute);
 app.use('/', heritageRoute);
 app.use('/', profileRoute )
 
+
+app.all('*', (req, res) => {
+  res.redirect('http://localhost:5173/')
+  res.status(404).send('404 Not Found');
+});
+
+
 //Error Handler:
 app.use(errorHandler);
 const port = process.env.PORT || 8000;

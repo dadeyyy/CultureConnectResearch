@@ -1,17 +1,23 @@
-import { useNavigate } from "react-router-dom";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { IUser } from "@/type/index";
+import { useNavigate } from 'react-router-dom';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { IUser } from '@/type/index';
 
 export const INITIAL_USER = {
   id: 0,
-  firstName: "",
-  lastName: "",
-  username: "",
-  email: "",
-  imageUrl: "",
-  bio: "",
-  role: "",
-  province: "",
+  firstName: '',
+  lastName: '',
+  username: '',
+  email: '',
+  imageUrl: '',
+  bio: '',
+  role: '',
+  province: '',
 };
 
 const INITIAL_STATE = {
@@ -40,12 +46,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const cooki = localStorage.getItem("currentUserId");
+  const cooki = localStorage.getItem('currentUserId');
 
   const checkAuthUser = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/user/${cooki}`);
+      const response = await fetch(`http://localhost:8000/user/${cooki}`, {
+        credentials: 'include',
+      });
       const data = await response.json();
       if (response.ok) {
         setUser(data.user);
@@ -54,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return false;
     } catch (error) {
-      console.error("Error checking authentication:", error);
+      console.error('Error checking authentication:', error);
       return false;
     } finally {
       setIsLoading(false);
@@ -62,12 +70,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const cookieFallback = localStorage.getItem("currentUserId");
-    if (cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) {
-      navigate("/signin");
+    const cookieFallback = localStorage.getItem('currentUserId');
+    const withoutAuthRoute = ['/signup', '/', '/confirm-email'];
+    const isSignInRoute = withoutAuthRoute.includes(window.location.pathname);
+    if (isSignInRoute) {
+      return;
+    } else if (
+      cookieFallback === '[]' ||
+      cookieFallback === null ||
+      cookieFallback === undefined
+    ) {
+      navigate('/signin');
+    }
+    else{
+      checkAuthUser();
     }
 
-    checkAuthUser();
   }, [cooki]);
 
   // useEffect(() => {
@@ -83,7 +101,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuthUser,
   };
 
-  return <AuthContext.Provider value={value}>{!isLoading && children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {!isLoading && children}
+    </AuthContext.Provider>
+  );
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

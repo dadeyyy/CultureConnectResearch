@@ -32,7 +32,9 @@ const FollowCard = ({ userId }: { userId: string }) => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/user/${userId}`);
+        const response = await fetch(`http://localhost:8000/user/${userId}`,{
+          credentials: 'include'
+        });
         const data = await response.json();
         if (response.ok) {
           setUserProfile((prevUser) => ({
@@ -58,6 +60,7 @@ const FollowCard = ({ userId }: { userId: string }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ followerId: user.id, followingId: userId }),
+        credentials: "include"
       });
 
       if (response.ok) {
@@ -99,7 +102,7 @@ const FollowCard = ({ userId }: { userId: string }) => {
           <Link to={`/profile/${userId}`}>
             <div className="flex flex-row gap-2">
               <Avatar>
-                <AvatarImage src={userProfile.imageUrl} alt={`profile-pictre`} />
+                <AvatarImage src={userProfile.imageUrl  || ''} alt={`profile-pictre`} />
                 <AvatarFallback>
                   {getInitials(userProfile.firstName, userProfile.lastName)}
                 </AvatarFallback>

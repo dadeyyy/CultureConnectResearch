@@ -9,7 +9,7 @@ import { db } from '../utils/db.server.js';
 import { isAuthenticated } from '../middleware/middleware.js';
 import { catchAsync } from '../middleware/errorHandler.js';
 import ExpressError from '../middleware/ExpressError.js';
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 import { liveStream, selectedLiveStream } from '../utils/cloudflare.js';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -23,7 +23,7 @@ liveStreamRoute.get(
   '/getLiveStreams',
   // isAuthenticated,
   catchAsync(async (req: Request, res: Response) => {
-    const onGoingLive = await liveStream('live-inprogress')
+    const onGoingLive = await liveStream('live-inprogress');
 
     const onGoingLiveData =
       (await onGoingLive.json()) as pastLiveStreamApiResponse;
@@ -40,7 +40,7 @@ liveStreamRoute.get(
 liveStreamRoute.get(
   '/pastLiveStreams',
   catchAsync(async (req: Request, res: Response) => {
-    const pastLiveStreams = await liveStream('ready')
+    const pastLiveStreams = await liveStream('ready');
     const data = (await pastLiveStreams.json()) as pastLiveStreamApiResponse;
     if (data.success) {
       return res.status(200).json(data.result);
@@ -99,7 +99,7 @@ liveStreamRoute.post(
     const currentUser = await db.user.findUnique({ where: { id: user } });
 
     if (user && currentUser) {
-      const onGoingLive = await liveStream('live-inprogress')
+      const onGoingLive = await liveStream('live-inprogress');
 
       const onGoingLiveData =
         (await onGoingLive.json()) as pastLiveStreamApiResponse;
@@ -115,8 +115,8 @@ liveStreamRoute.post(
         const valueOfVideoUID = videoUID[0];
 
         //Retrieve the specific video
-        const videoDetails = await selectedLiveStream(valueOfVideoUID)
-  
+        const videoDetails = await selectedLiveStream(valueOfVideoUID);
+
         const videoDetailsData = (await videoDetails.json()) as editVideoTypes;
 
         //Check if the video is already saved in the database
@@ -205,31 +205,33 @@ liveStreamRoute.get(
       return res.json(liveStream?.comments);
     }
 
-    throw new ExpressError('No livestream found', 404)
+    throw new ExpressError('No livestream found', 404);
   })
 );
 
 //LiveDetails fetchLiveStreams
-liveStreamRoute.get('/fetchLiveStreams/:id', catchAsync( async (req:Request, res:Response) => {
+liveStreamRoute.get(
+  '/fetchLiveStreams/:id',
+  catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
 
-  const id = req.params.id;
+    const liveStreams = await liveStream();
 
-  const liveStreams = await liveStream();
+    const liveStreamsData =
+      (await liveStreams.json()) as pastLiveStreamApiResponse;
 
-  const liveStreamsData =
-    (await liveStreams.json()) as pastLiveStreamApiResponse;
+    if (liveStreamsData.success) {
+      //getResults without the current id
+      const liveStreamsDataWithoutId = liveStreamsData.result.filter(
+        (data) => data.uid !== id
+      );
 
-  if (liveStreamsData.success) {
-    //getResults without the current id
-    const liveStreamsDataWithoutId = liveStreamsData.result.filter(
-      (data) => data.uid !== id
-    );
+      return res.json(liveStreamsDataWithoutId);
+    }
 
-    return res.json(liveStreamsDataWithoutId);
-  }
-
-  throw new ExpressError('Failed to get livestreams', 404)
-}));
+    throw new ExpressError('Failed to get livestreams', 404);
+  })
+);
 
 liveStreamRoute.get('/deleteLiveStreams', async (req, res) => {
   const data = await db.liveStreamComment.deleteMany({});

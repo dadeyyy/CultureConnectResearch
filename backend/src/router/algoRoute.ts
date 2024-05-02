@@ -21,6 +21,7 @@ algoRoute.get(
   isAuthenticated,
   catchAsync(async (req: Request, res: Response) => {
     const currentUser = req.session.user?.id;
+
     const posts = await db.post.findMany({
       select: {
         id: true,
@@ -35,6 +36,7 @@ algoRoute.get(
     }));
 
     recommender.train(documents);
+
     const userLikes = await db.user.findUnique({
       where: {
         id: currentUser,
@@ -45,10 +47,11 @@ algoRoute.get(
     });
 
     if (!userLikes) {
-      throw new ExpressError('User not found', 404);
+      return res.status(404).json({ error: 'User not found' });
     }
 
     const userLikesId = userLikes.likes.map((userLike) => userLike.postId);
+
     const filteredUserLikesId = userLikesId
       .filter((id) => id !== null)
       .map(Number)
@@ -57,7 +60,9 @@ algoRoute.get(
     const lastId = filteredUserLikesId[0];
 
     if (filteredUserLikesId.length === 0) {
-      throw new ExpressError('No liked posts found for the user', 204);
+      return res
+        .status(204)
+        .json({ message: 'No liked posts found for the user' });
     }
 
     const recentPost = await db.post.findMany({
@@ -70,13 +75,6 @@ algoRoute.get(
       take: 1,
     });
 
-    // console.log(filteredUserLikesId);
-    // console.log("length-1", filteredUserLikesId[0]);
-    // console.log("index-0", filteredUserLikesId[0]);
-    // console.log(
-    //   "recent post: ",
-    //   recentPost.map((post) => post.id)
-    // );
     const recentPostStrint = recentPost.map((post) => post.id);
     const similarDocuments = recommender.getSimilarDocuments(
       recentPostStrint.toString()
@@ -112,7 +110,64 @@ algoRoute.get(
     });
 
     if (!user) {
-      throw new ExpressError('User not found', 404);
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ like: suggestedPosts });
+  })
+);
+
+algoRoute.get(
+  '/interest',
+  isAuthenticated,
+  catchAsync(async (req: Request, res: Response) => {
+    const currentUser = req.session.user?.id;
+
+    const userLikes = await db.user.findUnique({
+      where: {
+        id: currentUser,
+      },
+      include: {
+        likes: true,
+      },
+    });
+
+    if (!userLikes) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userLikesId = userLikes.likes.map((userLike) => userLike.postId);
+
+    const filteredUserLikesId = userLikesId
+      .filter((id) => id !== null)
+      .map(Number)
+      .sort((a, b) => b - a);
+
+    const lastId = filteredUserLikesId[0];
+
+    if (filteredUserLikesId.length === 0) {
+      return res
+        .status(204)
+        .json({ message: 'No liked posts found for the user' });
+    }
+
+    const recentPost = await db.post.findMany({
+      select: {
+        id: true,
+      },
+      where: {
+        id: lastId,
+      },
+      take: 1,
+    });
+
+    const user = await db.user.findUnique({
+      where: { id: currentUser },
+      select: { interest: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
     const userInterests = user.interest || [];
@@ -138,9 +193,7 @@ algoRoute.get(
       distinct: ['id'],
     });
 
-    return res
-      .status(200)
-      .json({ like: suggestedPosts, interest: recommendedPosts });
+    return res.status(200).json({ interest: recommendedPosts });
   })
 );
 
