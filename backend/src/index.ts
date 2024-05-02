@@ -93,7 +93,7 @@ app.use('/', notificationRoute);
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
 
 app.all('*', (req, res) => {
-  res.status(404).send('404 Not Found');
+  res.json({message: "HELLO"})
 });
 
 //Error Handler:
