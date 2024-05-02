@@ -1,23 +1,23 @@
 // EditPost.tsx
 
-import { useParams } from "react-router-dom";
-import { getPostById, DummyPost } from "@/dummy/dummy";
-import Loader from "@/components/shared/Loader";
+import { useParams } from 'react-router-dom';
+// import { getPostById, DummyPost } from "@/dummy/dummy";
+import Loader from '@/components/shared/Loader';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 const EditPost = () => {
   const { id } = useParams<{ id: string }>();
-  const [post, setPost] = useState<DummyPost | undefined>(undefined); // Specify the type explicitly
+  // const [post, setPost] = useState<DummyPost | undefined>(undefined); // Specify the type explicitly
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const fetchedPost = await getPostById(id);
-        setPost(fetchedPost);
+        // const fetchedPost = await getPostById(id);
+        // setPost(fetchedPost);
       } catch (error) {
-        console.error("Error fetching post:", error);
+        console.error('Error fetching post:', error);
       } finally {
         setIsLoading(false);
       }
