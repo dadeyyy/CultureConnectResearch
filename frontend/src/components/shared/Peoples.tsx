@@ -13,7 +13,7 @@ type peopleProps = {
   province?: string;
   avatarUrl: string;
 }[];
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const Peoples = () => {
   const [people, setPeople] = useState<peopleProps>([]);
   const [peopleLoad, setPeopleLoad] = useState(false);
@@ -23,7 +23,7 @@ const Peoples = () => {
     const fetchPeople = async () => {
       setPeopleLoad(true);
       try {
-        const response = await fetch(`http://localhost:8000/peoples`, {
+        const response = await fetch(`${server}/peoples`, {
           credentials: "include",
         });
 

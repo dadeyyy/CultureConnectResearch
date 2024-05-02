@@ -33,6 +33,8 @@ import { IPost, multiFormatDateString } from "@/lib/utils";
 import ArchiveUploader from "../shared/ArchiveUploader";
 import toast from "react-hot-toast";
 
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+
 const formSchema = z.object({
   caption: z.string().min(0, {
     message: "You cannot create a post without a caption.",
@@ -125,7 +127,7 @@ const PostForm = ({ action, post }: PostFormProps) => {
           console.log(pair[0] + ": " + pair[1]);
         }
 
-        const response = await fetch(`http://localhost:8000/post/${post?.id}`, {
+        const response = await fetch(`${server}/post/${post?.id}`, {
           method: "PUT",
           body: formData,
           credentials: "include",
@@ -164,7 +166,7 @@ const PostForm = ({ action, post }: PostFormProps) => {
         });
       }
       try {
-        const response = await fetch("http://localhost:8000/post", {
+        const response = await fetch(`${server}/post`, {
           method: "POST",
           body: formData,
           credentials: "include",

@@ -23,6 +23,8 @@ interface ArchiveProps {
 }
 [];
 
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+
 const ArchiveCategory = () => {
   const { province, category } = useParams<{ province: string; category: string }>();
   const [archives, setArchives] = useState<ArchiveProps[]>([]);
@@ -40,7 +42,7 @@ const ArchiveCategory = () => {
   useEffect(() => {
     const fetchArchives = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/archives/${province}/${category}`, {
+        const response = await fetch(`${server}/archives/${province}/${category}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

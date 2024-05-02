@@ -70,7 +70,7 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
     <p className="small-medium lg:base-medium test-dark-2">{label}</p>
   </div>
 );
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const Profile = () => {
   const { id } = useParams();
   const { user } = useUserContext();
@@ -86,7 +86,7 @@ const Profile = () => {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/get-post/${id}`, {
+        const response = await fetch(`${server}/get-post/${id}`, {
           credentials: "include",
         });
         const data = await response.json();
@@ -107,7 +107,7 @@ const Profile = () => {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/get-shared-post/${id}`, {
+        const response = await fetch(`${server}/get-shared-post/${id}`, {
           credentials: "include",
         });
         const data = await response.json();
@@ -128,7 +128,7 @@ const Profile = () => {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/user/likes/${id}`, {
+        const response = await fetch(`${server}/user/likes/${id}`, {
           credentials: "include",
         });
         const data = await response.json();
@@ -149,7 +149,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchFollowingCount = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/following-count/${id}`);
+        const response = await fetch(`${server}/following-count/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -164,7 +164,7 @@ const Profile = () => {
 
     const fetchFollowersCount = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/followers-count/${id}`);
+        const response = await fetch(`${server}/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -184,7 +184,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/user/${id}`,
+        const response = await fetch(`${server}/user/${id}`,
           {credentials:'include'}
         );
         const data = await response.json();
@@ -207,7 +207,7 @@ const Profile = () => {
   useEffect(() => {
     const checkIfFollowing = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/is-following/${id}`);
+        const response = await fetch(`${server}/is-following/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -232,7 +232,7 @@ const Profile = () => {
 
   const handleFollow = async () => {
     try {
-      const response = await fetch("http://localhost:8000/follow", {
+      const response = await fetch(`${server}:8000/follow`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -256,7 +256,7 @@ const Profile = () => {
 
   const handleUnfollow = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/unfollow/${id}`, {
+      const response = await fetch(`${server}/unfollow/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

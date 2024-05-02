@@ -24,7 +24,7 @@ import toast from "react-hot-toast";
 import { provincesTest } from "@/lib/provinces";
 import { useState } from "react";
 import { Box, LinearProgress } from "@mui/material";
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const SupaAdmin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,7 @@ const SupaAdmin = () => {
       interest: ["culture", "art", "People", "culture", "art", "People"],
     };
     try {
-      const response = await fetch("http://localhost:8000/signup", {
+      const response = await fetch(`${server}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

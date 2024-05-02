@@ -49,7 +49,7 @@ const formSchema = z.object({
     required_error: 'Add a description.',
   }),
 });
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const LiveStream = () => {
   const [availableLivestreams, setAvailableLivestreams] = useState<streamState>(
     []
@@ -76,7 +76,7 @@ const LiveStream = () => {
   useEffect(() => {
     const fetchLiveStreamData = async () => {
       const liveStreamResponse = await fetch(
-        'http://localhost:8000/getLiveStreams',
+        `${server}/getLiveStreams`,
         { credentials: 'include' }
       );
 
@@ -96,7 +96,7 @@ const LiveStream = () => {
   useEffect(() => {
     const fetchPastLiveStreamData = async () => {
       const pastLiveStreamResponse = await fetch(
-        'http://localhost:8000/pastLiveStreams',
+        `${server}/pastLiveStreams`,
         { credentials: 'include' }
       );
 
@@ -116,7 +116,7 @@ const LiveStream = () => {
   useEffect(() => {
     const fetchUrlStreamKey = async () => {
       const getUrlStreamKey = await fetch(
-        'http://localhost:8000/getUrlStreamKey',
+        `${server}/getUrlStreamKey`,
         {
           credentials: 'include',
         }
@@ -142,7 +142,7 @@ const LiveStream = () => {
       uid: videoUID,
     };
 
-    const response = await fetch('http://localhost:8000/startLiveStream', {
+    const response = await fetch(`${server}/startLiveStream`, {
       body: JSON.stringify(valuesWithUID),
       method: 'POST',
       credentials: 'include',

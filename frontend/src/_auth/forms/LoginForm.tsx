@@ -9,6 +9,8 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import { useUserContext } from "@/context/AuthContext";
 
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+
 const LoginForm = () => {
   const navigate = useNavigate();
   const { setUser, setIsAuthenticated } = useUserContext();
@@ -22,7 +24,7 @@ const LoginForm = () => {
 
   const onSubmit = async (values: z.infer<typeof login>) => {
     try {
-      const response = await fetch("http://localhost:8000/signin", {
+      const response = await fetch(`${server}/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

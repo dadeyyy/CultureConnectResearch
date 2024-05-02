@@ -28,7 +28,7 @@ const ProfileValidation = z.object({
   email: z.string().email(),
   bio: z.string(),
 });
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const UpdateProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -61,7 +61,7 @@ const UpdateProfile = () => {
         formData.append("file", values.file[0]);
       }
 
-      const response = await fetch(`http://localhost:8000/profile/${user.id}`, {
+      const response = await fetch(`${server}/profile/${user.id}`, {
         method: "PUT",
         body: formData,
         credentials: "include",

@@ -42,7 +42,7 @@ const PostContext = createContext<IPostContext | undefined>(undefined);
 interface ForYouProviderProps {
   children: ReactNode;
 }
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 export const ForYouProvider: React.FC<ForYouProviderProps> = ({ children }) => {
   const [postData, setPostData] = useState<IPost[]>([]);
   const [isPostLoading, setIsPostLoading] = useState(true);
@@ -50,7 +50,7 @@ export const ForYouProvider: React.FC<ForYouProviderProps> = ({ children }) => {
 
   const fetchPosts = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8000/algorithm", { credentials: "include" });
+      const response = await fetch(`${server}:8000/algorithm`, { credentials: "include" });
       const data = await response.json();
       console.log("ALGORITHM", data);
 

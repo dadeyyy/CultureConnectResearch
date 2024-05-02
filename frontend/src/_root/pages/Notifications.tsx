@@ -19,8 +19,8 @@ type Notification = {
   userId: number;
   createdAt: string;
 };
-
-const socket = io('http://localhost:8000');
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const socket = io(`${server}`);
 
 const Notifications = () => {
   const { user } = useUserContext();

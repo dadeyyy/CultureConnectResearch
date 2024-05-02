@@ -27,7 +27,7 @@ interface File {
   url: string;
   filename: string;
 }
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const ArchiveDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { province } = useParams<{ province: string }>();
@@ -56,7 +56,7 @@ const ArchiveDetails: React.FC = () => {
   useEffect(() => {
     const fetchArchiveData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/archive/${province}/${id}`, {
+        const response = await fetch(`${server}/archive/${province}/${id}`, {
           credentials: "include",
         });
         if (!response.ok) {
@@ -114,7 +114,7 @@ const ArchiveDetails: React.FC = () => {
   //DELETE FUNCTION
   const deleteArchive = async (archiveId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/archive/${province}/${archiveId}`, {
+      const response = await fetch(`${server}/archive/${province}/${archiveId}`, {
         method: "DELETE",
         credentials: "include",
       });

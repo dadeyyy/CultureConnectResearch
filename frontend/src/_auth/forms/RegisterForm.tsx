@@ -26,6 +26,8 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+
 const RegisterForm = () => {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof registration>>({
@@ -66,7 +68,7 @@ const RegisterForm = () => {
       };
 
       try {
-        const response = await fetch("http://localhost:8000/signup", {
+        const response = await fetch(`${server}/signup`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

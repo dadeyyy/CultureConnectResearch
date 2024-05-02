@@ -35,7 +35,7 @@ interface UserProfile {
   updatedAt: string;
   username: string;
 }
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const Comments = ({ postId, action, type }: CommentProps) => {
   const { user, isLoading } = useUserContext();
   const [newComment, setNewComment] = useState("");
@@ -52,7 +52,7 @@ const Comments = ({ postId, action, type }: CommentProps) => {
     const fetchComments = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/${type === "shared" ? "shared-post" : "post"}/${postId}/comments`,
+          `${server}/${type === "shared" ? "shared-post" : "post"}/${postId}/comments`,
           {
             credentials: "include",
           }
@@ -79,7 +79,7 @@ const Comments = ({ postId, action, type }: CommentProps) => {
     } else if (selectedValue === "delete") {
       try {
         const response = await fetch(
-          `http://localhost:8000/${type === "shared" ? "shared-post" : "post"}/${postId}/comment/${
+          `${server}/${type === "shared" ? "shared-post" : "post"}/${postId}/comment/${
             comments[index].id
           }`,
           {
@@ -105,7 +105,7 @@ const Comments = ({ postId, action, type }: CommentProps) => {
   const handleCommentSubmit = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/${type === "shared" ? "shared-post" : "post"}/${postId}/comment`,
+        `${server}/${type === "shared" ? "shared-post" : "post"}/${postId}/comment`,
         {
           method: "POST",
           headers: {

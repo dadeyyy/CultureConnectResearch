@@ -37,7 +37,7 @@ interface UserProfile {
   updatedAt: string;
   username: string;
 }
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const CommentCard: React.FC<CommentCardProps> = ({
   comment,
   index,
@@ -51,7 +51,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
   useEffect(() => {
     const fetchCommentUser = async (userId: number) => {
       try {
-        const response = await fetch(`http://localhost:8000/user/${userId}`, {
+        const response = await fetch(`${server}/user/${userId}`, {
           credentials: "include",
         });
         const data = await response.json();

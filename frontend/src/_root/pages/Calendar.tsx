@@ -52,6 +52,7 @@ interface ICalendar {
   name: string;
   calendars: IEvent[];
 }
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 
 const Calendar = () => {
   const { user } = useUserContext();
@@ -76,7 +77,7 @@ const Calendar = () => {
     async (clickInfo: EventClickArg) => {
       try {
         // Fetch additional event details using the event ID from the API
-        const response = await fetch(`http://localhost:8000/get-event/${clickInfo.event.id}`, {
+        const response = await fetch(`${server}/${clickInfo.event.id}`, {
           credentials: "include",
         });
 
@@ -97,7 +98,7 @@ const Calendar = () => {
 
   const handleDeleteClick = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/delete-calendar/${id}`, {
+      const response = await fetch(`${server}/delete-calendar/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -124,7 +125,7 @@ const Calendar = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:8000/province/${selectedProvince}`, {
+        const response = await fetch(`${server}/province/${selectedProvince}`, {
           credentials: "include",
         });
 

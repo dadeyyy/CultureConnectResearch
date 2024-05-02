@@ -32,6 +32,8 @@ interface ArchiveData {
   createdAt: string;
 }
 
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+
 const ArchiveProvince = () => {
   const { province } = useParams<{ province: string }>();
   const [archives, setArchives] = useState<ArchiveData[]>([]);
@@ -51,7 +53,7 @@ const ArchiveProvince = () => {
   useEffect(() => {
     const fetchArchives = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/archive-count/${province}`, {
+        const response = await fetch(`${server}/archive-count/${province}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -82,7 +84,7 @@ const ArchiveProvince = () => {
   useEffect(() => {
     const fetchArchives = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/recent/${province}`, {
+        const response = await fetch(`${server}/recent/${province}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

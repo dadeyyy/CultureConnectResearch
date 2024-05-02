@@ -50,8 +50,8 @@ interface PostStatsProps {
   sharedAuthorId?: number;
 }
 
-const socket = io('http://localhost:8000');
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const socket = io(`${server}`);
 const PostStats = ({
   postId,
   userId,
@@ -77,7 +77,7 @@ const PostStats = ({
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/post/${postId}`, {
+        const response = await fetch(`${server}/post/${postId}`, {
           credentials: 'include',
         });
 
@@ -99,7 +99,7 @@ const PostStats = ({
     const fetchCommentCount = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/${
+          `${}server/${
             type === 'regular' ? `post/${postId}` : `shared-post/${shareId}`
           }/comments`,
           {
@@ -122,7 +122,7 @@ const PostStats = ({
     const checkLikeStatus = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/${
+          `${}server/${
             type === 'regular' ? `post/${postId}` : `shared/${shareId}`
           }/like-status`,
           {
@@ -155,7 +155,7 @@ const PostStats = ({
     setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
     try {
       const response = await fetch(
-        `http://localhost:8000/${
+        `${server}/${
           type === 'regular' ? `post/${postId}` : `shared/${shareId}`
         }/like`,
         {
@@ -202,7 +202,7 @@ const PostStats = ({
     try {
       console.log(values);
       const response = await fetch(
-        `http://localhost:8000/post/share/${postId}`,
+        `${server}/post/share/${postId}`,
         {
           method: 'POST',
           credentials: 'include',

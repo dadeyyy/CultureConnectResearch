@@ -55,7 +55,7 @@ interface PostProps {
   };
   reportCount: number;
 }
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const Reports = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const Reports = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:8000/post/reported/${user.province}`,
+          `${server}/post/reported/${user.province}`,
           {
             credentials: 'include',
             method: 'GET',
@@ -118,7 +118,7 @@ const Reports = () => {
   async function handleDeletePost(postId: number) {
     setProgress(true);
     try {
-      const response = await fetch(`http://localhost:8000/post/${postId}`, {
+      const response = await fetch(`${server}/post/${postId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

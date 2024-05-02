@@ -73,7 +73,7 @@ type Archive = {
   province: string;
   updatedAt: string;
 };
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archiveData }) => {
   const [province, setProvince] = useState(provinceData);
   const [archive, setArchive] = useState<Archive | null>(null);
@@ -133,7 +133,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
 
       try {
         const response = await fetch(
-          `http://localhost:8000/archive/${provinceData}/${archiveData?.id}`,
+          `${server}/${provinceData}/${archiveData?.id}`,
           {
             method: "PUT",
             body: formData,
@@ -177,7 +177,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archive
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/archive/${provinceData}`, {
+        const response = await fetch(`${server}/${provinceData}`, {
           method: "POST",
           body: formData,
           credentials: "include",

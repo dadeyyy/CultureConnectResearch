@@ -60,6 +60,7 @@ interface calendarProps {
   action: "create" | "update";
 }
 
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -99,7 +100,7 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
       };
       console.log(formData.startDate);
       try {
-        const response = await fetch("http://localhost:8000/create-calendar", {
+        const response = await fetch(`${server}/create-calendar`, {
           method: "POST",
           credentials: "include",
           body: JSON.stringify(formData),
@@ -131,7 +132,7 @@ const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
 
       try {
         const response = await fetch(
-          `http://localhost:8000/update-calendar/${calendarDetails?.id}`,
+          `${server}/update-calendar/${calendarDetails?.id}`,
           {
             method: "PUT",
             credentials: "include",

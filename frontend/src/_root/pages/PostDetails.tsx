@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import PostForm from "@/components/forms/PostForm";
 import toast from "react-hot-toast";
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -24,7 +24,7 @@ const PostDetails = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/post/${id}`, {
+        const response = await fetch(`${server}/post/${id}`, {
           credentials: "include",
         });
 
@@ -43,7 +43,7 @@ const PostDetails = () => {
   }, [id]);
 
   async function handleDeletePost() {
-    const response = await fetch(`http://localhost:8000/post/${id}`, {
+    const response = await fetch(`${server}/post/${id}`, {
       method: "DELETE",
       credentials: "include",
     });

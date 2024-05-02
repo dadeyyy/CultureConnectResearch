@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import PostForm from "../forms/PostForm";
 import { Skeleton } from "../ui/skeleton";
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -85,7 +85,7 @@ const LeftSidebar = () => {
   ].filter(Boolean);
 
   const handleLogout = async () => {
-    const response = await fetch("http://localhost:8000/logout", {
+    const response = await fetch(`${server}/logout`, {
       method: "POST",
       credentials: "include",
     });

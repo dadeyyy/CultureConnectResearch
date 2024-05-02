@@ -33,7 +33,7 @@ const FormSchema = z.object({
     required_error: "Select a reason.",
   }),
 });
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const ReportForm = ({
   userId,
   postId,
@@ -63,7 +63,7 @@ const ReportForm = ({
   const handleContinue = async (data: z.infer<typeof FormSchema>) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8000/post/${postId}/report`, {
+      const response = await fetch(`${server}/post/${postId}/report`, {
         credentials: "include",
         method: "POST",
         headers: {

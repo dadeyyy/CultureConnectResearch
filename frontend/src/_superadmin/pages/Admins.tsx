@@ -19,7 +19,7 @@ type peopleProps = {
   avatarUrl: string;
   email: string;
 }[];
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const Admins = () => {
   const [people, setPeople] = useState<peopleProps>([]);
   const [peopleLoad, setPeopleLoad] = useState(false);
@@ -28,7 +28,7 @@ const Admins = () => {
     const fetchPeople = async () => {
       setPeopleLoad(true);
       try {
-        const response = await fetch(`http://localhost:8000/admins-users`, {
+        const response = await fetch(`${server}/admins-users`, {
           credentials: "include",
         });
 

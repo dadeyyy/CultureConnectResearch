@@ -46,7 +46,7 @@ type peopleProps = {
   province?: string;
   avatarUrl: string;
 }[];
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const Home = () => {
   const { user, isLoading } = useUserContext();
   const [postData, setPostData] = useState<IPost[]>([]);
@@ -74,9 +74,9 @@ const Home = () => {
     sharedOffset: number
   ) => {
     try {
-      let endpoint = `http://localhost:8000/post/all?limit=${limit}&offset=${offset}&sharedOffset=${sharedOffset}`;
+      let endpoint = `${server}/post/all?limit=${limit}&offset=${offset}&sharedOffset=${sharedOffset}`;
       if (selectedSection === "Following") {
-        endpoint = `http://localhost:8000/following/posts?userId=${user.id}&limit=${limit}&offset=${offset}&sharedOffset=${sharedOffset}`;
+        endpoint = `${server}/following/posts?userId=${user.id}&limit=${limit}&offset=${offset}&sharedOffset=${sharedOffset}`;
       }
       const response = await fetch(endpoint, {
         credentials: "include",
@@ -132,7 +132,7 @@ const Home = () => {
     const fetchPeople = async () => {
       setPeopleLoad(true);
       try {
-        const response = await fetch(`http://localhost:8000/peoples`, {
+        const response = await fetch(`${server}/peoples`, {
           credentials: "include",
         });
 

@@ -112,7 +112,7 @@ type Recommendation = {
   like: Post[];
   interest: Post[];
 };
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const Explore = () => {
   const [searchValue, setSearchValue] = useState("");
   const { user } = useUserContext();
@@ -127,7 +127,7 @@ const Explore = () => {
   useEffect(() => {
     const fetchReco = async () => {
       try {
-        const response = await fetch("http://localhost:8000/algorithm", {
+        const response = await fetch(`${server}/algorithm`, {
           credentials: "include",
         });
         const data = await response.json();
@@ -150,7 +150,7 @@ const Explore = () => {
   useEffect(() => {
     const fetchReco = async () => {
       try {
-        const response = await fetch("http://localhost:8000/interest", {
+        const response = await fetch(`${server}/interest`, {
           credentials: "include",
         });
         const data = await response.json();
@@ -174,7 +174,7 @@ const Explore = () => {
     setIsLoading(true);
     try {
       const encodedSearchValue = encodeURIComponent(searchValue);
-      const response = await fetch(`http://localhost:8000/search?query=${encodedSearchValue}`, {
+      const response = await fetch(`${server}/search?query=${encodedSearchValue}`, {
         credentials: "include",
       });
       const data: SearchResult = await response.json();

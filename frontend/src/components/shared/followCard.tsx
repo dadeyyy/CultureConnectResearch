@@ -17,7 +17,7 @@ interface userProfile {
   updatedAt: string;
   username: string;
 }
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const FollowCard = ({ userId }: { userId: string }) => {
   const { user, isLoading } = useUserContext();
   const [userProfile, setUserProfile] = useState<userProfile>();
@@ -32,7 +32,7 @@ const FollowCard = ({ userId }: { userId: string }) => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/user/${userId}`,{
+        const response = await fetch(`${server}/user/${userId}`,{
           credentials: 'include'
         });
         const data = await response.json();
@@ -54,7 +54,7 @@ const FollowCard = ({ userId }: { userId: string }) => {
 
   const handleFollow = async () => {
     try {
-      const response = await fetch("http://localhost:8000/follow", {
+      const response = await fetch(`${server}/follow`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ const FollowCard = ({ userId }: { userId: string }) => {
 
   const handleUnfollow = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/unfollow/${userId}`, {
+      const response = await fetch(`${server}/unfollow/${userId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

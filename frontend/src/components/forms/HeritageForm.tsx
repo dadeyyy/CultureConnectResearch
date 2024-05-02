@@ -38,7 +38,7 @@ interface HeritageProps {
   provinceData: string | undefined;
   action: "Create" | "Update";
 }
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const HeritageForm = ({ provinceData, action }: HeritageProps) => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +77,7 @@ const HeritageForm = ({ provinceData, action }: HeritageProps) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/heritage/${provinceData}`,
+        `${server}/heritage/${provinceData}`,
         {
           method: "POST",
           body: formData,

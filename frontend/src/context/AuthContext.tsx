@@ -39,7 +39,7 @@ type IContextType = {
 };
 
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // const USER_STORAGE_KEY = "currentUser";
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuthUser = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/user/${cooki}`, {
+      const response = await fetch(`${server}/user/${cooki}`, {
         credentials: 'include',
       });
       const data = await response.json();

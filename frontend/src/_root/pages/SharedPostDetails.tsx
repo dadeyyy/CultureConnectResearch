@@ -21,7 +21,7 @@ const formSchema = z.object({
     message: "You cannot create a post without a caption.",
   }),
 });
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const SharedPostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -37,7 +37,7 @@ const SharedPostDetails = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/shared-post/${id}`, {
+        const response = await fetch(`${server}/shared-post/${id}`, {
           credentials: "include",
         });
 
@@ -56,7 +56,7 @@ const SharedPostDetails = () => {
   }, [id]);
 
   async function handleDeletePost() {
-    const response = await fetch(`http://localhost:8000/shared-post/${id}`, {
+    const response = await fetch(`${server}/shared-post/${id}`, {
       method: "DELETE",
       credentials: "include",
     });

@@ -76,6 +76,8 @@ type MapProps = {
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
 
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+
 const MapForm: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const [mapData, setMapData] = useState<Point[]>([]);
@@ -94,7 +96,7 @@ const MapForm: React.FC = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/${parameter}`, {
+        const response = await fetch(`${server}/${parameter}`, {
           credentials: "include",
         });
 
@@ -201,7 +203,7 @@ const MapForm: React.FC = () => {
   };
 
   async function handleDeletePost(province: string, id: number) {
-    const response = await fetch(`http://localhost:8000/heritage/${province}/${id}`, {
+    const response = await fetch(`${server}/${province}/${id}`, {
       method: "DELETE",
       credentials: "include",
     });

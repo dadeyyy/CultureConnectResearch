@@ -176,7 +176,7 @@ authRouter.post(
         to: newUser.email,
         from: 'andrei.lazo.30@gmail.com',
         subject: 'Confirm your email',
-        text: `Click the link to confirm your email: http://localhost:8000/confirm/${confirmationToken}`,
+        text: `Click the link to confirm your email: https://culture-connect-research-git-main-dadeyyys-projects.vercel.app/confirm/${confirmationToken}`,
         html: `<strong>Click the link to confirm your email:</strong> <a href="http://localhost:8000/confirm/${confirmationToken}">Confirm Email</a>`,
       };
 

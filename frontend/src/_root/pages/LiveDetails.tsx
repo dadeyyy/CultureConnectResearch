@@ -35,7 +35,7 @@ const idColor = (id: number) => {
   return color;
 };
 
-const socket = io('http://localhost:8000');
+const socket = io('${server}');
 type commentResponse = {
   id: number;
   content: string;
@@ -51,7 +51,7 @@ type Comment = {
   message: string;
   timeStamp: string;
 };
-
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
 const LiveDetails = () => {
   const { id } = useParams();
   const { user } = useUserContext();
@@ -81,7 +81,7 @@ const LiveDetails = () => {
     // Listens for the socket when user joins
 
     const fetchOngoingLiveStream = async () => {
-      const live = await fetch(`http://localhost:8000/livestream/${id}`, {
+      const live = await fetch(`${server}/livestream/${id}`, {
         credentials: 'include',
       });
       const liveData = await live.json();
@@ -115,7 +115,7 @@ const LiveDetails = () => {
   useEffect(() => {
     const lives = async () => {
       const fetchLiveStream = await fetch(
-        `http://localhost:8000/fetchLiveStreams/${id}`,
+        `${server}/fetchLiveStreams/${id}`,
         {
           credentials: 'include',
         }
@@ -134,7 +134,7 @@ const LiveDetails = () => {
   useEffect(() => {
     const fetchLiveStreamComments = async () => {
       const comments = await fetch(
-        `http://localhost:8000/liveStream/${id}/comments`,
+        `${server}/liveStream/${id}/comments`,
         {
           credentials: 'include',
         }
