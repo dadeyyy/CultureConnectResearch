@@ -1,16 +1,110 @@
-import express from 'express';
-import { isAuthenticated, isAuthor, isProvinceAdmin, validate, } from '../middleware/middleware.js';
-import { db } from '../utils/db.server.js';
-import { upload, cloudinary } from '../utils/cloudinary.js';
-import { postSchema, } from '../utils/Schemas.js';
-import { catchAsync } from '../middleware/errorHandler.js';
-import ExpressError from '../middleware/ExpressError.js';
+import express from "express";
+import { isAuthenticated, isAuthor, isProvinceAdmin, validate, } from "../middleware/middleware.js";
+import { db } from "../utils/db.server.js";
+import { upload, cloudinary } from "../utils/cloudinary.js";
+import { postSchema, } from "../utils/Schemas.js";
+import { catchAsync } from "../middleware/errorHandler.js";
+import ExpressError from "../middleware/ExpressError.js";
+import axios from "axios";
 const postRoute = express.Router();
+// postRoute.get("/testnudes", async (req, res) => {
+//   try {
+//     const response = await axios.get(
+//       "https://api.sightengine.com/1.0/check.json",
+//       {
+//         params: {
+//           url: "https://res.cloudinary.com/dmpip4nzo/image/upload/v1714672569/uploads/urawsjdjqym8gvg61t0b.jpg",
+//           models: "nudity-2.0,offensive,gore",
+//           api_user: "1265562336",
+//           api_secret: "kEUrZw2vnrqS2XvArXXe77VCbvFf2k4j",
+//         },
+//       }
+//     );
+//     const result: CheckResult = response.data;
+//     console.log(result);
+//     res.json(response.data);
+//   } catch (error) {
+//     // handle error
+//     if (axios.isAxiosError(error)) {
+//       if (error.response) res.json(error.response.data);
+//       else res.status(500).json({ error: error.message });
+//     } else {
+//       res.status(500).json({ error });
+//     }
+//   }
+// });
+const post = await db.post.findMany({
+    where: { isValidated: false },
+    include: {
+        photos: true,
+    },
+});
+async function validateImage(url, id) {
+    try {
+        const response = await axios.get("https://api.sightengine.com/1.0/check.json", {
+            params: {
+                url: `${url}`,
+                models: "nudity-2.0,offensive,gore",
+                api_user: "1265562336",
+                api_secret: "kEUrZw2vnrqS2XvArXXe77VCbvFf2k4j",
+            },
+        });
+        const result = response.data;
+        console.log(result);
+        if (!result) {
+            return "error";
+        }
+        if (result.gore.prob >= 0.8 ||
+            result.nudity.erotica >= 0.8 ||
+            result.nudity.sextoy >= 0.8 ||
+            result.nudity.sexual_activity >= 0.8 ||
+            result.nudity.sexual_display >= 0.8 ||
+            result.offensive.prob >= 0.8) {
+            return "Your post has been removed because it violates our terms and agreements.";
+        }
+        else {
+            const updatedPost = await db.post.update({
+                where: {
+                    id: id,
+                },
+                data: {
+                    isValidated: true,
+                },
+                include: {
+                    photos: true,
+                },
+            });
+            console.log(updatedPost);
+            return updatedPost;
+        }
+    }
+    catch (error) {
+        // handle error
+        if (axios.isAxiosError(error)) {
+            if (error.response)
+                return error.response.data;
+            else
+                return { error: error.message };
+        }
+        else {
+            return { error };
+        }
+    }
+}
+post.map(async (images) => images.photos.map(async (image) => {
+    try {
+        const result = await validateImage(image.url, images.id);
+        console.log(result);
+    }
+    catch (error) {
+        console.error("Error:", error);
+    }
+}));
 //ADD POST
-postRoute.post('/post', isAuthenticated, upload.array('image'), validate(postSchema), catchAsync(async (req, res) => {
+postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSchema), catchAsync(async (req, res) => {
     const data = req.body;
     const files = req.files;
-    const tags = data.tags?.replace(/ /g, '').split(',') || [];
+    const tags = data.tags?.replace(/ /g, "").split(",") || [];
     const images = files?.map((file) => ({
         url: file.path,
         filename: file.filename,
@@ -32,12 +126,12 @@ postRoute.post('/post', isAuthenticated, upload.array('image'), validate(postSch
     if (newPost) {
         return res
             .status(201)
-            .json({ message: 'Successfully created new post', data: newPost });
+            .json({ message: "Successfully created new post", data: newPost });
     }
-    throw new ExpressError('Failed to create post', 400);
+    throw new ExpressError("Failed to create post", 400);
 }));
 // GET ALL THE POST
-postRoute.get('/post', isAuthenticated, catchAsync(async (req, res) => {
+postRoute.get("/post", isAuthenticated, catchAsync(async (req, res) => {
     const limit = parseInt(req.query.limit) || 2;
     const offset = parseInt(req.query.offset) || 0;
     const allPost = await db.post.findMany({
@@ -49,13 +143,13 @@ postRoute.get('/post', isAuthenticated, catchAsync(async (req, res) => {
         take: limit,
         skip: offset,
         orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
         },
     });
     res.status(200).json(allPost);
 }));
 //fetch all
-postRoute.get('/post/all', isAuthenticated, catchAsync(async (req, res) => {
+postRoute.get("/post/all", isAuthenticated, catchAsync(async (req, res) => {
     const limit = parseInt(req.query.limit) || 1;
     const regularOffset = parseInt(req.query.offset) || 0;
     const sharedOffset = parseInt(req.query.sharedOffset) || 0; // New offset for shared posts
@@ -65,28 +159,28 @@ postRoute.get('/post/all', isAuthenticated, catchAsync(async (req, res) => {
             user: true,
         },
         orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
         },
         skip: regularOffset,
         take: limit,
     });
     const regularPostsWithType = regularPosts.map((post) => ({
         ...post,
-        type: 'regular',
+        type: "regular",
     }));
     const sharedPosts = await db.sharedPost.findMany({
         include: {
             user: true,
         },
         orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
         },
         skip: sharedOffset, // Use separate offset for shared posts
         take: limit,
     });
     const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
         ...sharedPost,
-        type: 'shared',
+        type: "shared",
     }));
     const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
     // Sort combined posts by createdAt
@@ -94,7 +188,7 @@ postRoute.get('/post/all', isAuthenticated, catchAsync(async (req, res) => {
     res.status(200).json(sortedPosts);
 }));
 // GET SPECIFIC POST
-postRoute.get('/post/:id', isAuthenticated, catchAsync(async (req, res) => {
+postRoute.get("/post/:id", isAuthenticated, catchAsync(async (req, res) => {
     // Get parameter ID
     const postId = parseInt(req.params.id);
     // Find post in the database
@@ -122,13 +216,13 @@ postRoute.get('/post/:id', isAuthenticated, catchAsync(async (req, res) => {
         return res.status(200).json(post);
     }
     // If not, return not found
-    throw new ExpressError('Post not found', 404);
+    throw new ExpressError("Post not found", 404);
 }));
-postRoute.put('/post/:postId', isAuthenticated, isAuthor, upload.array('image'), validate(postSchema), catchAsync(async (req, res) => {
+postRoute.put("/post/:postId", isAuthenticated, isAuthor, upload.array("image"), validate(postSchema), catchAsync(async (req, res) => {
     const postId = parseInt(req.params.postId);
     const data = req.body;
     const files = req.files;
-    const tags = data.tags?.replace(/ /g, '').split(',') || [];
+    const tags = data.tags?.replace(/ /g, "").split(",") || [];
     const dataNoFiles = {
         caption: data.caption,
         province: data.province,
@@ -184,7 +278,7 @@ postRoute.put('/post/:postId', isAuthenticated, isAuthor, upload.array('image'),
     }
     return res.status(200).json(updatedPost);
 }));
-postRoute.delete('/post/:postId', isAuthenticated, catchAsync(async (req, res) => {
+postRoute.delete("/post/:postId", isAuthenticated, catchAsync(async (req, res) => {
     const postId = parseInt(req.params.postId);
     // Find post to delete
     const post = await db.post.findUnique({
@@ -193,7 +287,7 @@ postRoute.delete('/post/:postId', isAuthenticated, catchAsync(async (req, res) =
         },
     });
     if (!post) {
-        throw new ExpressError('Post not found', 404);
+        throw new ExpressError("Post not found", 404);
     }
     // Delete associated SharedPost records first
     await db.sharedPost.deleteMany({
@@ -212,7 +306,7 @@ postRoute.delete('/post/:postId', isAuthenticated, catchAsync(async (req, res) =
         .status(200)
         .json({ message: `Successfully deleted post! #${deletedPost.id}` });
 }));
-postRoute.post('/post/:postId/report', catchAsync(async (req, res) => {
+postRoute.post("/post/:postId/report", catchAsync(async (req, res) => {
     const { postId } = req.params;
     const currentUser = req.session.user?.id;
     const { reason } = req.body;
@@ -227,7 +321,7 @@ postRoute.post('/post/:postId/report', catchAsync(async (req, res) => {
     });
     // Determine if the post is the current user's post, if not, proceed to report
     if (!post || post.user.id === currentUser) {
-        throw new ExpressError('You cannot report your own post or the post does not exist', 403);
+        throw new ExpressError("You cannot report your own post or the post does not exist", 403);
     }
     // Check if the user has already reported this post
     const existingReport = await db.report.findFirst({
@@ -237,7 +331,7 @@ postRoute.post('/post/:postId/report', catchAsync(async (req, res) => {
         },
     });
     if (existingReport) {
-        throw new ExpressError('You already reported this post', 400);
+        throw new ExpressError("You already reported this post", 400);
     }
     // Create a report record
     await db.report.create({
@@ -270,14 +364,14 @@ postRoute.post('/post/:postId/report', catchAsync(async (req, res) => {
                 reports: true,
             },
         });
-        return res.json({ deletedReportedPost, message: 'Post was deleted' });
+        return res.json({ deletedReportedPost, message: "Post was deleted" });
     }
     return res
         .status(200)
-        .json({ message: 'Post reported successfully', updatedPost });
+        .json({ message: "Post reported successfully", updatedPost });
 }));
 //get reports via province e
-postRoute.get('/post/reported/:province', isAuthenticated, isProvinceAdmin, async (req, res) => {
+postRoute.get("/post/reported/:province", isAuthenticated, isProvinceAdmin, async (req, res) => {
     const province = req.params.province;
     const reportedPosts = await db.post.findMany({
         where: {
@@ -298,7 +392,7 @@ postRoute.get('/post/reported/:province', isAuthenticated, isProvinceAdmin, asyn
     }
 });
 //following posts
-postRoute.get('/following/posts', isAuthenticated, catchAsync(async (req, res) => {
+postRoute.get("/following/posts", isAuthenticated, catchAsync(async (req, res) => {
     const limit = parseInt(req.query.limit) || 1;
     const regularOffset = parseInt(req.query.offset) || 0;
     const sharedOffset = parseInt(req.query.sharedOffset) || 0;
@@ -318,7 +412,7 @@ postRoute.get('/following/posts', isAuthenticated, catchAsync(async (req, res) =
             user: true,
         },
         orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
         },
         skip: regularOffset,
         take: limit,
@@ -330,14 +424,14 @@ postRoute.get('/following/posts', isAuthenticated, catchAsync(async (req, res) =
     });
     const regularPostsWithType = regularPosts.map((post) => ({
         ...post,
-        type: 'regular',
+        type: "regular",
     }));
     const sharedPosts = await db.sharedPost.findMany({
         include: {
             user: true,
         },
         orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
         },
         skip: sharedOffset, // Use separate offset for shared posts
         take: limit,
@@ -349,7 +443,7 @@ postRoute.get('/following/posts', isAuthenticated, catchAsync(async (req, res) =
     });
     const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
         ...sharedPost,
-        type: 'shared',
+        type: "shared",
     }));
     const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
     // Sort combined posts by createdAt
@@ -357,7 +451,7 @@ postRoute.get('/following/posts', isAuthenticated, catchAsync(async (req, res) =
     res.status(200).json(sortedPosts);
 }));
 //get reports via province e
-postRoute.get('/get-post/:userId', isAuthenticated, catchAsync(async (req, res) => {
+postRoute.get("/get-post/:userId", isAuthenticated, catchAsync(async (req, res) => {
     const userId = parseInt(req.params.userId);
     const posts = await db.post.findMany({
         where: {
@@ -380,11 +474,11 @@ postRoute.get('/get-post/:userId', isAuthenticated, catchAsync(async (req, res) 
         return res.status(200).json(posts);
     }
 }));
-postRoute.get('/user/likes/:id', isAuthenticated, catchAsync(async (req, res) => {
+postRoute.get("/user/likes/:id", isAuthenticated, catchAsync(async (req, res) => {
     const userIdParam = req.params.id;
     const userId = parseInt(userIdParam);
     if (!userId) {
-        throw new Error('Invalid user ID');
+        throw new Error("Invalid user ID");
     }
     const likedPosts = await db.like.findMany({
         where: {
@@ -412,5 +506,30 @@ postRoute.get('/user/likes/:id', isAuthenticated, catchAsync(async (req, res) =>
     });
     res.status(200).json(likedPosts);
 }));
+// postRoute.get("/testnudes", async (req, res) => {
+//   try {
+//     const response = await axios.get(
+//       "https://api.sightengine.com/1.0/check.json",
+//       {
+//         params: {
+//           url: "https://res.cloudinary.com/dmpip4nzo/image/upload/v1714672569/uploads/urawsjdjqym8gvg61t0b.jpg",
+//           models: "nudity-2.0,offensive,gore",
+//           api_user: "1265562336",
+//           api_secret: "kEUrZw2vnrqS2XvArXXe77VCbvFf2k4j",
+//         },
+//       }
+//     );
+//     console.log(response.data);
+//     res.json(response.data);
+//   } catch (error) {
+//     // handle error
+//     if (axios.isAxiosError(error)) {
+//       if (error.response) res.json(error.response.data);
+//       else res.status(500).json({ error: error.message });
+//     } else {
+//       res.status(500).json({ error });
+//     }
+//   }
+// });
 export default postRoute;
 //# sourceMappingURL=postRoute.js.map
