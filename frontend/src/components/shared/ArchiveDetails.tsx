@@ -65,9 +65,11 @@ const ArchiveDetails: React.FC = () => {
         const data = await response.json();
         setArchiveData(data.data);
         console.log(archiveData);
-      } catch (error: any) {
+      } catch (error) {
         console.error(error);
-        setError(error.message || "Failed to fetch archive data");
+        
+          setError( "Failed to fetch archive data");
+ 
       } finally {
         setLoading(false);
       }

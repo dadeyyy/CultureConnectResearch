@@ -24,14 +24,14 @@ type IPost = {
   province: string;
   updatedAt: string;
   user: {
-    avatarUrl: string | null;
+    avatarUrl: string 
     createdAt: string;
     firstName: string;
     id: number;
     lastName: string;
     role: string;
     username: string;
-    province?: string;
+    province: string;
   };
   tags: string[];
   type: "shared" | "regular";

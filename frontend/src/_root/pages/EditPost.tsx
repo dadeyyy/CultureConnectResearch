@@ -3,7 +3,7 @@
 import { useParams } from "react-router-dom";
 import { getPostById, DummyPost } from "@/dummy/dummy";
 import Loader from "@/components/shared/Loader";
-import PostForm from "@/components/forms/PostForm";
+
 import { useEffect, useState } from "react";
 
 const EditPost = () => {
@@ -52,7 +52,7 @@ const EditPost = () => {
           <h2 className="h3-bold md:h2-bold text-left w-full">Edit Post</h2>
         </div>
 
-        <PostForm action="Update" post={post} />
+        {/* <PostForm action="Update" post={post} /> */}
       </div>
     </div>
   );

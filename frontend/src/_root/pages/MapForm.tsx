@@ -33,6 +33,10 @@ interface Point {
   createdAt: string;
   updatedAt: string;
   provinceId: string;
+  files: {
+    id: number;
+    url: string;
+  }[];
 }
 
 interface ArchivePoint {
