@@ -65,7 +65,7 @@ const PostCard = ({ post }: PostCardProps) => {
           <div className="flex items-center gap-2">
             {!post && <span>no post found</span>}
             <Avatar>
-              <AvatarImage src={post.user.avatarUrl} alt={`profile-pictre`} />
+              <AvatarImage src={post.user.avatarUrl || ''} alt={`profile-pictre`} />
               <AvatarFallback>
                 {getInitials(post?.user.firstName, post?.user.lastName)}
               </AvatarFallback>
