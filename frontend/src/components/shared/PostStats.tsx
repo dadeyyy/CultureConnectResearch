@@ -99,7 +99,7 @@ const PostStats = ({
     const fetchCommentCount = async () => {
       try {
         const response = await fetch(
-          `${}server/${
+          `${server}/${
             type === 'regular' ? `post/${postId}` : `shared-post/${shareId}`
           }/comments`,
           {
@@ -122,7 +122,7 @@ const PostStats = ({
     const checkLikeStatus = async () => {
       try {
         const response = await fetch(
-          `${}server/${
+          `${server}/${
             type === 'regular' ? `post/${postId}` : `shared/${shareId}`
           }/like-status`,
           {
