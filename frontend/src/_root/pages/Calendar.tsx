@@ -320,7 +320,7 @@ const Calendar = () => {
               {currentEvents.length > 0 ? (
                 currentEvents.map((event) => (
                   <li key={event.id}>
-                    <strong>• {formatDateToWord(event.startStr)}</strong> - {event.title}
+                    <strong>• {formatDateToWord(event.startDate)}</strong> - {event.title}
                   </li>
                 ))
               ) : (
