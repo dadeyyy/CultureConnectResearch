@@ -14,6 +14,7 @@ import archiveRoute from './router/archive.js';
 import followRouter from './router/followRoute.js';
 import liveStreamRoute from './router/liveStream.js';
 import profileRoute from './router/profileRoute.js';
+import notificationRoute from './router/notificationRoute.js';
 import { createServer } from 'node:http';
 import socket from './socket.js';
 import shareRoute from './router/shareRoute.js';
@@ -62,6 +63,7 @@ app.use('/', followRouter);
 app.use('/', shareRoute);
 app.use('/', heritageRoute);
 app.use('/', profileRoute);
+app.use('/', notificationRoute);
 app.all('*', (req, res) => {
     res.redirect('http://localhost:5173/');
     res.status(404).send('404 Not Found');

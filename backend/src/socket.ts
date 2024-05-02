@@ -5,7 +5,7 @@ function socket(server: any) {
   const botName = 'Livestream bot';
   const io = new Server(server, {
     cors: {
-      origin: 'http://localhost:5173'
+      origin: 'http://localhost:5173',
     },
     connectionStateRecovery: {},
   });
@@ -16,14 +16,11 @@ function socket(server: any) {
       socket.join(liveStreamRoomId);
 
       //Welcome current user:
-      socket.emit(
-        'message',
-        {
-            username: botName,
-            message: `Welcome to the livestream @${username}`,
-            timeStamp: new Date().toISOString(),
-          }
-      );
+      socket.emit('message', {
+        username: botName,
+        message: `Welcome to the livestream @${username}`,
+        timeStamp: new Date().toISOString(),
+      });
 
       //Broadcast when user connects
       socket.broadcast.to(liveStreamRoomId).emit('message', {
@@ -53,6 +50,51 @@ function socket(server: any) {
         });
       }
     );
+
+    type likeType = {
+      postAuthorId: number;
+      postId: number;
+      likerFirstName: string;
+      likerLastName: string;
+      type: string;
+    };
+    //Notification with like
+    socket.on('like', async (data: likeType) => {
+      let content = '';
+
+      if (data.type === 'likeShared') {
+        content = `${data.likerFirstName} ${data.likerLastName} liked your shared post`;
+      } else {
+        content = `${data.likerFirstName} ${data.likerLastName} liked your post`;
+      }
+      const notification = await db.notification.create({
+        data: {
+          type: data.type,
+          userId: data.postAuthorId,
+          content: content,
+          postId: data.postId,
+        },
+      });
+      io.emit('newNotifs', notification)
+    });
+
+
+    socket.on('fetchNotifications', async (data: any) => {
+      
+      // Fetch notifications based on the user ID
+      const userId = data.userId;
+      const notifications = await db.notification.findMany({
+        where: {
+          userId: userId
+        },
+        orderBy:{
+          createdAt: 'desc'
+        }
+      });
+    
+      // Emit the fetched notifications to all clients
+      socket.emit('initialNotifications', notifications);
+    });
 
     //Runs when client disconnects:
 
