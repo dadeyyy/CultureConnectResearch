@@ -47,7 +47,7 @@ algoRoute.get(
     });
 
     if (!userLikes) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const userLikesId = userLikes.likes.map((userLike) => userLike.postId);
@@ -60,9 +60,7 @@ algoRoute.get(
     const lastId = filteredUserLikesId[0];
 
     if (filteredUserLikesId.length === 0) {
-      return res
-        .status(204)
-        .json({ message: 'No liked posts found for the user' });
+      return res.status(204).json({ message: "No liked posts found for the user" });
     }
 
     const recentPost = await db.post.findMany({
@@ -76,9 +74,7 @@ algoRoute.get(
     });
 
     const recentPostStrint = recentPost.map((post) => post.id);
-    const similarDocuments = recommender.getSimilarDocuments(
-      recentPostStrint.toString()
-    );
+    const similarDocuments = recommender.getSimilarDocuments(recentPostStrint.toString());
     similarDocuments.map((id) => {
       console.log(+id.id);
     });
@@ -94,7 +90,7 @@ algoRoute.get(
       },
       orderBy: {
         likes: {
-          _count: 'desc',
+          _count: "desc",
         },
       },
       take: 5,
@@ -110,17 +106,15 @@ algoRoute.get(
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     res.status(200).json({ like: suggestedPosts });
   })
 );
 
-algoRoute.get(
-  '/interest',
-  isAuthenticated,
-  catchAsync(async (req: Request, res: Response) => {
+algoRoute.get("/interest", isAuthenticated, catchAsync(async (req:Request, res:Response) => {
+  
     const currentUser = req.session.user?.id;
 
     const userLikes = await db.user.findUnique({
@@ -133,7 +127,7 @@ algoRoute.get(
     });
 
     if (!userLikes) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const userLikesId = userLikes.likes.map((userLike) => userLike.postId);
@@ -146,9 +140,7 @@ algoRoute.get(
     const lastId = filteredUserLikesId[0];
 
     if (filteredUserLikesId.length === 0) {
-      return res
-        .status(204)
-        .json({ message: 'No liked posts found for the user' });
+      return res.status(204).json({ message: "No liked posts found for the user" });
     }
 
     const recentPost = await db.post.findMany({
@@ -167,7 +159,7 @@ algoRoute.get(
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const userInterests = user.interest || [];
@@ -176,26 +168,26 @@ algoRoute.get(
       where: {
         OR: userInterests.flatMap((interest) => [
           { tags: { has: interest } },
-          { caption: { contains: interest, mode: 'insensitive' } },
-          { province: { contains: interest, mode: 'insensitive' } },
-          { municipality: { contains: interest, mode: 'insensitive' } },
+          { caption: { contains: interest, mode: "insensitive" } },
+          { province: { contains: interest, mode: "insensitive" } },
+          { municipality: { contains: interest, mode: "insensitive" } },
         ]),
         id: {
           notIn: filteredUserLikesId,
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 5,
       include: {
         photos: true,
         user: true,
       },
-      distinct: ['id'],
+      distinct: ["id"],
     });
 
     return res.status(200).json({ interest: recommendedPosts });
-  })
-);
+  
+}))
 
 algoRoute.get(
   '/search',

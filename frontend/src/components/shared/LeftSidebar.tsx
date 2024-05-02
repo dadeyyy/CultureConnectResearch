@@ -73,6 +73,11 @@ const LeftSidebar = () => {
       label: "Live Streams",
     },
     {
+      imgURL: "/assets/icons/notification.svg",
+      route: "/notifications",
+      label: "Notifications",
+    },
+    {
       imgURL: `${user.imageUrl}`,
       route: `/profile/${user.id}`,
       label: "Profile",
