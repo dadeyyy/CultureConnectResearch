@@ -64,9 +64,13 @@ app.use('/', shareRoute);
 app.use('/', heritageRoute);
 app.use('/', profileRoute);
 app.use('/', notificationRoute);
+//This middleware will tell the application to use the built react-app
+// app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
+app.get('/test', (req, res) => {
+    res.json({ message: "HELKSJAFDLKSDJFSLDFK" });
+});
 app.all('*', (req, res) => {
-    res.redirect('http://localhost:5173/');
-    res.status(404).send('404 Not Found');
+    res.json({ message: "HELLO" });
 });
 //Error Handler:
 app.use(errorHandler);
