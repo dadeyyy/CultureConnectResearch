@@ -93,7 +93,6 @@ app.use('/', notificationRoute);
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
 
 app.all('*', (req, res) => {
-  res.redirect('http://localhost:5173/');
   res.status(404).send('404 Not Found');
 });
 
