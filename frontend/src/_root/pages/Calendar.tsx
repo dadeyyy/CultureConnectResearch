@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import ReactMapGl, { Marker } from "react-map-gl";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import allLocales from "@fullcalendar/core/locales-all";
-import { useUserContext } from "@/context/AuthContext";
-import { Button } from "@/components/ui/button";
-import { provinces } from "@/lib/provinces";
-import toast from "react-hot-toast";
-import timeGridPlugin from "@fullcalendar/timegrid";
+import { useCallback, useEffect, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import ReactMapGl, { Marker } from 'react-map-gl';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import allLocales from '@fullcalendar/core/locales-all';
+import { useUserContext } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { provinces } from '@/lib/provinces';
+import toast from 'react-hot-toast';
+import timeGridPlugin from '@fullcalendar/timegrid';
 import {
   Dialog,
   DialogTrigger,
@@ -18,19 +18,30 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import { DateSelectArg, EventApi, EventClickArg, EventInput } from "@fullcalendar/core/index.js";
-import rrulePlugin from "@fullcalendar/rrule";
-import CalendarForm from "@/components/forms/CalendarForm";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import Loader from "@/components/shared/Loader";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import {
+  DateSelectArg,
+  EventApi,
+  EventClickArg,
+  EventInput,
+} from '@fullcalendar/core/index.js';
+import rrulePlugin from '@fullcalendar/rrule';
+import CalendarForm from '@/components/forms/CalendarForm';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import Loader from '@/components/shared/Loader';
 
-mapboxgl.accessToken ="pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
+mapboxgl.accessToken =
+  'pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA';
 
 interface IEvent {
   id: string;
@@ -52,13 +63,13 @@ interface ICalendar {
   name: string;
   calendars: IEvent[];
 }
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000';
 
 const Calendar = () => {
   const { user } = useUserContext();
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedProvince, setSelectedProvince] = useState("Bataan");
+  const [selectedProvince, setSelectedProvince] = useState('Bataan');
   const [calendarDetails, setCalendarDetails] = useState<IEvent>();
   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([]);
   const [calendar, setCalendar] = useState<ICalendar>();
@@ -68,7 +79,7 @@ const Calendar = () => {
     (selectInfo: DateSelectArg) => {
       const selectedDateValue = selectInfo.start.toString();
       console.log(selectedDateValue);
-      setOpenModal(user.role === "USER" ? false : true);
+      setOpenModal(user.role === 'USER' ? false : true);
     },
     [user.role]
   );
@@ -78,11 +89,11 @@ const Calendar = () => {
       try {
         // Fetch additional event details using the event ID from the API
         const response = await fetch(`${server}/${clickInfo.event.id}`, {
-          credentials: "include",
+          credentials: 'include',
         });
 
         if (!response.ok) {
-          toast.error("Error fetching event details");
+          toast.error('Error fetching event details');
           return;
         }
 
@@ -99,8 +110,8 @@ const Calendar = () => {
   const handleDeleteClick = async (id: string) => {
     try {
       const response = await fetch(`${server}/delete-calendar/${id}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'DELETE',
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -113,7 +124,7 @@ const Calendar = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to delete calendar");
+      toast.error('Failed to delete calendar');
     }
   };
 
@@ -121,16 +132,16 @@ const Calendar = () => {
     const fetchCalendar = async () => {
       try {
         if (!selectedProvince) {
-          console.log("Please select a province");
+          console.log('Please select a province');
           return;
         }
 
         const response = await fetch(`${server}/province/${selectedProvince}`, {
-          credentials: "include",
+          credentials: 'include',
         });
 
         if (!response.ok) {
-          toast.error("Error fetching calendar");
+          toast.error('Error fetching calendar');
           return;
         }
 
@@ -145,12 +156,16 @@ const Calendar = () => {
               municipality: event.municipality,
               location: event.location,
               repeat: event.repeat,
-              startDate: new Date(event.startDate).toISOString().replace(/T.*$/, ""),
-              endDate: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
+              startStr: new Date(event.startDate)
+                .toISOString()
+                .replace(/T.*$/, ''),
+              endDate: new Date(event.endDate)
+                .toISOString()
+                .replace(/T.*$/, ''),
             }))
           );
         } else {
-          console.log("NO DATA");
+          console.log('NO DATA');
         }
       } catch (error) {
         toast.error(`Error fetching calendar: ${error}`);
@@ -166,16 +181,16 @@ const Calendar = () => {
 
   const getEventColor = (repeat: string): string => {
     switch (repeat) {
-      case "once":
-        return "blue";
-      case "weekly":
-        return "green";
-      case "monthly":
-        return "orange";
-      case "yearly":
-        return "purple";
+      case 'once':
+        return 'blue';
+      case 'weekly':
+        return 'green';
+      case 'monthly':
+        return 'orange';
+      case 'yearly':
+        return 'purple';
       default:
-        return "gray";
+        return 'gray';
     }
   };
 
@@ -205,15 +220,24 @@ const Calendar = () => {
       const eventInput: EventInput = {
         id: event.id,
         title: event.title,
-        start: new Date(event.startDate).toISOString().slice(0, 10).replace(/T.*$/, ""),
+        start: new Date(event.startDate)
+          .toISOString()
+          .slice(0, 10)
+          .replace(/T.*$/, ''),
         // end: new Date(event.endDate).toISOString().replace(/T.*$/, ""),
         color: getEventColor(event.repeat),
       };
 
-      if (event.repeat !== "once") {
+      if (event.repeat !== 'once') {
         eventInput.rrule = {
-          dtstart: new Date(event.startDate).toISOString().slice(0, 10).replace(/T.*$/, ""),
-          until: new Date(event.endDate).toISOString().slice(0, 10).replace(/T.*$/, ""),
+          dtstart: new Date(event.startDate)
+            .toISOString()
+            .slice(0, 10)
+            .replace(/T.*$/, ''),
+          until: new Date(event.endDate)
+            .toISOString()
+            .slice(0, 10)
+            .replace(/T.*$/, ''),
           freq: event.repeat,
         };
       }
@@ -246,9 +270,12 @@ const Calendar = () => {
   //   }) || [];
 
   const formatDateToWord = (dateString: string): string => {
-    const options: Intl.DateTimeFormatOptions = { month: "long", day: "numeric" };
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'long',
+      day: 'numeric',
+    };
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", options);
+    return date.toLocaleDateString('en-US', options);
   };
 
   return (
@@ -256,14 +283,19 @@ const Calendar = () => {
       <div className="w-full h-full flex lg:flex-row xs:flex-col ">
         <div className="w-full p-5 py-10 bg-blue-200 xs:h-2/3 lg:h-full overflow-auto">
           <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin]}
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              interactionPlugin,
+              rrulePlugin,
+            ]}
             initialView="dayGridMonth"
             selectable={
-              user.role === "ADMIN" &&
+              user.role === 'ADMIN' &&
               user.province?.toLowerCase() === selectedProvince.toLowerCase()
             }
             editable={
-              user.role === "ADMIN" &&
+              user.role === 'ADMIN' &&
               user.province?.toLowerCase() === selectedProvince.toLowerCase()
             }
             locales={allLocales}
@@ -272,9 +304,9 @@ const Calendar = () => {
             select={handleDateSelect}
             eventClick={handleEventClick}
             headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay',
             }}
             contentHeight={600}
           />
@@ -296,9 +328,12 @@ const Calendar = () => {
           </FormControl>
           <Dialog>
             <DialogTrigger asChild>
-              {user.role === "ADMIN" &&
-              user.province?.toLowerCase() === selectedProvince.toLowerCase() ? (
-                <Button className="xs:hidden lg:flex w-full my-5">Add Event</Button>
+              {user.role === 'ADMIN' &&
+              user.province?.toLowerCase() ===
+                selectedProvince.toLowerCase() ? (
+                <Button className="xs:hidden lg:flex w-full my-5">
+                  Add Event
+                </Button>
               ) : (
                 <></>
               )}
@@ -309,7 +344,7 @@ const Calendar = () => {
                 <DialogDescription>
                   Input information for the event you want to add
                 </DialogDescription>
-              </DialogHeader>{" "}
+              </DialogHeader>{' '}
               <CalendarForm province={selectedProvince} action="create" />
             </DialogContent>
           </Dialog>
@@ -320,7 +355,8 @@ const Calendar = () => {
               {currentEvents.length > 0 ? (
                 currentEvents.map((event) => (
                   <li key={event.id}>
-                    <strong>• {formatDateToWord(event.startDate)}</strong> - {event.title}
+                    <strong>• {formatDateToWord(event.startStr)}</strong> -{' '}
+                    {event.title}
                   </li>
                 ))
               ) : (
@@ -332,7 +368,9 @@ const Calendar = () => {
         <Sheet open={openModalDetails} onOpenChange={setOpenModalDetails}>
           <SheetContent className="lg:max-w-[720px] xs:w-full bg-white opacity-90 overflow-y-auto custom-scrollbar">
             <SheetHeader>
-              <SheetTitle className="text-2xl text-center">Event Details</SheetTitle>
+              <SheetTitle className="text-2xl text-center">
+                Event Details
+              </SheetTitle>
             </SheetHeader>
             {!calendarDetails ? (
               <Loader />
@@ -340,36 +378,55 @@ const Calendar = () => {
               <div className="flex flex-col gap-3 ">
                 <div className="flex flex-col gap-5">
                   <div className="flex">
-                    <Label className="mr-5 font-extrabold text-lg">Event Title: </Label>
-                    <Label className="text-lg font-regular">{calendarDetails.title}</Label>
+                    <Label className="mr-5 font-extrabold text-lg">
+                      Event Title:{' '}
+                    </Label>
+                    <Label className="text-lg font-regular">
+                      {calendarDetails.title}
+                    </Label>
                   </div>
                   <div className="flex">
-                    <Label className="mr-5 font-extrabold text-lg">Event Details: </Label>
-                    <Label className="text-lg font-regular  ">{calendarDetails.details}</Label>
+                    <Label className="mr-5 font-extrabold text-lg">
+                      Event Details:{' '}
+                    </Label>
+                    <Label className="text-lg font-regular  ">
+                      {calendarDetails.details}
+                    </Label>
                   </div>
                   <div className="flex">
-                    <Label className="mr-5 font-extrabold text-lg">Event repeat: </Label>
+                    <Label className="mr-5 font-extrabold text-lg">
+                      Event repeat:{' '}
+                    </Label>
                     <Label className="text-lg font-regular max-h-56 overflow-auto">
                       {calendarDetails.repeat}
                     </Label>
                   </div>
                   <div className="flex">
-                    <Label className="mr-5 font-extrabold text-lg">Event Date: </Label>
+                    <Label className="mr-5 font-extrabold text-lg">
+                      Event Date:{' '}
+                    </Label>
                     <Label className="text-lg font-regular">
                       {calendarDetails?.endDate === null
                         ? formatDateToWord(calendarDetails.startDate)
-                        : `${formatDateToWord(calendarDetails.startDate)} to ${formatDateToWord(
-                            calendarDetails.endDate
-                          )}`}
+                        : `${formatDateToWord(
+                            calendarDetails.startDate
+                          )} to ${formatDateToWord(calendarDetails.endDate)}`}
                     </Label>
                   </div>
                   <div className="flex">
-                    <Label className="mr-5 font-extrabold text-lg">Event Location: </Label>
+                    <Label className="mr-5 font-extrabold text-lg">
+                      Event Location:{' '}
+                    </Label>
                     <Label className="text-lg font-regular">
-                      In {calendarDetails.municipality}, {calendarDetails.provinceId}
+                      In {calendarDetails.municipality},{' '}
+                      {calendarDetails.provinceId}
                     </Label>
                   </div>
-                  <div className={`flex flex-col gap-1 ${user.role === "ADMIN" ? "" : "hidden"}`}>
+                  <div
+                    className={`flex flex-col gap-1 ${
+                      user.role === 'ADMIN' ? '' : 'hidden'
+                    }`}
+                  >
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button className={`bg-blue-500`}>Edit</Button>
@@ -377,8 +434,10 @@ const Calendar = () => {
                       <DialogContent className="w-full bg-white ">
                         <DialogHeader>
                           <DialogTitle>Edit event</DialogTitle>
-                          <DialogDescription>Edit information for the event</DialogDescription>
-                        </DialogHeader>{" "}
+                          <DialogDescription>
+                            Edit information for the event
+                          </DialogDescription>
+                        </DialogHeader>{' '}
                         <CalendarForm
                           province={selectedProvince}
                           calendarDetails={calendarDetails}
@@ -398,13 +457,13 @@ const Calendar = () => {
                 <div className="flex flex-col pl-3 h-full">
                   <Label className="mr-5 font-bold text-lg">Map: </Label>
                   <ReactMapGl
-                    mapLib={import("mapbox-gl")}
+                    mapLib={import('mapbox-gl')}
                     initialViewState={{
                       longitude: calendarDetails?.location.coordinates[0],
                       latitude: calendarDetails?.location.coordinates[1],
                       zoom: 10,
                     }}
-                    style={{ width: "100%", height: 550 }}
+                    style={{ width: '100%', height: 550 }}
                     mapStyle="mapbox://styles/mapbox/streets-v9"
                   >
                     <Marker

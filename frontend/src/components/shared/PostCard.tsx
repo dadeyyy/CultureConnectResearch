@@ -1,15 +1,15 @@
-import { Link } from "react-router-dom";
-import PostStats from "./PostStats";
-import { multiFormatDateString } from "@/lib/utils";
-import { useUserContext } from "@/context/AuthContext";
-import Carousel from "./Carousel";
-import { filterInappropriateWords } from "@/lib/CaptionFilter";
-import Comments from "./Comments";
-import { municipalities, provincesTest } from "@/lib/provinces";
-import ReportForm from "../forms/ReportForm";
-import { Badge } from "../ui/badge";
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Link } from 'react-router-dom';
+import PostStats from './PostStats';
+import { multiFormatDateString } from '@/lib/utils';
+import { useUserContext } from '@/context/AuthContext';
+import Carousel from './Carousel';
+import { filterInappropriateWords } from '@/lib/CaptionFilter';
+import Comments from './Comments';
+import { municipalities, provincesTest } from '@/lib/provinces';
+import ReportForm from '../forms/ReportForm';
+import { Badge } from '../ui/badge';
+import { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface PostCardProps {
   post: {
@@ -43,7 +43,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showFullCaption, setShowFullCaption] = useState(false);
   const truncatedCaption =
     post.caption.length > 128
-      ? `${post.caption.slice(0, post.caption.lastIndexOf(" ", 156))}...`
+      ? `${post.caption.slice(0, post.caption.lastIndexOf(' ', 156))}...`
       : post.caption;
   const toggleCaption = () => {
     setShowFullCaption(!showFullCaption);
@@ -54,8 +54,8 @@ const PostCard = ({ post }: PostCardProps) => {
   if (!post.user) return null;
 
   const getInitials = (firstName: string, lastName: string) => {
-    const firstInitial = firstName ? firstName.charAt(0) : "";
-    const lastInitial = lastName ? lastName.charAt(0) : "";
+    const firstInitial = firstName ? firstName.charAt(0) : '';
+    const lastInitial = lastName ? lastName.charAt(0) : '';
     return `${firstInitial}${lastInitial}`.toUpperCase();
   };
   return (
@@ -63,8 +63,9 @@ const PostCard = ({ post }: PostCardProps) => {
       <div className="flex-between">
         <Link to={`/profile/${post.user.id}`}>
           <div className="flex items-center gap-2">
+            {!post && <span>no post found</span>}
             <Avatar>
-              <AvatarImage src={post?.user.avatarUrl} alt={`profile-pictre`} />
+              <AvatarImage src={post.user.avatarUrl} alt={`profile-pictre`} />
               <AvatarFallback>
                 {getInitials(post?.user.firstName, post?.user.lastName)}
               </AvatarFallback>
@@ -82,23 +83,31 @@ const PostCard = ({ post }: PostCardProps) => {
                 )}
               </div>
               <div className="flex gap-2 text-dark-3">
-                <p className="subtle-regular xs:text-xs">{multiFormatDateString(post.createdAt)}</p>
                 <p className="subtle-regular xs:text-xs">
-                  {"In "}
+                  {multiFormatDateString(post.createdAt)}
+                </p>
+                <p className="subtle-regular xs:text-xs">
+                  {'In '}
                   {post?.municipality &&
                     municipalities[post.province]?.find(
                       (municipal) => municipal.value === post.municipality
                     )?.label}
-                  {", "}
+                  {', '}
                   {post?.province &&
-                    provincesTest.find((province) => province.value === post.province)?.label}
+                    provincesTest.find(
+                      (province) => province.value === post.province
+                    )?.label}
                 </p>
               </div>
             </div>
           </div>
         </Link>
 
-        <ReportForm userId={user.id} postId={post.id} postUserId={post.user.id} />
+        <ReportForm
+          userId={user.id}
+          postId={post.id}
+          postUserId={post.user.id}
+        />
       </div>
 
       <Link to={`/posts/${post.id}`}>
