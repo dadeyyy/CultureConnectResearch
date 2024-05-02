@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   Dialog,
   DialogContent,
@@ -8,13 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { useUserContext } from "@/context/AuthContext";
-import { Textarea } from "../ui/textarea";
+} from '@/components/ui/dialog';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { Button } from '@/components/ui/button';
+import { useUserContext } from '@/context/AuthContext';
+import { Textarea } from '../ui/textarea';
 import {
   Form,
   FormControl,
@@ -22,22 +22,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Badge } from "../ui/badge";
-import { IPost, multiFormatDateString } from "@/lib/utils";
-import { municipalities, provincesTest } from "@/lib/provinces";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/form';
+import { Badge } from '../ui/badge';
+import { IPost, multiFormatDateString } from '@/lib/utils';
+import { municipalities, provincesTest } from '@/lib/provinces';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
+} from '@/components/ui/carousel';
+import { io } from 'socket.io-client';
 
 const formSchema = z.object({
   caption: z.string().min(0, {
-    message: "You cannot create a post without a caption.",
+    message: 'You cannot create a post without a caption.',
   }),
 });
 
@@ -45,10 +46,19 @@ interface PostStatsProps {
   postId: number;
   userId: number;
   shareId?: number;
-  type: "regular" | "shared";
+  type: 'regular' | 'shared';
+  sharedAuthorId?: number;
 }
 
-const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
+const socket = io('http://localhost:8000');
+
+const PostStats = ({
+  postId,
+  userId,
+  shareId,
+  type,
+  sharedAuthorId,
+}: PostStatsProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isLoading } = useUserContext();
@@ -60,7 +70,7 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      caption: "",
+      caption: '',
     },
   });
 
@@ -68,7 +78,7 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
     const fetchPost = async () => {
       try {
         const response = await fetch(`http://localhost:8000/post/${postId}`, {
-          credentials: "include",
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -78,7 +88,7 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
         const postData = await response.json();
         setPost(postData);
       } catch (error) {
-        console.error("Error fetching post:", error);
+        console.error('Error fetching post:', error);
       }
     };
 
@@ -90,10 +100,10 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
       try {
         const response = await fetch(
           `http://localhost:8000/${
-            type === "regular" ? `post/${postId}` : `shared-post/${shareId}`
+            type === 'regular' ? `post/${postId}` : `shared-post/${shareId}`
           }/comments`,
           {
-            credentials: "include",
+            credentials: 'include',
           }
         );
         const data = await response.json();
@@ -101,7 +111,7 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
           setCommentCount(data.comments.length);
         }
       } catch (error) {
-        console.error("Error fetching comment count:", error);
+        console.error('Error fetching comment count:', error);
       }
     };
 
@@ -113,16 +123,19 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
       try {
         const response = await fetch(
           `http://localhost:8000/${
-            type === "regular" ? `post/${postId}` : `shared/${shareId}`
+            type === 'regular' ? `post/${postId}` : `shared/${shareId}`
           }/like-status`,
           {
-            method: "GET",
-            credentials: "include",
+            method: 'GET',
+            credentials: 'include',
           }
         );
 
         if (!response.ok) {
-          console.error("Error checking like status. Server responded with:", response);
+          console.error(
+            'Error checking like status. Server responded with:',
+            response
+          );
           return;
         }
 
@@ -130,7 +143,7 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
         setIsLiked(data.isLiked);
         setLikeCount(data.count);
       } catch (error) {
-        console.error("Error checking like status:", error);
+        console.error('Error checking like status:', error);
       }
     };
 
@@ -142,56 +155,87 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
     setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
     try {
       const response = await fetch(
-        `http://localhost:8000/${type === "regular" ? `post/${postId}` : `shared/${shareId}`}/like`,
+        `http://localhost:8000/${
+          type === 'regular' ? `post/${postId}` : `shared/${shareId}`
+        }/like`,
         {
-          method: "POST",
-          credentials: "include",
+          method: 'POST',
+          credentials: 'include',
         }
       );
 
       if (!response.ok) {
-        console.error("Error liking post. Server responded with:", response);
+        console.error('Error liking post. Server responded with:', response);
         return;
       }
-
+      // {userId, firstName: user.firstName, lastName: user.lastName}
       const data = await response.json();
       setLikeCount(data.count);
+      // if()
+      if (!isLiked && post?.user.id !== user.id) {
+        if (type === 'regular') {
+          socket.emit('like', {
+            postAuthorId: post?.user.id,
+            postId: post?.id,
+            likerFirstName: user.firstName,
+            likerLastName: user.lastName,
+            type: 'like',
+          });
+        } else if (type === 'shared') {
+
+          socket.emit('like', {
+            postAuthorId: sharedAuthorId,
+            postId: shareId,
+            likerFirstName: user.firstName,
+            likerLastName: user.lastName,
+            type: 'likeShared',
+          });
+        }
+      }
+      
     } catch (error) {
-      console.error("Error liking post:", error);
+      console.error('Error liking post:', error);
     }
   };
 
   const handleShare = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log(values);
-      const response = await fetch(`http://localhost:8000/post/share/${postId}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      const response = await fetch(
+        `http://localhost:8000/post/share/${postId}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
       if (!response.ok) {
-        console.error("Error liking post. Server responded with:", response);
+        console.error('Error liking post. Server responded with:', response);
         return;
       }
-      toast.success("Shared Successfully");
+      toast.success('Shared Successfully');
       navigate(`/home`);
     } catch (error) {
-      console.error("Error liking post:", error);
-      toast.error("Failed to Share");
+      console.error('Error liking post:', error);
+      toast.error('Failed to Share');
     }
   };
 
-  const containerStyles = location.pathname.startsWith("/profile") ? "w-full" : "";
+  const containerStyles = location.pathname.startsWith('/profile')
+    ? 'w-full'
+    : '';
 
   return (
-    <div className={`flex justify-between w-full items-center my-5 z-20 ${containerStyles}`}>
+    <div
+      className={`flex justify-between w-full items-center my-5 z-20 ${containerStyles}`}
+    >
       <div className="flex gap-2 mr-5">
         <img
-          src={isLiked ? "/assets/icons/liked.svg" : "/assets/icons/like.svg"}
+          src={isLiked ? '/assets/icons/liked.svg' : '/assets/icons/like.svg'}
           alt="like"
           width={20}
           height={20}
@@ -202,14 +246,19 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
       </div>
       <a
         onClick={() => {
-          navigate(`/${type === "regular" ? `posts/${postId}` : `shared-post/${shareId}`}`);
+          navigate(
+            `/${
+              type === 'regular' ? `posts/${postId}` : `shared-post/${shareId}`
+            }`
+          );
         }}
-
-        className={`hover:cursor-pointer focus:outline-none  ${showComments ? "hidden" : ""}`}
+        className={`hover:cursor-pointer focus:outline-none  ${
+          showComments ? 'hidden' : ''
+        }`}
       >
         <div className="flex flex-row gap-1">
           <img
-            src={"/assets/icons/comment.svg"}
+            src={'/assets/icons/comment.svg'}
             alt="comment"
             width={25}
             height={25}
@@ -223,7 +272,7 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
         <DialogTrigger asChild>
           <div className="flex flex-row gap-1 items-center cursor-pointer">
             <img
-              src={"/assets/icons/share.svg"}
+              src={'/assets/icons/share.svg'}
               alt="comment"
               width={25}
               height={25}
@@ -234,17 +283,23 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[560px]">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleShare)} encType="multipart/form-data">
+            <form
+              onSubmit={form.handleSubmit(handleShare)}
+              encType="multipart/form-data"
+            >
               <DialogHeader className="flex flex-row justify-center  border-2 border-transparent border-b-gray-300 items-center p-2">
-                <DialogTitle className="text-xl font-bold">Share Post</DialogTitle>
+                <DialogTitle className="text-xl font-bold">
+                  Share Post
+                </DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 ">
                 <div className="flex gap-3 items-center mt-5 hover:cursor-pointer">
                   <img
                     src={
                       isLoading
-                        ? "/assets/icons/profile-placeholder.svg"
-                        : user.imageUrl || "/assets/icons/profile-placeholder.svg"
+                        ? '/assets/icons/profile-placeholder.svg'
+                        : user.imageUrl ||
+                          '/assets/icons/profile-placeholder.svg'
                     }
                     alt="profile picture"
                     className="h-12 w-12 rounded-full bg-cover"
@@ -262,7 +317,9 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
                         <p className="font-bold text-regular">
                           {user.firstName} {user.lastName}
                         </p>
-                        <p className="small-regular text-light-3">@{user.username}</p>
+                        <p className="small-regular text-light-3">
+                          @{user.username}
+                        </p>
                       </>
                     )}
                   </div>
@@ -318,7 +375,10 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
 
                   <div className="flex items-center gap-3">
                     <img
-                      src={post?.user.avatarUrl || "/assets/icons/profile-placeholder.svg"}
+                      src={
+                        post?.user.avatarUrl ||
+                        '/assets/icons/profile-placeholder.svg'
+                      }
                       alt="user"
                       className="w-8 h-8 lg:w-12 lg:h-12 object-cover rounded-full"
                     />
@@ -340,15 +400,17 @@ const PostStats = ({ postId, userId, shareId, type }: PostStatsProps) => {
                         </p>
                         •
                         <p className="text-regular lg:text-sm">
-                          {"In "}
+                          {'In '}
                           {post?.municipality &&
                             municipalities[post?.province]?.find(
-                              (municipal) => municipal.value === post?.municipality
+                              (municipal) =>
+                                municipal.value === post?.municipality
                             )?.label}
-                          {", "}
+                          {', '}
                           {post?.province &&
-                            provincesTest.find((province) => province.value === post?.province)
-                              ?.label}
+                            provincesTest.find(
+                              (province) => province.value === post?.province
+                            )?.label}
                         </p>
                       </div>
                     </div>

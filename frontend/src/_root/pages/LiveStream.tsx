@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import VideoCard from '@/components/shared/VideoCard';
-// import { io } from 'socket.io-client';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Carousel,

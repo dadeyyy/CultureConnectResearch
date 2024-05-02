@@ -213,7 +213,7 @@ const SharedPostCard = ({ id, caption, userId, createdAt, postId, author }: Post
           </Link>
           <Carousel photos={post?.photos || []} />
         </div>
-        <PostStats postId={post.id} userId={user.id} shareId={id} type="shared" />
+        <PostStats sharedAuthorId={author.id} postId={post.id} userId={user.id} shareId={id} type="shared" />
         <Comments postId={id} action="home" type="shared" />
       </div>
     </div>

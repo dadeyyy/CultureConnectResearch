@@ -22,6 +22,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import heritageRoute from './router/heritage.js';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { db } from './utils/db.server.js';
+import path from 'node:path';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -85,15 +86,16 @@ app.use('/', liveStreamRoute);
 app.use('/', followRouter);
 app.use('/', shareRoute);
 app.use('/', heritageRoute);
-app.use('/', profileRoute );
+app.use('/', profileRoute);
 app.use('/', notificationRoute);
 
+//This middleware will tell the application to use the built react-app
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
 
 app.all('*', (req, res) => {
-  res.redirect('http://localhost:5173/')
+  res.redirect('http://localhost:5173/');
   res.status(404).send('404 Not Found');
 });
-
 
 //Error Handler:
 app.use(errorHandler);

@@ -1,8 +1,6 @@
 import VideoCard from '@/components/shared/VideoCard';
 import { Button } from '@/components/ui/button';
-// import { io } from 'socket.io-client';
 import { Card } from '@/components/ui/card';
-
 import { Input } from '@/components/ui/input';
 import { useUserContext } from '@/context/AuthContext';
 import { filterInappropriateWords } from '@/lib/CaptionFilter';
