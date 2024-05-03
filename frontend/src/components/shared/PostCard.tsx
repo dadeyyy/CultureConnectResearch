@@ -58,6 +58,7 @@ const PostCard = ({ post }: PostCardProps) => {
     const lastInitial = lastName ? lastName.charAt(0) : "";
     return `${firstInitial}${lastInitial}`.toUpperCase();
   };
+
   return (
     <div className="post-card">
       <div className="flex-between">
@@ -82,7 +83,9 @@ const PostCard = ({ post }: PostCardProps) => {
                 )}
               </div>
               <div className="flex gap-2 text-dark-3">
-                <p className="subtle-regular xs:text-xs">{multiFormatDateString(post.createdAt)}</p>
+                <p className="subtle-regular xs:text-xs">
+                  {multiFormatDateString(post.createdAt)}
+                </p>
                 <p className="subtle-regular xs:text-xs">
                   {"In "}
                   {post?.municipality &&
@@ -91,14 +94,20 @@ const PostCard = ({ post }: PostCardProps) => {
                     )?.label}
                   {", "}
                   {post?.province &&
-                    provincesTest.find((province) => province.value === post.province)?.label}
+                    provincesTest.find(
+                      (province) => province.value === post.province
+                    )?.label}
                 </p>
               </div>
             </div>
           </div>
         </Link>
 
-        <ReportForm userId={user.id} postId={post.id} postUserId={post.user.id} />
+        <ReportForm
+          userId={user.id}
+          postId={post.id}
+          postUserId={post.user.id}
+        />
       </div>
 
       <Link to={`/posts/${post.id}`}>

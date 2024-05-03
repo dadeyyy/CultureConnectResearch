@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -20,17 +20,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { provincesTest, municipalities } from "@/lib/provinces";
 import { blacklist } from "./PostInfo";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "../ui/input";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-import { IPost, multiFormatDateString } from "@/lib/utils";
-import ArchiveUploader from "../shared/ArchiveUploader";
+import { IPost } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 const formSchema = z.object({
@@ -52,28 +55,10 @@ type PostFormProps = {
   post?: IPost;
 };
 
-type PostProps = {
-  caption: string;
-  createdAt: string;
-  id: number;
-  municipality: string;
-  photos: {
-    id: number;
-    url: string;
-    filename: string;
-    postId: number;
-  }[];
-  province: string;
-  updatedAt: string;
-  userId: number;
-  tags: string[];
-};
-
 const PostForm = ({ action, post }: PostFormProps) => {
   const { id } = useParams();
   // const [post, setPost] = useState<PostProps | null>(null);
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-  const [selectedMunicipal, setSelectedMunicipal] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const navigate = useNavigate();
@@ -163,6 +148,7 @@ const PostForm = ({ action, post }: PostFormProps) => {
           formData.append(`image`, file);
         });
       }
+
       try {
         const response = await fetch("http://localhost:8000/post", {
           method: "POST",
@@ -176,7 +162,7 @@ const PostForm = ({ action, post }: PostFormProps) => {
         const data = await response.json();
         toast.success("Posting successful!");
         setIsLoading(false);
-        navigate("/home");
+        navigate(0);
       } catch (error) {
         toast.error("Error during POST request:");
         setIsLoading(false);
@@ -187,7 +173,10 @@ const PostForm = ({ action, post }: PostFormProps) => {
   };
 
   const handleFilesRemoved = (removedFileNames: string[]) => {
-    setDeletedFiles((prevDeletedFiles) => [...prevDeletedFiles, ...removedFileNames]);
+    setDeletedFiles((prevDeletedFiles) => [
+      ...prevDeletedFiles,
+      ...removedFileNames,
+    ]);
   };
 
   return (
@@ -236,11 +225,13 @@ const PostForm = ({ action, post }: PostFormProps) => {
                             )}
                           >
                             {field.value
-                              ? provincesTest.find((province) => province.value === field.value)
-                                  ?.label
+                              ? provincesTest.find(
+                                  (province) => province.value === field.value
+                                )?.label
                               : post?.province
-                              ? provincesTest.find((province) => province.value === post.province)
-                                  ?.label
+                              ? provincesTest.find(
+                                  (province) => province.value === post.province
+                                )?.label
                               : "Select Province"}
 
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -289,7 +280,8 @@ const PostForm = ({ action, post }: PostFormProps) => {
                               !field.value && "text-muted-foreground"
                             )}
                             disabled={
-                              !selectedProvince || !municipalities[selectedProvince]?.length
+                              !selectedProvince ||
+                              !municipalities[selectedProvince]?.length
                             }
                           >
                             {selectedProvince !== null
@@ -298,7 +290,8 @@ const PostForm = ({ action, post }: PostFormProps) => {
                                 )?.label
                               : post?.province
                               ? (municipalities[post.province] || []).find(
-                                  (municipal) => municipal.value === post.municipality
+                                  (municipal) =>
+                                    municipal.value === post.municipality
                                 )?.label
                               : "Select Municipality"}
 
@@ -312,19 +305,27 @@ const PostForm = ({ action, post }: PostFormProps) => {
                           <CommandEmpty>No municipal found.</CommandEmpty>
                           <CommandGroup className="max-h-[200px] overflow-y-auto">
                             {selectedProvince &&
-                              municipalities[selectedProvince]?.map((municipal) => (
-                                <CommandItem
-                                  value={municipal.label}
-                                  key={municipal.value}
-                                  onSelect={() => {
-                                    form.setValue("municipality", municipal.value);
-                                    field.onChange(municipal.value); // Update the field.value
-                                    console.log("Selected Municipality:", municipal.label);
-                                  }}
-                                >
-                                  {municipal.label}
-                                </CommandItem>
-                              ))}
+                              municipalities[selectedProvince]?.map(
+                                (municipal) => (
+                                  <CommandItem
+                                    value={municipal.label}
+                                    key={municipal.value}
+                                    onSelect={() => {
+                                      form.setValue(
+                                        "municipality",
+                                        municipal.value
+                                      );
+                                      field.onChange(municipal.value); // Update the field.value
+                                      console.log(
+                                        "Selected Municipality:",
+                                        municipal.label
+                                      );
+                                    }}
+                                  >
+                                    {municipal.label}
+                                  </CommandItem>
+                                )
+                              )}
                           </CommandGroup>
                         </Command>
                       </PopoverContent>
@@ -384,10 +385,17 @@ const PostForm = ({ action, post }: PostFormProps) => {
           </div>
         )}
         <div className="flex gap-4 items-center justify-end">
-          <Button type="button" className="shad-button_dark-4" onClick={() => navigate(-1)}>
+          <Button
+            type="button"
+            className="shad-button_dark-4"
+            onClick={() => navigate(-1)}
+          >
             Cancel
           </Button>
-          <Button type="submit" className="shad-button_primary whitespace-nowrap">
+          <Button
+            type="submit"
+            className="shad-button_primary whitespace-nowrap"
+          >
             Submit
           </Button>
         </div>

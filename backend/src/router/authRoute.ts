@@ -100,6 +100,8 @@ authRouter.post(
   '/signup',
   validate(signUpSchema),
   catchAsync(async (req: Request, res: Response) => {
+    
+
     const data: signUpType = req.body;
     //Generate confirmation token
     const confirmationToken = uuidv4();

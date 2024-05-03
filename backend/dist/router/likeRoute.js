@@ -20,6 +20,18 @@ likeRoute.post('/post/:postId/like', isAuthenticated, catchAsync(async (req, res
                 id: existingLike.id,
             },
         });
+        const notif = await db.notification.findFirst({
+            where: {
+                type: 'like',
+                postId: +postId,
+            }
+        });
+        console.log(notif);
+        await db.notification.delete({
+            where: {
+                id: notif?.id
+            }
+        });
         const count = await db.like.count({
             where: {
                 postId: +postId,
@@ -78,6 +90,18 @@ likeRoute.post('/shared/:sharedId/like', isAuthenticated, catchAsync(async (req,
             where: {
                 id: existingLike.id,
             },
+        });
+        const notif = await db.notification.findFirst({
+            where: {
+                type: 'likeShared',
+                postId: +sharedId,
+            }
+        });
+        console.log(notif);
+        await db.notification.delete({
+            where: {
+                id: notif?.id
+            }
         });
         const count = await db.like.count({
             where: {

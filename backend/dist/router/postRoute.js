@@ -33,12 +33,6 @@ const postRoute = express.Router();
 //     }
 //   }
 // });
-const post = await db.post.findMany({
-    where: { isValidated: false },
-    include: {
-        photos: true,
-    },
-});
 async function validateImage(url, id) {
     try {
         const response = await axios.get("https://api.sightengine.com/1.0/check.json", {
@@ -60,7 +54,22 @@ async function validateImage(url, id) {
             result.nudity.sexual_activity >= 0.8 ||
             result.nudity.sexual_display >= 0.8 ||
             result.offensive.prob >= 0.8) {
-            return "Your post has been removed because it violates our terms and agreements.";
+            await db.sharedPost.deleteMany({
+                where: {
+                    postId: id,
+                },
+            });
+            const deletePost = await db.post.delete({
+                where: {
+                    id: id,
+                },
+                include: {
+                    reports: true,
+                    photos: true,
+                    sharedPost: true,
+                },
+            });
+            return deletePost;
         }
         else {
             const updatedPost = await db.post.update({
@@ -91,15 +100,24 @@ async function validateImage(url, id) {
         }
     }
 }
-post.map(async (images) => images.photos.map(async (image) => {
-    try {
-        const result = await validateImage(image.url, images.id);
-        console.log(result);
-    }
-    catch (error) {
-        console.error("Error:", error);
-    }
-}));
+setInterval(async () => {
+    const post = await db.post.findMany({
+        where: { isValidated: false },
+        include: {
+            photos: true,
+        },
+    });
+    post.map(async (images) => images.photos.map(async (image) => {
+        try {
+            const result = await validateImage(image.url, images.id);
+            console.log(result);
+        }
+        catch (error) {
+            console.error("Error:", error);
+        }
+    }));
+    console.log("Running background task...");
+}, 10000);
 //ADD POST
 postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSchema), catchAsync(async (req, res) => {
     const data = req.body;
@@ -148,20 +166,36 @@ postRoute.get("/post", isAuthenticated, catchAsync(async (req, res) => {
     });
     res.status(200).json(allPost);
 }));
+const deleteOldestData = (array) => {
+    setTimeout(() => {
+        array.shift();
+    }, 2000);
+};
+setInterval(() => {
+    deleteOldestData(postIds);
+    deleteOldestData(sharedPostIds);
+}, 30000);
+let postIds = [];
+let sharedPostIds = [];
 //fetch all
 postRoute.get("/post/all", isAuthenticated, catchAsync(async (req, res) => {
     const limit = parseInt(req.query.limit) || 1;
-    const regularOffset = parseInt(req.query.offset) || 0;
-    const sharedOffset = parseInt(req.query.sharedOffset) || 0; // New offset for shared posts
+    console.log(postIds);
+    // Fetch existing post IDs
     const regularPosts = await db.post.findMany({
         include: {
             photos: true,
             user: true,
         },
+        where: {
+            isValidated: true,
+            id: {
+                notIn: postIds,
+            },
+        },
         orderBy: {
             createdAt: "desc",
         },
-        skip: regularOffset,
         take: limit,
     });
     const regularPostsWithType = regularPosts.map((post) => ({
@@ -172,10 +206,14 @@ postRoute.get("/post/all", isAuthenticated, catchAsync(async (req, res) => {
         include: {
             user: true,
         },
+        where: {
+            id: {
+                notIn: sharedPostIds,
+            },
+        },
         orderBy: {
             createdAt: "desc",
         },
-        skip: sharedOffset, // Use separate offset for shared posts
         take: limit,
     });
     const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
@@ -186,7 +224,65 @@ postRoute.get("/post/all", isAuthenticated, catchAsync(async (req, res) => {
     // Sort combined posts by createdAt
     const sortedPosts = allPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     res.status(200).json(sortedPosts);
+    regularPosts.forEach((post) => {
+        postIds.push(post.id);
+    });
+    console.log(postIds);
+    sharedPosts.forEach((post) => {
+        sharedPostIds.push(post.id);
+    });
+    console.log(sharedPostIds);
 }));
+//fetch all
+// postRoute.get(
+//   "/post/all",
+//   isAuthenticated,
+//   catchAsync(async (req: Request, res: Response) => {
+//     const limit: number = parseInt(req.query.limit as string) || 1;
+//     const regularOffset: number = parseInt(req.query.offset as string) || 0;
+//     const sharedOffset: number =
+//       parseInt(req.query.sharedOffset as string) || 0; // New offset for shared posts
+//     const regularPosts = await db.post.findMany({
+//       include: {
+//         photos: true,
+//         user: true,
+//       },
+//       where: {
+//         isValidated: true,
+//       },
+//       orderBy: {
+//         createdAt: "desc",
+//       },
+//       skip: regularOffset,
+//       take: limit,
+//     });
+//     const regularPostsWithType = regularPosts.map((post) => ({
+//       ...post,
+//       type: "regular",
+//     }));
+//     const sharedPosts = await db.sharedPost.findMany({
+//       include: {
+//         user: true,
+//       },
+//       orderBy: {
+//         createdAt: "desc",
+//       },
+//       skip: sharedOffset, // Use separate offset for shared posts
+//       take: limit,
+//     });
+//     const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
+//       ...sharedPost,
+//       type: "shared",
+//     }));
+//     const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
+//     // Sort combined posts by createdAt
+//     const sortedPosts = allPosts.sort(
+//       (a, b) =>
+//         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+//     );
+//     res.status(200).json(sortedPosts);
+//   })
+// );
 // GET SPECIFIC POST
 postRoute.get("/post/:id", isAuthenticated, catchAsync(async (req, res) => {
     // Get parameter ID

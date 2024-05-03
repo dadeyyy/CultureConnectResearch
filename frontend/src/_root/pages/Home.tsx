@@ -24,14 +24,14 @@ type IPost = {
   province: string;
   updatedAt: string;
   user: {
-    avatarUrl: string | null;
+    avatarUrl: string;
     createdAt: string;
     firstName: string;
     id: number;
     lastName: string;
     role: string;
     username: string;
-    province?: string;
+    province: string;
   };
   tags: string[];
   type: "shared" | "regular";
@@ -61,22 +61,18 @@ const Home = () => {
   const [people, setPeople] = useState<peopleProps>([]);
   const [peopleLoad, setPeopleLoad] = useState(false);
 
-  const sharedPostCount = postData.filter(
-    (post) => post.type === "shared"
-  ).length;
-  const regularPostCount = postData.filter(
-    (post) => post.type === "regular"
-  ).length;
+  // const sharedPostCount = postData.filter(
+  //   (post) => post.type === "shared"
+  // ).length;
+  // const regularPostCount = postData.filter(
+  //   (post) => post.type === "regular"
+  // ).length;
 
-  const fetchPosts = async (
-    limit: number,
-    offset: number,
-    sharedOffset: number
-  ) => {
+  const fetchPosts = async (limit: number) => {
     try {
-      let endpoint = `http://localhost:8000/post/all?limit=${limit}&offset=${offset}&sharedOffset=${sharedOffset}`;
+      let endpoint = `http://localhost:8000/post/all?limit=${limit}`;
       if (selectedSection === "Following") {
-        endpoint = `http://localhost:8000/following/posts?userId=${user.id}&limit=${limit}&offset=${offset}&sharedOffset=${sharedOffset}`;
+        endpoint = `http://localhost:8000/following/posts?userId=${user.id}&limit=${limit}`;
       }
       const response = await fetch(endpoint, {
         credentials: "include",
@@ -103,15 +99,15 @@ const Home = () => {
   useEffect(() => {
     setPostData([]);
     setIsPostLoading(true);
-    fetchPosts(5, 0, 0);
-  }, [selectedSection]);
+    fetchPosts(5);
+  }, []);
 
   useEffect(() => {
     const observerInstance = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isPostLoading && !error) {
           setIsLoadingMore(true);
-          fetchPosts(5, regularPostCount, sharedPostCount); // Fetch more posts when scrolling to the end
+          fetchPosts(5); // Fetch more posts when scrolling to the end
         }
       },
       { threshold: 1 }
