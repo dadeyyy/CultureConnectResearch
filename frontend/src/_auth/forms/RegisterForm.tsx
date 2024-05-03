@@ -26,7 +26,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 
 const RegisterForm = () => {
   const navigate = useNavigate();

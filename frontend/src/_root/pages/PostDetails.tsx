@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import PostForm from "@/components/forms/PostForm";
 import toast from "react-hot-toast";
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();

@@ -33,7 +33,7 @@ const FormSchema = z.object({
     required_error: "Select a reason.",
   }),
 });
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const ReportForm = ({
   userId,
   postId,

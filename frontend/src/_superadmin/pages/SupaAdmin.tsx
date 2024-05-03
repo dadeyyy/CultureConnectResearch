@@ -24,7 +24,7 @@ import toast from "react-hot-toast";
 import { provincesTest } from "@/lib/provinces";
 import { useState } from "react";
 import { Box, LinearProgress } from "@mui/material";
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
 const SupaAdmin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);

@@ -35,7 +35,7 @@ const idColor = (id: number) => {
   return color;
 };
 
-const socket = io('${server}');
+const socket = io('http://localhost:8000');
 type commentResponse = {
   id: number;
   content: string;
@@ -51,7 +51,7 @@ type Comment = {
   message: string;
   timeStamp: string;
 };
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const LiveDetails = () => {
   const { id } = useParams();
   const { user } = useUserContext();

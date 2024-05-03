@@ -39,7 +39,8 @@ type IContextType = {
 };
 
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
+console.log(server)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // const USER_STORAGE_KEY = "currentUser";
   const navigate = useNavigate();

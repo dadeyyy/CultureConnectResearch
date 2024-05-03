@@ -33,7 +33,7 @@ import { IPost, multiFormatDateString } from "@/lib/utils";
 import ArchiveUploader from "../shared/ArchiveUploader";
 import toast from "react-hot-toast";
 
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
 
 const formSchema = z.object({
   caption: z.string().min(0, {

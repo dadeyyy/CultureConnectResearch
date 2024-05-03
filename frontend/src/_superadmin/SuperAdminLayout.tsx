@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Outlet } from "react-router-dom";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
 const SuperAdminLayout = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();

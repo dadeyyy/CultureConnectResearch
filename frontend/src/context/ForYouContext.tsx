@@ -42,7 +42,7 @@ const PostContext = createContext<IPostContext | undefined>(undefined);
 interface ForYouProviderProps {
   children: ReactNode;
 }
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 export const ForYouProvider: React.FC<ForYouProviderProps> = ({ children }) => {
   const [postData, setPostData] = useState<IPost[]>([]);
   const [isPostLoading, setIsPostLoading] = useState(true);

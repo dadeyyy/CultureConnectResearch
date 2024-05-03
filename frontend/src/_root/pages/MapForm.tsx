@@ -80,7 +80,7 @@ type MapProps = {
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGFkZXkiLCJhIjoiY2xyOWhjcW45MDFkZjJtbGRhM2toN2k4ZiJ9.STlq7rzxQrBIiH4BbrEvoA";
 
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
 
 const MapForm: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);

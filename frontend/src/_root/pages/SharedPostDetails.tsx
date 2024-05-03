@@ -21,7 +21,7 @@ const formSchema = z.object({
     message: "You cannot create a post without a caption.",
   }),
 });
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
 const SharedPostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();

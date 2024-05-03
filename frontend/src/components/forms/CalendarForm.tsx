@@ -60,7 +60,7 @@ interface calendarProps {
   action: "create" | "update";
 }
 
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const CalendarForm = ({ province, calendarDetails, action }: calendarProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

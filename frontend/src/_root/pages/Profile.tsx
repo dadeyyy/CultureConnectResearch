@@ -70,7 +70,7 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
     <p className="small-medium lg:base-medium test-dark-2">{label}</p>
   </div>
 );
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const Profile = () => {
   const { id } = useParams();
   const { user } = useUserContext();

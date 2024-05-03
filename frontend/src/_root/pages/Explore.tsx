@@ -112,7 +112,7 @@ type Recommendation = {
   like: Post[];
   interest: Post[];
 };
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
 const Explore = () => {
   const [searchValue, setSearchValue] = useState("");
   const { user } = useUserContext();

@@ -17,7 +17,7 @@ interface userProfile {
   updatedAt: string;
   username: string;
 }
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const FollowCard = ({ userId }: { userId: string }) => {
   const { user, isLoading } = useUserContext();
   const [userProfile, setUserProfile] = useState<userProfile>();

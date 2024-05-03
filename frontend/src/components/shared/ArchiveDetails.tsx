@@ -27,7 +27,7 @@ interface File {
   url: string;
   filename: string;
 }
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const ArchiveDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { province } = useParams<{ province: string }>();

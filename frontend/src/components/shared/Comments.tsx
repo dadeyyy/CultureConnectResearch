@@ -35,7 +35,7 @@ interface UserProfile {
   updatedAt: string;
   username: string;
 }
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const Comments = ({ postId, action, type }: CommentProps) => {
   const { user, isLoading } = useUserContext();
   const [newComment, setNewComment] = useState("");

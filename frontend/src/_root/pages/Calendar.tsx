@@ -63,7 +63,7 @@ interface ICalendar {
   name: string;
   calendars: IEvent[];
 }
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000';
+const server ='http://localhost:8000';
 
 const Calendar = () => {
   const { user } = useUserContext();

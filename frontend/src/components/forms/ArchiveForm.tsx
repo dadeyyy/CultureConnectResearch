@@ -73,7 +73,7 @@ type Archive = {
   province: string;
   updatedAt: string;
 };
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const ArchiveForm: React.FC<ArchiveFormProps> = ({ provinceData, action, archiveData }) => {
   const [province, setProvince] = useState(provinceData);
   const [archive, setArchive] = useState<Archive | null>(null);

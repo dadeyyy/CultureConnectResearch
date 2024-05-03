@@ -28,7 +28,7 @@ const ProfileValidation = z.object({
   email: z.string().email(),
   bio: z.string(),
 });
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server = 'http://localhost:8000'
 const UpdateProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();

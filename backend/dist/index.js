@@ -66,9 +66,6 @@ app.use('/', profileRoute);
 app.use('/', notificationRoute);
 //This middleware will tell the application to use the built react-app
 // app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
-app.get('/test', (req, res) => {
-    res.json({ message: "HELKSJAFDLKSDJFSLDFK" });
-});
 app.all('*', (req, res) => {
     res.json({ message: "HELLO" });
 });

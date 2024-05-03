@@ -38,7 +38,7 @@ interface HeritageProps {
   provinceData: string | undefined;
   action: "Create" | "Update";
 }
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 const HeritageForm = ({ provinceData, action }: HeritageProps) => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);

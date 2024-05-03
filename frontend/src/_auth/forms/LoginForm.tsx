@@ -9,7 +9,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import { useUserContext } from "@/context/AuthContext";
 
-const server = process.env.REACT_APP_BACKEND_PORT || 'http://localhost:8000'
+const server ='http://localhost:8000'
 
 const LoginForm = () => {
   const navigate = useNavigate();
