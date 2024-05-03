@@ -17,7 +17,12 @@ type FileUploaderProps = {
   onFilesRemoved: (removedFileNames: string[]) => void;
 };
 
-const FileUploader = ({ fieldChange, action, photos, onFilesRemoved }: FileUploaderProps) => {
+const FileUploader = ({
+  fieldChange,
+  action,
+  photos,
+  onFilesRemoved,
+}: FileUploaderProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [removedFileNames, setRemovedFileNames] = useState<string[]>([]);
 
@@ -48,7 +53,9 @@ const FileUploader = ({ fieldChange, action, photos, onFilesRemoved }: FileUploa
       setFiles(updatedFiles);
       fieldChange(updatedFiles);
 
-      const newFileUrls = acceptedFiles.map((file) => URL.createObjectURL(file));
+      const newFileUrls = acceptedFiles.map((file) =>
+        URL.createObjectURL(file)
+      );
       const updatedFileUrls = [...fileUrls, ...newFileUrls];
       setFileUrls(updatedFileUrls);
     },
@@ -82,7 +89,10 @@ const FileUploader = ({ fieldChange, action, photos, onFilesRemoved }: FileUploa
     const removedFileName = getRemovedFileNames(index);
 
     if (removedFileName) {
-      setRemovedFileNames((prevRemovedFileNames) => [...prevRemovedFileNames, removedFileName]);
+      setRemovedFileNames((prevRemovedFileNames) => [
+        ...prevRemovedFileNames,
+        removedFileName,
+      ]);
       onFilesRemoved([removedFileName]);
     }
   };
@@ -158,7 +168,11 @@ const FileUploader = ({ fieldChange, action, photos, onFilesRemoved }: FileUploa
               </div>
             ))}
           </div>
-          <Button type="button" className="shad-button_primary" onClick={openFile}>
+          <Button
+            type="button"
+            className="shad-button_primary"
+            onClick={openFile}
+          >
             Click here to add more
           </Button>
           <Button onClick={removeAllFiles} className="mt-4 bg-red-500">
@@ -167,10 +181,21 @@ const FileUploader = ({ fieldChange, action, photos, onFilesRemoved }: FileUploa
         </>
       ) : (
         <div className="flex-center flex-col p-7 h-80 lg:h-[550px]">
-          <img src="/assets/icons/file-upload.svg" width={96} height={77} alt="file upload" />
-          <h3 className="base-medium text-dark-2 mb-2 mt-6">Drag photos here</h3>
+          <img
+            src="/assets/icons/file-upload.svg"
+            width={96}
+            height={77}
+            alt="file upload"
+          />
+          <h3 className="base-medium text-dark-2 mb-2 mt-6">
+            Drag photos here
+          </h3>
           <p className="text-light-4 small-regular mb-6">SVG, PNG, JPG</p>
-          <Button type="button" className="shad-button_primary" onClick={openFile}>
+          <Button
+            type="button"
+            className="shad-button_primary"
+            onClick={openFile}
+          >
             Select from computer
           </Button>
         </div>

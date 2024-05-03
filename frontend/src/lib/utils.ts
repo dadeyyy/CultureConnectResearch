@@ -140,3 +140,35 @@ export type ISharedPost = {
     tags: string[];
   };
 };
+
+export type CheckResult = {
+  alcohol: number;
+  drugs: number;
+  gore: { prob: number };
+  media: { id: string; uri: string };
+  medical_drugs: number;
+  nudity: {
+    sexual_activity: number;
+    sexual_display: number;
+    erotica: number;
+    sextoy: number;
+  };
+  offensive: {
+    prob: number;
+    nazi: number;
+    confederate: number;
+    supremacist: number;
+    terrorist: number;
+  };
+  recreational_drugs: number;
+  request: {
+    id: string;
+    timestamp: number;
+    operations: number;
+  };
+  skull: { prob: number };
+  status: string;
+  weapon: number;
+  weapon_firearm: number;
+  weapon_knife: number;
+};

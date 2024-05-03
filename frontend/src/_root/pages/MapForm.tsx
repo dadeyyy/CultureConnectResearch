@@ -87,7 +87,8 @@ const MapForm: React.FC = () => {
   const [mapData, setMapData] = useState<Point[]>([]);
   type SelectedMarkerType = Point | ArchivePoint | HeritagePoint | null;
 
-  const [selectedMarker, setSelectedMarker] = useState<SelectedMarkerType>(null);
+  const [selectedMarker, setSelectedMarker] =
+    useState<SelectedMarkerType>(null);
   const [lng, setLng] = useState<number>(-70.9);
   const [lat, setLat] = useState<number>(42.35);
   const [zoom, setZoom] = useState<number>(9);
@@ -153,7 +154,9 @@ const MapForm: React.FC = () => {
           el.style.width = "50px";
           el.style.height = "50px";
 
-          const marker = new mapboxgl.Marker(el).setLngLat(item.location.coordinates).addTo(map);
+          const marker = new mapboxgl.Marker(el)
+            .setLngLat(item.location.coordinates)
+            .addTo(map);
           const popup = new mapboxgl.Popup({ offset: 25 });
           const popupContent = document.createElement("div");
           popupContent.innerHTML = `<span>${item.title}</span>`;
@@ -207,10 +210,13 @@ const MapForm: React.FC = () => {
   };
 
   async function handleDeletePost(province: string, id: number) {
-    const response = await fetch(`${server}/${province}/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    const response = await fetch(
+      `http://localhost:8000/heritage/${province}/${id}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
 
     const data = await response.json();
 
@@ -227,7 +233,9 @@ const MapForm: React.FC = () => {
       <div className="lg:w-1/2 xs:w-full absolute gap-2 flex items-center z-10  flex-col p-5">
         <div className="grid grid-cols-3 gap-2 w-full">
           <Button
-            className={`h-full ${parameter === "locations" && "bg-blue-900 text-white"}`}
+            className={`h-full ${
+              parameter === "locations" && "bg-blue-900 text-white"
+            }`}
             onClick={() => {
               setParameter("locations");
               setSelectedMarker(null);
@@ -236,7 +244,9 @@ const MapForm: React.FC = () => {
             Events
           </Button>
           <Button
-            className={`h-full ${parameter === "heritages" && "bg-blue-900 text-white"}`}
+            className={`h-full ${
+              parameter === "heritages" && "bg-blue-900 text-white"
+            }`}
             onClick={() => {
               setParameter("heritages");
               setSelectedMarker(null);
@@ -245,7 +255,9 @@ const MapForm: React.FC = () => {
             Heritages
           </Button>
           <Button
-            className={`h-full ${parameter === "archives" && "bg-blue-900 text-white"}`}
+            className={`h-full ${
+              parameter === "archives" && "bg-blue-900 text-white"
+            }`}
             onClick={() => {
               setParameter("archives");
               setSelectedMarker(null);
@@ -269,7 +281,8 @@ const MapForm: React.FC = () => {
             <SheetHeader>
               <SheetTitle>Add a heritage</SheetTitle>
               <SheetDescription>
-                Add a cultural heritage based on the location you are administering.
+                Add a cultural heritage based on the location you are
+                administering.
               </SheetDescription>
             </SheetHeader>
             <HeritageForm provinceData={user.province} action="Create" />
@@ -283,10 +296,14 @@ const MapForm: React.FC = () => {
           <div className="flex">
             <span className="border border-white border-b-black w-[400px] px-2 mb-5">
               {"title" in selectedMarker && (
-                <h3 className="font-bold my-2 text-2xl">{selectedMarker.title}</h3>
+                <h3 className="font-bold my-2 text-2xl">
+                  {selectedMarker.title}
+                </h3>
               )}
               {"name" in selectedMarker && (
-                <h3 className="font-bold my-2 text-2xl">{selectedMarker.name}</h3>
+                <h3 className="font-bold my-2 text-2xl">
+                  {selectedMarker.name}
+                </h3>
               )}
             </span>
             <button
@@ -311,7 +328,9 @@ const MapForm: React.FC = () => {
                   : ""}
               </p>
               {selectedMarker && "details" in selectedMarker && (
-                <p className="mt-5 overflow-auto h-3/4">{selectedMarker.details}</p>
+                <p className="mt-5 overflow-auto h-3/4">
+                  {selectedMarker.details}
+                </p>
               )}
             </>
           ) : parameter === "archives" ? (
@@ -326,12 +345,14 @@ const MapForm: React.FC = () => {
                   ? `Municipality of ${
                       selectedMarker.municipality &&
                       municipalities[selectedMarker.province]?.find(
-                        (municipal) => municipal.value === selectedMarker.municipality
+                        (municipal) =>
+                          municipal.value === selectedMarker.municipality
                       )?.label
                     } in ${
                       selectedMarker.province &&
-                      provincesTest.find((province) => province.value === selectedMarker.province)
-                        ?.label
+                      provincesTest.find(
+                        (province) => province.value === selectedMarker.province
+                      )?.label
                     }`
                   : ""}
               </p>
@@ -349,7 +370,9 @@ const MapForm: React.FC = () => {
                 </span>
               )}
               {selectedMarker && "description" in selectedMarker && (
-                <p className="mt-5 overflow-auto h-3/4">{selectedMarker.description}</p>
+                <p className="mt-5 overflow-auto h-3/4">
+                  {selectedMarker.description}
+                </p>
               )}
             </>
           ) : (
@@ -367,7 +390,9 @@ const MapForm: React.FC = () => {
                     : ""}
                 </p>
                 {selectedMarker && "description" in selectedMarker && (
-                  <p className="my-3 overflow-auto h-28">{selectedMarker.description}</p>
+                  <p className="my-3 overflow-auto h-28">
+                    {selectedMarker.description}
+                  </p>
                 )}
 
                 <div className="flex flex-col gap-2">
@@ -385,10 +410,15 @@ const MapForm: React.FC = () => {
                   {selectedMarker && "province" in selectedMarker && (
                     <Button
                       onClick={() => {
-                        handleDeletePost(selectedMarker.province, selectedMarker.id);
+                        handleDeletePost(
+                          selectedMarker.province,
+                          selectedMarker.id
+                        );
                       }}
                       variant="ghost"
-                      className={`bg-red-200 w-full ${user.role === "ADMIN" ? "" : "hidden"}`}
+                      className={`bg-red-200 w-full ${
+                        user.role === "ADMIN" ? "" : "hidden"
+                      }`}
                     >
                       Delete
                     </Button>

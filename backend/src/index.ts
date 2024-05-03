@@ -22,9 +22,9 @@ import { errorHandler } from './middleware/errorHandler.js';
 import heritageRoute from './router/heritage.js';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { db } from './utils/db.server.js';
-import path from 'node:path';
 
-if (process.env.NODE_ENV !== 'production') {
+
+if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
 
@@ -33,7 +33,7 @@ const server = createServer(app);
 
 socket(server);
 
-declare module 'express-session' {
+declare module "express-session" {
   interface SessionData {
     user: {
       id: number;
@@ -47,7 +47,7 @@ declare module 'express-session' {
 app.use(express.json());
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: "http://localhost:5173",
     credentials: true, // Enable credentials (including cookies)
   })
 );
@@ -57,7 +57,7 @@ app.use(
     cookie: {
       maxAge: 3600000, // 1 hour
       secure: false, // Set to true if using HTTPS
-      sameSite: 'lax',
+      sameSite: "lax",
     },
     secret: process.env.SESSION_SECRET as string,
     resave: false,
@@ -70,7 +70,7 @@ app.use(
   })
 );
 
-app.use(morgan('tiny'));
+app.use(morgan("tiny"));
 
 //Routers
 
