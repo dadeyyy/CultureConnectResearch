@@ -220,28 +220,103 @@ postRoute.get(
   })
 );
 
-const deleteOldestData = (array: number[]) => {
-  setTimeout(() => {
-    array.shift();
-  }, 2000);
-};
-
-setInterval(() => {
-  deleteOldestData(postIds);
-  deleteOldestData(sharedPostIds);
-}, 5000);
-
-let postIds: number[] = [];
-let sharedPostIds: number[] = [];
-
 //fetch all
+// postRoute.get(
+//   "/post/all",
+//   isAuthenticated,
+//   catchAsync(async (req: Request, res: Response) => {
+//     const limit: number = parseInt(req.query.limit as string) || 1;
+//     const deleteOldestData = (array: number[]) => {
+//       setTimeout(() => {
+//         array.shift();
+//       }, 2000);
+//     };
+
+//     setInterval(() => {
+//       deleteOldestData(postIds);
+//       deleteOldestData(sharedPostIds);
+//     }, 5000);
+
+//     let postIds: number[] = [];
+//     let sharedPostIds: number[] = [];
+
+//     console.log(postIds);
+//     // Fetch existing post IDs
+//     const regularPosts = await db.post.findMany({
+//       include: {
+//         photos: true,
+//         user: true,
+//       },
+//       where: {
+//         isValidated: true,
+//         id: {
+//           notIn: postIds,
+//         },
+//       },
+//       orderBy: {
+//         createdAt: "desc",
+//       },
+//       take: limit,
+//     });
+//     const regularPostsWithType = regularPosts.map((post) => ({
+//       ...post,
+//       type: "regular",
+//     }));
+
+//     const sharedPosts = await db.sharedPost.findMany({
+//       include: {
+//         user: true,
+//       },
+//       where: {
+//         id: {
+//           notIn: sharedPostIds,
+//         },
+//       },
+//       orderBy: {
+//         createdAt: "desc",
+//       },
+//       take: limit,
+//     });
+
+//     const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
+//       ...sharedPost,
+//       type: "shared",
+//     }));
+
+//     const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
+
+//     // Sort combined posts by createdAt
+//     const sortedPosts = allPosts.sort(
+//       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+//     );
+
+//     res.status(200).json(sortedPosts);
+//     regularPosts.forEach((post) => {
+//       postIds.push(post.id);
+//     });
+//     console.log(postIds);
+//     sharedPosts.forEach((post) => {
+//       sharedPostIds.push(post.id);
+//     });
+//     console.log(sharedPostIds);
+//   })
+// );
+
+// fetch all
 postRoute.get(
   "/post/all",
   isAuthenticated,
   catchAsync(async (req: Request, res: Response) => {
-    const limit: number = parseInt(req.query.limit as string) || 1;
-    console.log(postIds);
-    // Fetch existing post IDs
+    const postLimit: number = parseInt(req.query.postLimit as string) || 1;
+    const shareLimit: number = parseInt(req.query.shareLimit as string) || 1;
+    const regularOffset: number = parseInt(req.query.offset as string) || 0;
+    const sharedOffset: number = parseInt(req.query.sharedOffset as string) || 0;
+
+    console.log("postLimit: ", postLimit);
+    console.log("shareLimit: ", shareLimit);
+    console.log("regularOffset: ", regularOffset);
+    console.log("sharedOffset: ", sharedOffset);
+
     const regularPosts = await db.post.findMany({
       include: {
         photos: true,
@@ -249,15 +324,14 @@ postRoute.get(
       },
       where: {
         isValidated: true,
-        id: {
-          notIn: postIds,
-        },
       },
       orderBy: {
         createdAt: "desc",
       },
-      take: limit,
+      skip: regularOffset,
+      take: postLimit,
     });
+
     const regularPostsWithType = regularPosts.map((post) => ({
       ...post,
       type: "regular",
@@ -267,15 +341,11 @@ postRoute.get(
       include: {
         user: true,
       },
-      where: {
-        id: {
-          notIn: sharedPostIds,
-        },
-      },
       orderBy: {
         createdAt: "desc",
       },
-      take: limit,
+      skip: sharedOffset,
+      take: shareLimit,
     });
 
     const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
@@ -291,74 +361,8 @@ postRoute.get(
     );
 
     res.status(200).json(sortedPosts);
-    regularPosts.forEach((post) => {
-      postIds.push(post.id);
-    });
-    console.log(postIds);
-    sharedPosts.forEach((post) => {
-      sharedPostIds.push(post.id);
-    });
-    console.log(sharedPostIds);
   })
 );
-
-//fetch all
-// postRoute.get(
-//   "/post/all",
-//   isAuthenticated,
-//   catchAsync(async (req: Request, res: Response) => {
-//     const limit: number = parseInt(req.query.limit as string) || 1;
-//     const regularOffset: number = parseInt(req.query.offset as string) || 0;
-//     const sharedOffset: number =
-//       parseInt(req.query.sharedOffset as string) || 0; // New offset for shared posts
-
-//     const regularPosts = await db.post.findMany({
-//       include: {
-//         photos: true,
-//         user: true,
-//       },
-//       where: {
-//         isValidated: true,
-//       },
-//       orderBy: {
-//         createdAt: "desc",
-//       },
-//       skip: regularOffset,
-//       take: limit,
-//     });
-
-//     const regularPostsWithType = regularPosts.map((post) => ({
-//       ...post,
-//       type: "regular",
-//     }));
-
-//     const sharedPosts = await db.sharedPost.findMany({
-//       include: {
-//         user: true,
-//       },
-//       orderBy: {
-//         createdAt: "desc",
-//       },
-//       skip: sharedOffset, // Use separate offset for shared posts
-//       take: limit,
-//     });
-
-//     const sharedPostsWithType = sharedPosts.map((sharedPost) => ({
-//       ...sharedPost,
-//       type: "shared",
-//     }));
-
-//     const allPosts = [...regularPostsWithType, ...sharedPostsWithType];
-
-//     // Sort combined posts by createdAt
-//     const sortedPosts = allPosts.sort(
-//       (a, b) =>
-//         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-//     );
-
-//     res.status(200).json(sortedPosts);
-//   })
-// );
 
 // GET SPECIFIC POST
 postRoute.get(

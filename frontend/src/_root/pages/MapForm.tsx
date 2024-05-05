@@ -250,7 +250,7 @@ const MapForm: React.FC = () => {
             events.forEach((item) => {
               const el = document.createElement("div");
               el.className = "marker";
-              el.style.backgroundImage = `url("../public/assets/icons/event-point.svg")`;
+              el.style.backgroundImage = `url("/assets/icons/event-point.svg")`;
 
               el.style.width = "50px";
               el.style.height = "50px";

@@ -20,11 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { provincesTest, municipalities } from "@/lib/provinces";
@@ -36,7 +32,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { IPost } from "@/lib/utils";
 import toast from "react-hot-toast";
 
-const server = 'http://localhost:8000'
+const server = "http://localhost:8000";
 
 const formSchema = z.object({
   caption: z.string().min(0, {
@@ -175,10 +171,7 @@ const PostForm = ({ action, post }: PostFormProps) => {
   };
 
   const handleFilesRemoved = (removedFileNames: string[]) => {
-    setDeletedFiles((prevDeletedFiles) => [
-      ...prevDeletedFiles,
-      ...removedFileNames,
-    ]);
+    setDeletedFiles((prevDeletedFiles) => [...prevDeletedFiles, ...removedFileNames]);
   };
 
   return (
@@ -227,13 +220,11 @@ const PostForm = ({ action, post }: PostFormProps) => {
                             )}
                           >
                             {field.value
-                              ? provincesTest.find(
-                                  (province) => province.value === field.value
-                                )?.label
+                              ? provincesTest.find((province) => province.value === field.value)
+                                  ?.label
                               : post?.province
-                              ? provincesTest.find(
-                                  (province) => province.value === post.province
-                                )?.label
+                              ? provincesTest.find((province) => province.value === post.province)
+                                  ?.label
                               : "Select Province"}
 
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -282,8 +273,7 @@ const PostForm = ({ action, post }: PostFormProps) => {
                               !field.value && "text-muted-foreground"
                             )}
                             disabled={
-                              !selectedProvince ||
-                              !municipalities[selectedProvince]?.length
+                              !selectedProvince || !municipalities[selectedProvince]?.length
                             }
                           >
                             {selectedProvince !== null
@@ -292,8 +282,7 @@ const PostForm = ({ action, post }: PostFormProps) => {
                                 )?.label
                               : post?.province
                               ? (municipalities[post.province] || []).find(
-                                  (municipal) =>
-                                    municipal.value === post.municipality
+                                  (municipal) => municipal.value === post.municipality
                                 )?.label
                               : "Select Municipality"}
 
@@ -307,27 +296,19 @@ const PostForm = ({ action, post }: PostFormProps) => {
                           <CommandEmpty>No municipal found.</CommandEmpty>
                           <CommandGroup className="max-h-[200px] overflow-y-auto">
                             {selectedProvince &&
-                              municipalities[selectedProvince]?.map(
-                                (municipal) => (
-                                  <CommandItem
-                                    value={municipal.label}
-                                    key={municipal.value}
-                                    onSelect={() => {
-                                      form.setValue(
-                                        "municipality",
-                                        municipal.value
-                                      );
-                                      field.onChange(municipal.value); // Update the field.value
-                                      console.log(
-                                        "Selected Municipality:",
-                                        municipal.label
-                                      );
-                                    }}
-                                  >
-                                    {municipal.label}
-                                  </CommandItem>
-                                )
-                              )}
+                              municipalities[selectedProvince]?.map((municipal) => (
+                                <CommandItem
+                                  value={municipal.label}
+                                  key={municipal.value}
+                                  onSelect={() => {
+                                    form.setValue("municipality", municipal.value);
+                                    field.onChange(municipal.value); // Update the field.value
+                                    console.log("Selected Municipality:", municipal.label);
+                                  }}
+                                >
+                                  {municipal.label}
+                                </CommandItem>
+                              ))}
                           </CommandGroup>
                         </Command>
                       </PopoverContent>
@@ -387,18 +368,11 @@ const PostForm = ({ action, post }: PostFormProps) => {
           </div>
         )}
         <div className="flex gap-4 items-center justify-end">
-          <Button
-            type="button"
-            className="shad-button_dark-4"
-            onClick={() => navigate(-1)}
-          >
+          <Button type="button" className="shad-button_dark-4" onClick={() => navigate(-1)}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            className="shad-button_primary whitespace-nowrap"
-          >
-            Submit
+          <Button type="submit" className="shad-button_primary whitespace-nowrap">
+            Upload
           </Button>
         </div>
       </form>

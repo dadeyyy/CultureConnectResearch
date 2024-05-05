@@ -112,7 +112,7 @@ type Recommendation = {
   like: Post[];
   interest: Post[];
 };
-const server = 'http://localhost:8000'
+const server = "http://localhost:8000";
 const Explore = () => {
   const [searchValue, setSearchValue] = useState("");
   const { user } = useUserContext();
@@ -154,6 +154,7 @@ const Explore = () => {
           credentials: "include",
         });
         const data = await response.json();
+        console.log(data);
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -163,7 +164,7 @@ const Explore = () => {
         setIsPostLoading(false);
       } catch (error) {
         console.error("Error fetching posts:", error);
-        setError("Something went wrong while fetching posts. Please try again later.");
+        setError("Something went wrong while fetching suggested posts. Please try again later.");
         setIsPostLoading(false);
       }
     };
@@ -193,6 +194,7 @@ const Explore = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", options);
   };
+  console.log(interestData);
 
   return (
     <div className="flex flex-1 overflow-y-scroll custom-scrollbar">
@@ -223,7 +225,7 @@ const Explore = () => {
             <>
               <span className="text-xl font-bold m-auto">For you</span>
               <hr className="border-2 border-gray-500 w-1/3 m-auto" />
-              {likeData.length > 0 ? (
+              {likeData.length > 0 && (
                 <>
                   <div className="home-posts">
                     <span className="text-lg font-semibold text-start w-full">
@@ -231,10 +233,6 @@ const Explore = () => {
                     </span>
                     {isPostLoading ? (
                       <Loader />
-                    ) : error ? (
-                      <div className="error-container">
-                        <p className="body-medium text-dark-1">Error: {error}</p>
-                      </div>
                     ) : (
                       <>
                         <ul className="flex flex-col flex-1 gap-9 w-full">
@@ -248,9 +246,6 @@ const Explore = () => {
                     )}
                   </div>
                 </>
-              ) : (
-                // <PostSkeleton />
-                <></>
               )}
               {interestData.length > 0 ? (
                 <>
@@ -260,10 +255,6 @@ const Explore = () => {
                     </span>
                     {isPostLoading ? (
                       <Loader />
-                    ) : error ? (
-                      <div className="error-container">
-                        <p className="body-medium text-dark-1">Error: {error}</p>
-                      </div>
                     ) : (
                       <>
                         <ul className="flex flex-col flex-1 gap-9 w-full">

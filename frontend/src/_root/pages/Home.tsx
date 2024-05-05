@@ -24,7 +24,7 @@ type IPost = {
   province: string;
   updatedAt: string;
   user: {
-    avatarUrl: string 
+    avatarUrl: string;
     createdAt: string;
     firstName: string;
     id: number;
@@ -46,7 +46,7 @@ type peopleProps = {
   province?: string;
   avatarUrl: string;
 }[];
-const server ='http://localhost:8000'
+const server = "http://localhost:8000";
 const Home = () => {
   const { user, isLoading } = useUserContext();
   const [postData, setPostData] = useState<IPost[]>([]);
@@ -55,24 +55,24 @@ const Home = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [load, setLoad] = useState(true);
   const observerTarget = useRef<HTMLDivElement>(null);
-  const [selectedSection, setSelectedSection] = useState<
-    "For You" | "Following"
-  >("For You");
+  const [selectedSection, setSelectedSection] = useState<"For You" | "Following">("For You");
   const [people, setPeople] = useState<peopleProps>([]);
   const [peopleLoad, setPeopleLoad] = useState(false);
 
-  // const sharedPostCount = postData.filter(
-  //   (post) => post.type === "shared"
-  // ).length;
-  // const regularPostCount = postData.filter(
-  //   (post) => post.type === "regular"
-  // ).length;
-
-  const fetchPosts = async (limit: number) => {
+  const sharedPostCount = postData.filter((post) => post.type === "shared").length;
+  const regularPostCount = postData.filter((post) => post.type === "regular").length;
+  console.log("regular post: ", regularPostCount);
+  console.log("shared post: ", sharedPostCount);
+  const fetchPosts = async (
+    postLimit: number,
+    shareLimit: number,
+    postCount: number,
+    sharedPost: number
+  ) => {
     try {
-      let endpoint = `http://localhost:8000/post/all?limit=${limit}`;
+      let endpoint = `http://localhost:8000/post/all?postLimit=${postLimit}&shareLimit=${shareLimit}&offset=${postCount}&sharedOffset=${sharedPost}`;
       if (selectedSection === "Following") {
-        endpoint = `http://localhost:8000/following/posts?userId=${user.id}&limit=${limit}`;
+        endpoint = `http://localhost:8000/following/posts?userId=${user.id}&limit=${postLimit}&shareLimit=${shareLimit}&offset=${postCount}&sharedOffset=${sharedPost}`;
       }
       const response = await fetch(endpoint, {
         credentials: "include",
@@ -87,9 +87,7 @@ const Home = () => {
       setLoad(false);
     } catch (error) {
       console.error("Error fetching posts:", error);
-      setError(
-        "Something went wrong while fetching posts. Please try again later."
-      );
+      setError("Something went wrong while fetching posts. Please try again later.");
       setIsPostLoading(false);
       setLoad(false);
     }
@@ -99,7 +97,8 @@ const Home = () => {
   useEffect(() => {
     setPostData([]);
     setIsPostLoading(true);
-    fetchPosts(5);
+    fetchPosts(2, 2, 0, 0);
+    console.log("this is being called");
   }, []);
 
   useEffect(() => {
@@ -107,7 +106,7 @@ const Home = () => {
       (entries) => {
         if (entries[0].isIntersecting && !isPostLoading && !error) {
           setIsLoadingMore(true);
-          fetchPosts(5); // Fetch more posts when scrolling to the end
+          fetchPosts(2, 2, regularPostCount, sharedPostCount); // Fetch more posts when scrolling to the end
         }
       },
       { threshold: 1 }
@@ -122,7 +121,7 @@ const Home = () => {
         observerInstance.unobserve(observerTarget.current);
       }
     };
-  }, [isPostLoading, error, postData.length]); // Add dependencies to useEffect
+  }, [postData.length]);
 
   useEffect(() => {
     const fetchPeople = async () => {
@@ -182,7 +181,7 @@ const Home = () => {
             ) : (
               <ul className="flex flex-col flex-1 w-full">
                 {postData.map((post, index) => (
-                  <li key={post.id} className="flex justify-center w-full">
+                  <li key={index} className="flex justify-center w-full">
                     {post.type === "shared" ? (
                       <SharedPostCard
                         id={post.id}
@@ -196,9 +195,7 @@ const Home = () => {
                     ) : (
                       <PostCard post={post} userId={user.id} />
                     )}
-                    {index === postData.length - 1 && (
-                      <div ref={observerTarget}></div>
-                    )}
+                    {index === postData.length - 1 && <div ref={observerTarget}></div>}
                   </li>
                 ))}
               </ul>

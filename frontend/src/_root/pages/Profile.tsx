@@ -70,7 +70,7 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
     <p className="small-medium lg:base-medium test-dark-2">{label}</p>
   </div>
 );
-const server ='http://localhost:8000'
+const server = "http://localhost:8000";
 const Profile = () => {
   const { id } = useParams();
   const { user } = useUserContext();
@@ -149,7 +149,9 @@ const Profile = () => {
   useEffect(() => {
     const fetchFollowingCount = async () => {
       try {
-        const response = await fetch(`${server}/following-count/${id}`);
+        const response = await fetch(`${server}/following-count/${id}`, {
+          credentials: "include",
+        });
         const data = await response.json();
 
         if (response.ok) {
@@ -164,7 +166,9 @@ const Profile = () => {
 
     const fetchFollowersCount = async () => {
       try {
-        const response = await fetch(`${server}/${id}`);
+        const response = await fetch(`${server}/followers-count/${id}`, {
+          credentials: "include",
+        });
         const data = await response.json();
 
         if (response.ok) {
@@ -184,9 +188,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch(`${server}/user/${id}`,
-          {credentials:'include'}
-        );
+        const response = await fetch(`${server}/user/${id}`, { credentials: "include" });
         const data = await response.json();
         if (response.ok) {
           setCurrentUser((prevUser) => ({
@@ -207,7 +209,7 @@ const Profile = () => {
   useEffect(() => {
     const checkIfFollowing = async () => {
       try {
-        const response = await fetch(`${server}/is-following/${id}`);
+        const response = await fetch(`${server}/is-following/${id}`, { credentials: "include" });
         const data = await response.json();
 
         if (response.ok) {
@@ -232,8 +234,9 @@ const Profile = () => {
 
   const handleFollow = async () => {
     try {
-      const response = await fetch(`${server}:8000/follow`, {
+      const response = await fetch(`${server}/follow`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -258,6 +261,7 @@ const Profile = () => {
     try {
       const response = await fetch(`${server}/unfollow/${id}`, {
         method: "DELETE",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
