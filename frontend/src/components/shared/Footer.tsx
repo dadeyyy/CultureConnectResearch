@@ -1,11 +1,14 @@
 const Footer = () => {
   return (
-    <div className="max-w-[1240px] mx-auto py-16 px-4 grid lg:grid-cols-3 gap-8 text-black">
+    <div
+      className="max-w-[1240px] mx-auto py-16 px-4 grid lg:grid-cols-3 gap-8 text-black"
+      id="contact"
+    >
       <div>
         <img src="/assets/images/logo-2.svg" alt="logo" width={300} height={325} />
         <p className="py-4">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Id odit ullam iste repellat
-          consequatur libero reiciendis, blanditiis accusantium.
+          A Social Media Platform Connecting Different Cultures in the Philippines Utilizing
+          Content-Based Filtering Algorithms
         </p>
         <div className="flex justify-between md:w-[75%] my-6"></div>
       </div>

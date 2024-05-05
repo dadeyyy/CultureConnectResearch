@@ -3,8 +3,8 @@ import { TypeAnimation } from "react-type-animation";
 
 const Hero = () => {
   return (
-    <div className="text-black">
-      <div className="max-w-[800px] mt-[-96px] w-screen h-screen mx-auto text-center flex flex-col items-center justify-center">
+    <div className="text-black" id="home">
+      <div className="max-w-[800px] h-[720px] w-screen mx-auto text-center flex flex-col items-center justify-center">
         <p className="text-gray font-bold p-2">Connecting different cultures in the Philippines</p>
         <img src="/assets/images/logo-2.svg" alt="logo" width={400} height={325} />
         <div className="flex justify-center items-center">

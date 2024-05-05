@@ -10,14 +10,22 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex justify-between items-center h-24 w-screen mx-auto px-20 text-black">
+    <div className="flex justify-between items-center h-24 w-screen mx-auto px-20 text-blac sticky top-0 bg-slate-200">
       <img src="/assets/images/logo.svg" width={50} height={50} />
       <ul className="hidden md:flex items-center">
-        <li className="p-4">Home</li>
-        <li className="p-4">Features</li>
-        <li className="p-4">Who we are</li>
-        <li className="p-4">About</li>
-        <li className="p-4">Contact</li>
+        <li className="p-4">
+          <a href="#home">Home</a>
+        </li>
+        <li className="p-4">
+          <a href="#features">Features</a>
+        </li>
+        <li className="p-4">
+          <a href="#team">Who we are</a>
+        </li>
+        <li className="p-4">
+          {" "}
+          <a href="#contact">Contact Us</a>
+        </li>
         <li>
           <Link to="/signin" className="leftsidebar-create rounded-md font-medium py-3 px-6 ">
             Sign in

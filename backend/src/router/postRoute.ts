@@ -1,17 +1,8 @@
 import express from "express";
-import {
-  isAuthenticated,
-  isAuthor,
-  isProvinceAdmin,
-  validate,
-} from "../middleware/middleware.js";
+import { isAuthenticated, isAuthor, isProvinceAdmin, validate } from "../middleware/middleware.js";
 import { db } from "../utils/db.server.js";
 import { upload, cloudinary } from "../utils/cloudinary.js";
-import {
-  postSchema,
-  postTypeSchema,
-  sharedPostTypeSchema,
-} from "../utils/Schemas.js";
+import { postSchema, postTypeSchema, sharedPostTypeSchema } from "../utils/Schemas.js";
 import { catchAsync } from "../middleware/errorHandler.js";
 import ExpressError from "../middleware/ExpressError.js";
 import { Request, Response } from "express";
@@ -81,17 +72,14 @@ const postRoute = express.Router();
 
 async function validateImage(url: string, id: number) {
   try {
-    const response = await axios.get(
-      "https://api.sightengine.com/1.0/check.json",
-      {
-        params: {
-          url: `${url}`,
-          models: "nudity-2.0,offensive,gore",
-          api_user: "1265562336",
-          api_secret: "kEUrZw2vnrqS2XvArXXe77VCbvFf2k4j",
-        },
-      }
-    );
+    const response = await axios.get("https://api.sightengine.com/1.0/check.json", {
+      params: {
+        url: `${url}`,
+        models: "nudity-2.0,offensive,gore",
+        api_user: "1265562336",
+        api_secret: "kEUrZw2vnrqS2XvArXXe77VCbvFf2k4j",
+      },
+    });
     const result: CheckResult = response.data;
     console.log(result);
     if (!result) {
@@ -200,9 +188,7 @@ postRoute.post(
       },
     });
     if (newPost) {
-      return res
-        .status(201)
-        .json({ message: "Successfully created new post", data: newPost });
+      return res.status(201).json({ message: "Successfully created new post", data: newPost });
     }
 
     throw new ExpressError("Failed to create post", 400);
@@ -243,7 +229,7 @@ const deleteOldestData = (array: number[]) => {
 setInterval(() => {
   deleteOldestData(postIds);
   deleteOldestData(sharedPostIds);
-}, 30000);
+}, 5000);
 
 let postIds: number[] = [];
 let sharedPostIds: number[] = [];
@@ -301,8 +287,7 @@ postRoute.get(
 
     // Sort combined posts by createdAt
     const sortedPosts = allPosts.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     res.status(200).json(sortedPosts);
@@ -524,9 +509,7 @@ postRoute.delete(
       include: { photos: true },
     });
 
-    return res
-      .status(200)
-      .json({ message: `Successfully deleted post! #${deletedPost.id}` });
+    return res.status(200).json({ message: `Successfully deleted post! #${deletedPost.id}` });
   })
 );
 
@@ -549,10 +532,7 @@ postRoute.post(
 
     // Determine if the post is the current user's post, if not, proceed to report
     if (!post || post.user.id === currentUser) {
-      throw new ExpressError(
-        "You cannot report your own post or the post does not exist",
-        403
-      );
+      throw new ExpressError("You cannot report your own post or the post does not exist", 403);
     }
 
     // Check if the user has already reported this post
@@ -604,39 +584,32 @@ postRoute.post(
       return res.json({ deletedReportedPost, message: "Post was deleted" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Post reported successfully", updatedPost });
+    return res.status(200).json({ message: "Post reported successfully", updatedPost });
   })
 );
 
 //get reports via province e
-postRoute.get(
-  "/post/reported/:province",
-  isAuthenticated,
-  isProvinceAdmin,
-  async (req, res) => {
-    const province = req.params.province;
+postRoute.get("/post/reported/:province", isAuthenticated, isProvinceAdmin, async (req, res) => {
+  const province = req.params.province;
 
-    const reportedPosts = await db.post.findMany({
-      where: {
-        reports: {
-          some: {
-            AND: [{ post: { province } }],
-          },
+  const reportedPosts = await db.post.findMany({
+    where: {
+      reports: {
+        some: {
+          AND: [{ post: { province } }],
         },
       },
-      include: {
-        reports: true,
-        user: true,
-        photos: true,
-      },
-    });
-    if (reportedPosts) {
-      return res.status(200).json(reportedPosts);
-    }
+    },
+    include: {
+      reports: true,
+      user: true,
+      photos: true,
+    },
+  });
+  if (reportedPosts) {
+    return res.status(200).json(reportedPosts);
   }
-);
+});
 
 //following posts
 postRoute.get(
@@ -645,8 +618,7 @@ postRoute.get(
   catchAsync(async (req: Request, res: Response) => {
     const limit: number = parseInt(req.query.limit as string) || 1;
     const regularOffset: number = parseInt(req.query.offset as string) || 0;
-    const sharedOffset: number =
-      parseInt(req.query.sharedOffset as string) || 0;
+    const sharedOffset: number = parseInt(req.query.sharedOffset as string) || 0;
     const userId = req.session.user?.id;
 
     const followingIds = await db.followers.findMany({
@@ -706,8 +678,7 @@ postRoute.get(
 
     // Sort combined posts by createdAt
     const sortedPosts = allPosts.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     res.status(200).json(sortedPosts);

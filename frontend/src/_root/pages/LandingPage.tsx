@@ -51,9 +51,8 @@ const LandingPage = () => {
       <Navbar />
       <Hero />
       <Features />
-
       <Cards />
-      <About />
+      {/* <About /> */}
       <Footer />
     </div>
   );

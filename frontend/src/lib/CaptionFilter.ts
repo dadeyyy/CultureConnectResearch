@@ -451,25 +451,41 @@ export const filterInappropriateWords = (text: string): string => {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escape special characters
   };
 
+  let filteredText = text;
+
   const replaceLookalikeCharacters = (word: string): string => {
     let replacedWord = word;
 
     for (const [lookalike, replacement] of Object.entries(lookalikeCharacters)) {
       const regex = new RegExp(escapeRegExp(lookalike), "gi");
       replacedWord = replacedWord.replace(regex, replacement);
-    }
 
+      inappropriateWords.forEach((word) => {
+        // const replacedWord = replaceLookalikeCharacters(word);
+        const regex = new RegExp(`\\b${escapeRegExp(replacedWord)}\\b`, "gi");
+
+        if (replacedWord.match(regex)) {
+          replacedWord = replacedWord.replace(regex, (match) => {
+            return match.replace(/[aeiouAEIOU]/g, "*");
+          });
+        }
+      });
+    }
     return replacedWord;
   };
 
-  let filteredText = replaceLookalikeCharacters(text);
+  const convertedText = replaceLookalikeCharacters(text);
 
   inappropriateWords.forEach((word) => {
-    const replacedWord = replaceLookalikeCharacters(word);
+    // const replacedWord = replaceLookalikeCharacters(word);
+    const replacedWord = "ako ay ungas";
     const regex = new RegExp(`\\b${escapeRegExp(replacedWord)}\\b`, "gi");
-    filteredText = filteredText.replace(regex, (match) => {
-      return match.replace(/[aeiouAEIOU]/g, "*"); // Replace vowels with asterisks
-    });
+
+    if (convertedText.match(regex)) {
+      filteredText = convertedText.replace(regex, (match) => {
+        return match.replace(/[aeiouAEIOU]/g, "*");
+      });
+    }
   });
 
   return filteredText;

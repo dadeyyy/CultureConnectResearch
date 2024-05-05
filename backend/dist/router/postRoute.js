@@ -1,8 +1,8 @@
 import express from "express";
-import { isAuthenticated, isAuthor, isProvinceAdmin, validate, } from "../middleware/middleware.js";
+import { isAuthenticated, isAuthor, isProvinceAdmin, validate } from "../middleware/middleware.js";
 import { db } from "../utils/db.server.js";
 import { upload, cloudinary } from "../utils/cloudinary.js";
-import { postSchema, } from "../utils/Schemas.js";
+import { postSchema } from "../utils/Schemas.js";
 import { catchAsync } from "../middleware/errorHandler.js";
 import ExpressError from "../middleware/ExpressError.js";
 import axios from "axios";
@@ -142,9 +142,7 @@ postRoute.post("/post", isAuthenticated, upload.array("image"), validate(postSch
         },
     });
     if (newPost) {
-        return res
-            .status(201)
-            .json({ message: "Successfully created new post", data: newPost });
+        return res.status(201).json({ message: "Successfully created new post", data: newPost });
     }
     throw new ExpressError("Failed to create post", 400);
 }));
@@ -174,7 +172,7 @@ const deleteOldestData = (array) => {
 setInterval(() => {
     deleteOldestData(postIds);
     deleteOldestData(sharedPostIds);
-}, 30000);
+}, 5000);
 let postIds = [];
 let sharedPostIds = [];
 //fetch all
@@ -398,9 +396,7 @@ postRoute.delete("/post/:postId", isAuthenticated, catchAsync(async (req, res) =
         },
         include: { photos: true },
     });
-    return res
-        .status(200)
-        .json({ message: `Successfully deleted post! #${deletedPost.id}` });
+    return res.status(200).json({ message: `Successfully deleted post! #${deletedPost.id}` });
 }));
 postRoute.post("/post/:postId/report", catchAsync(async (req, res) => {
     const { postId } = req.params;
@@ -462,9 +458,7 @@ postRoute.post("/post/:postId/report", catchAsync(async (req, res) => {
         });
         return res.json({ deletedReportedPost, message: "Post was deleted" });
     }
-    return res
-        .status(200)
-        .json({ message: "Post reported successfully", updatedPost });
+    return res.status(200).json({ message: "Post reported successfully", updatedPost });
 }));
 //get reports via province e
 postRoute.get("/post/reported/:province", isAuthenticated, isProvinceAdmin, async (req, res) => {
