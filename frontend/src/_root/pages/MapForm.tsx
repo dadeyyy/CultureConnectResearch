@@ -30,7 +30,9 @@ interface Point {
     type: string;
     coordinates: [number, number];
   };
-  date: string;
+  startDate: string;
+  endDate: string;
+  repeat: string;
   createdAt: string;
   updatedAt: string;
   provinceId: string;
@@ -416,7 +418,7 @@ const MapForm: React.FC = () => {
           <div className="absolute bg-white px-5 py-10 xs:py-5 shadow-lg rounded-lg lg:top-0 lg:right-0 xs:bottom-0 xs:top-48 h-full w-[450px] xs:max-w-screen-sm opacity-90">
             <div className="flex">
               <span className="border border-white border-b-black w-[400px] px-2 mb-5">
-                <h3 className="font-bold my-2 text-2xl">{event.title}</h3>
+                <h3 className="font-bold my-2 text-2xl capitalize">{event.title}</h3>
               </span>
               <button
                 onClick={() => setEvent(null)}
@@ -425,7 +427,13 @@ const MapForm: React.FC = () => {
                 <img src={"/assets/icons/close.svg"} />
               </button>
             </div>
-            <h2 className="font-semibold mb-1">Date: {formatDateToWord(event.date)}</h2>
+            <h2 className="font-semibold mb-1">
+              Date:{" "}
+              {event.repeat === "once"
+                ? formatDateToWord(event.startDate)
+                : `${formatDateToWord(event.startDate)} to ${formatDateToWord(event.endDate)}`}
+            </h2>
+            <h2 className="font-semibold mb-1 capitalize">Repeat: {event.repeat}</h2>
             <p className="font-semibold mb-1">{event.municipality}</p>
             <p className="mt-5 overflow-auto h-3/4">{event.details}</p>
           </div>
@@ -434,7 +442,7 @@ const MapForm: React.FC = () => {
           <div className="absolute bg-white px-5 py-10 xs:py-5 shadow-lg rounded-lg lg:top-0 lg:right-0 xs:bottom-0 xs:top-48 h-full w-[450px] xs:max-w-screen-sm opacity-90">
             <div className="flex">
               <span className="border border-white border-b-black w-[400px] px-2 mb-5">
-                <h3 className="font-bold my-2 text-2xl">{archive.title}</h3>
+                <h3 className="font-bold my-2 text-2xl capitalize">{archive.title}</h3>
               </span>
               <button
                 onClick={() => setArchive(null)}
@@ -465,7 +473,7 @@ const MapForm: React.FC = () => {
           <div className="absolute bg-white px-5 py-10 xs:py-5 shadow-lg rounded-lg lg:top-0 lg:right-0 xs:bottom-0 xs:top-48 h-full w-[450px] xs:max-w-screen-sm opacity-90">
             <div className="flex">
               <span className="border border-white border-b-black w-[400px] px-2 mb-5">
-                <h3 className="font-bold my-2 text-2xl">{heritage.name}</h3>
+                <h3 className="font-bold my-2 text-2xl capitalize">{heritage.name}</h3>
               </span>
               <button
                 onClick={() => setHeritage(null)}

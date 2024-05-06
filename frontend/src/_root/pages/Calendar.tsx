@@ -361,7 +361,7 @@ const Calendar = () => {
                   <div className="flex">
                     <Label className="mr-5 font-extrabold text-lg">Event Date: </Label>
                     <Label className="text-lg font-regular">
-                      {calendarDetails?.endDate === null
+                      {calendarDetails?.repeat === "once"
                         ? formatDateToWord(calendarDetails.startDate)
                         : `${formatDateToWord(calendarDetails.startDate)} to ${formatDateToWord(
                             calendarDetails.endDate
